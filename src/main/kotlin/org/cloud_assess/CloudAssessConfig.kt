@@ -1,6 +1,7 @@
 package org.cloud_assess
 
 import ch.kleis.lcaac.core.lang.SymbolTable
+import ch.kleis.lcaac.core.lang.evaluator.Evaluator
 import ch.kleis.lcaac.core.math.basic.BasicNumber
 import ch.kleis.lcaac.core.math.basic.BasicOperations
 import ch.kleis.lcaac.grammar.Loader
@@ -35,5 +36,12 @@ class CloudAssessConfig {
             .asSequence()
         val loader = Loader(BasicOperations)
         return loader.load(files)
+    }
+
+    @Bean
+    fun basicEvaluator(
+        symbolTable: SymbolTable<BasicNumber>,
+    ): Evaluator<BasicNumber> {
+        return Evaluator(symbolTable, BasicOperations)
     }
 }
