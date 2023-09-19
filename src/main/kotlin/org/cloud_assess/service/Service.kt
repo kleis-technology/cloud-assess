@@ -3,11 +3,11 @@ package org.cloud_assess.service
 import ch.kleis.lcaac.core.assessment.ContributionAnalysisProgram
 import ch.kleis.lcaac.core.lang.evaluator.Evaluator
 import ch.kleis.lcaac.core.lang.expression.*
+import ch.kleis.lcaac.core.lang.value.IndicatorValue
+import ch.kleis.lcaac.core.lang.value.ProductValue
 import ch.kleis.lcaac.core.math.basic.BasicNumber
 import ch.kleis.lcaac.core.math.basic.BasicOperations
-import org.cloud_assess.dto.InternalWorkloadDto
-import org.cloud_assess.dto.VirtualMachineDto
-import org.cloud_assess.dto.VirtualMachineListAssessmentDto
+import org.cloud_assess.dto.*
 import org.springframework.stereotype.Service
 
 @Service
@@ -71,8 +71,61 @@ class Service(
              */
             val program = ContributionAnalysisProgram(systemValue, entryPoint)
             val analysis = program.run()
+
+            /*
+                Results
+             */
+            val results = vms.map { vm ->
+                val id = vm.id
+                val qty = QuantityDto(1.0, "hour")
+                val meta = vm.meta
+
+                val source = analysis.getObservablePorts().getElements()
+                    .filterIsInstance<ProductValue<BasicNumber>>()
+                    .firstOrNull { it.fromProcessRef?.arguments?.get("id")?.toString() == id }
+                    ?: throw IllegalStateException("no impacts found for id=$id")
+                val impacts = Indicator.entries.associate { indicator ->
+                    val target = analysis.getControllablePorts().getElements()
+                        .filterIsInstance<IndicatorValue<BasicNumber>>()
+                        .firstOrNull { it.name == indicator.name }
+                        ?: throw IllegalStateException("no impact found for indicator=${indicator.name}")
+                    val impact = analysis.getPortContribution(source, target)
+                    indicator.name to ImpactDto(
+                        total = QuantityDto(
+                            impact.amount.value,
+                            impact.unit.toString(),
+                        )
+                    )
+                }
+                AssessmentDto(
+                    request = RequestDto(
+                        id = id,
+                        quantity = qty,
+                        meta = meta,
+                    ),
+                    impacts = ImpactsDto(
+                        ADPe = impacts["ADPe"]!!,
+                        ADPf = impacts["ADPf"]!!,
+                        AP = impacts["AP"]!!,
+                        GWP = impacts["GWP"]!!,
+                        LU = impacts["LU"]!!,
+                        ODP = impacts["ODP"]!!,
+                        PM = impacts["PM"]!!,
+                        POCP = impacts["POCP"]!!,
+                        WU = impacts["WU"]!!,
+                        CTUe = impacts["CTUe"]!!,
+                        CTUh_c = impacts["CTUh_c"]!!,
+                        CTUh_nc = impacts["CTUh_nc"]!!,
+                        Epf = impacts["Epf"]!!,
+                        Epm = impacts["Epm"]!!,
+                        Ept = impacts["Ept"]!!,
+                        IR = impacts["IR"]!!,
+                    )
+                )
+            }
+
             return VirtualMachineListAssessmentDto(
-                virtualMachines = emptyList(),
+                virtualMachines = results,
             )
         }
     }
