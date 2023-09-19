@@ -18,7 +18,7 @@ import java.nio.file.Paths
 import kotlin.io.path.isRegularFile
 
 @Configuration
-class CloudAssessConfig {
+class Config {
     @Bean
     fun lcaFiles(
         @Value("classpath:model") modelDirectory: File,

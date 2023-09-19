@@ -12,7 +12,6 @@ process internal_workload {
         total_slots workload
     }
     inputs {
-        // ram_size ram from infra_layer.pool_ram
         ram_size ram from pool_ram(
                      q_small = q_small,
                      q_medium = q_medium,
