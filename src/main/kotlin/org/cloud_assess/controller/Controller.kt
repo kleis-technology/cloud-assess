@@ -1,7 +1,7 @@
 package org.cloud_assess.controller
 
-import org.cloud_assess.dto.ServiceLayerDto
-import org.cloud_assess.dto.VirtualMachineListAssessmentDto
+import org.cloud_assess.dto.request.ServiceLayerDto
+import org.cloud_assess.dto.response.VirtualMachineListAssessmentDto
 import org.cloud_assess.service.Service
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody

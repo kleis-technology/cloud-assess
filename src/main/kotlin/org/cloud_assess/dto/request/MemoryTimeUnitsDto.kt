@@ -1,4 +1,4 @@
-package org.cloud_assess.dto
+package org.cloud_assess.dto.request
 
 import com.fasterxml.jackson.annotation.JsonProperty
 

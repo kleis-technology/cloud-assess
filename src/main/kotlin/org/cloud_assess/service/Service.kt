@@ -7,7 +7,10 @@ import ch.kleis.lcaac.core.lang.value.IndicatorValue
 import ch.kleis.lcaac.core.lang.value.ProductValue
 import ch.kleis.lcaac.core.math.basic.BasicNumber
 import ch.kleis.lcaac.core.math.basic.BasicOperations
-import org.cloud_assess.dto.*
+import org.cloud_assess.dto.request.InternalWorkloadDto
+import org.cloud_assess.dto.request.VirtualMachineDto
+import org.cloud_assess.dto.response.VirtualMachineListAssessmentDto
+import org.cloud_assess.dto.response.*
 import org.springframework.stereotype.Service
 
 @Service
