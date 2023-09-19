@@ -1,5 +1,8 @@
 package org.cloud_assess.dto
 
-enum class MemoryTimeUnitsDto(symbol: String) {
-    GB_HOUR("GB_hour")
+import com.fasterxml.jackson.annotation.JsonProperty
+
+enum class MemoryTimeUnitsDto {
+    @JsonProperty("GB_hour")
+    GB_HOUR
 }
