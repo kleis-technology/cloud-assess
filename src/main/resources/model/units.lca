@@ -1,0 +1,79 @@
+unit workload_slot {
+    symbol = "workload_slot"
+    dimension = "workload"
+}
+
+unit GB {
+    symbol = "GB"
+    dimension = "memory"
+}
+
+unit TB {
+    symbol = "TB"
+    alias_for = 1000 GB
+}
+
+unit kgCO2eq {
+    symbol = "kgCO2eq"
+    dimension = "CO2eq"
+}
+
+unit gCO2eq {
+    symbol = "gCO2eq"
+    alias_for = 0.001 kgCO2eq
+}
+
+unit kgSBeq {
+    symbol = "kgSBeq"
+    dimension = "SBeq"
+}
+
+unit mol_Hplus_eq {
+    symbol = "mol H+eq"
+    dimension = "Hplus_eq"
+}
+
+unit kgCFC11eq {
+    symbol = "kgCFC11eq"
+    dimension = "CFC11eq"
+}
+
+unit disease_occurrence {
+    symbol = "disease occurrence"
+    dimension = "disease_occurrence"
+}
+
+unit kgNMVOCeq {
+    symbol = "kgNMVOCeq"
+    dimension = "NMVOCeq"
+}
+
+unit CTUe {
+    symbol = "CTUe"
+    dimension = "CTUe"
+}
+
+unit CTUh {
+    symbol = "CTUh"
+    dimension = "CTUh"
+}
+
+unit kgPeq {
+    symbol = "kgPeq"
+    dimension = "Peq"
+}
+
+unit kgNeq {
+    symbol = "kgNeq"
+    dimension = "Neq_mass"
+}
+
+unit molNeq {
+    symbol = "molNeq"
+    dimension = "Neq_quantity"
+}
+
+unit kgU235eq {
+    symbol = "kgU235eq"
+    dimension = "U235eq"
+}

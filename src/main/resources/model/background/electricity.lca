@@ -1,0 +1,29 @@
+process electricity_mix {
+    labels {
+        geo = "GLO"
+    }
+    products {
+        1 kWh electricity
+    }
+    impacts {
+        0.00000271 kgSBeq ADPe
+        9.78 MJ ADPf
+        0.00389 mol_Hplus_eq AP
+        14.4 CTUe CTUe
+        2.04e-10 CTUh CTUh_c
+        7.73e-9 CTUh CTUh_nc
+        0.000383 kgPeq Epf
+        0.000723 kgNeq Epm
+        0.00728 molNeq Ept
+        0.762 kgCO2eq GWP
+        0.00235 kgCO2eq GWPf
+        0.758 kgCO2eq GWPlu
+        0.00157 kgU235eq IR
+        0.109 u LU
+        1.63 kgCFC11eq ODP
+        3.18e-8 disease_occurrence PM
+        2.82e-8 kgNMVOCeq POCP
+        0.00195 m3 WU
+        0.12 MJ TPE
+    }
+}
