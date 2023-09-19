@@ -5,6 +5,7 @@ import ch.kleis.lcaac.core.lang.evaluator.Evaluator
 import ch.kleis.lcaac.core.math.basic.BasicNumber
 import ch.kleis.lcaac.core.math.basic.BasicOperations
 import ch.kleis.lcaac.grammar.Loader
+import ch.kleis.lcaac.grammar.LoaderOption
 import ch.kleis.lcaac.grammar.parser.LcaLangLexer
 import ch.kleis.lcaac.grammar.parser.LcaLangParser
 import org.antlr.v4.runtime.CharStreams
@@ -35,7 +36,7 @@ class Config {
             .toList()
             .asSequence()
         val loader = Loader(BasicOperations)
-        return loader.load(files)
+        return loader.load(files, listOf(LoaderOption.WITH_PRELUDE))
     }
 
     @Bean
