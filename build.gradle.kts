@@ -1,6 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
+	id("maven-publish")
 	id("org.springframework.boot") version "3.1.3"
 	id("io.spring.dependency-management") version "1.1.3"
 	kotlin("jvm") version "1.8.22"
@@ -18,6 +19,15 @@ java {
 repositories {
 	mavenLocal() // TODO: Remove once ch.kleis.lcaac.{core, grammar} are publicly available.
 	mavenCentral()
+	maven {
+		name = "github"
+		url = uri("https://maven.pkg.github.com/kleis-technology/lca-plugin")
+		credentials {
+			username = System.getenv("GITHUB_ACTOR")
+			password = System.getenv("GITHUB_TOKEN")
+		}
+	}
+
 }
 
 dependencies {
@@ -47,3 +57,4 @@ tasks.withType<KotlinCompile> {
 tasks.withType<Test> {
 	useJUnitPlatform()
 }
+
