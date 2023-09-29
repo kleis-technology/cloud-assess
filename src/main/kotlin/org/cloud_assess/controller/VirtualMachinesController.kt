@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-class Controller(
+class VirtualMachinesController(
     private val prepareService: PrepareService,
     private val adapterService: AdapterService,
     private val executionService: ExecutionService,

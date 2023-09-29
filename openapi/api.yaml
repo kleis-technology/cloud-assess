@@ -21,6 +21,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/VirtualMachineListAssessmentDto'
+  /health:
+    get:
+      summary: Health endpoint
+      operationId: health
+      responses:
+        '200':
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthStatusDto'
 components:
   schemas:
     VirtualMachineListAssessmentDto:
@@ -184,6 +195,10 @@ components:
       type: string
       enum:
         - GB_hour
-
-
-
+    HealthStatusDto:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - UP

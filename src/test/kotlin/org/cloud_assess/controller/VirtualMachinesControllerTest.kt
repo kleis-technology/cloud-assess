@@ -28,8 +28,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @ExtendWith(SpringExtension::class)
-@WebMvcTest(controllers = [Controller::class])
-class ControllerTest {
+@WebMvcTest(controllers = [VirtualMachinesController::class])
+class VirtualMachinesControllerTest {
     @TestConfiguration
     class ControllerTestConfig {
         @Bean
