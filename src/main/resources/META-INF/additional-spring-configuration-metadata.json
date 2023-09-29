@@ -1,0 +1,9 @@
+{
+  "properties": [
+    {
+      "name": "lca.path",
+      "type": "java.lang.String",
+      "description": "Path to LCA as CODE model directory."
+    }
+  ]
+}

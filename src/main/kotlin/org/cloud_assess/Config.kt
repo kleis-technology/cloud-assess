@@ -22,7 +22,7 @@ import kotlin.io.path.isRegularFile
 class Config {
     @Bean
     fun lcaFiles(
-        @Value("classpath:model") modelDirectory: File,
+        @Value("\${lca.path}") modelDirectory: File,
     ): SymbolTable<BasicNumber> {
         val files = Files.walk(Paths.get(modelDirectory.path))
             .filter { it.isRegularFile() }
