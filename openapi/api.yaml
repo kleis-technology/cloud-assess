@@ -1,0 +1,189 @@
+openapi: "3.0.0"
+info:
+  title: Cloud Assess
+  version: 1.0.0
+paths:
+  /virtual_machines:
+    post:
+      summary: Assess a collection of virtual machines
+      operationId: assessVirtualMachines
+      requestBody:
+        description: Collection of virtual machines to assess
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceLayerDto'
+      responses:
+        '200':
+          description: Assessment of virtual machines
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VirtualMachineListAssessmentDto'
+components:
+  schemas:
+    VirtualMachineListAssessmentDto:
+      type: object
+      required: 
+        - virtual_machines
+      properties:
+        virtual_machines:
+          type: array
+          items:
+            $ref: '#/components/schemas/AssessmentDto'
+    AssessmentDto:
+      type: object
+      required:
+        - request
+        - impacts
+      properties:
+        request:
+          $ref: '#/components/schemas/RequestDto'
+        impacts:
+          $ref: '#/components/schemas/ImpactsDto'
+    RequestDto:
+      type: object
+      required:
+        - id
+        - quantity
+        - meta
+      properties:
+        id:
+          type: string
+        quantity:
+          $ref: '#/components/schemas/QuantityDto'
+        meta:
+          type: object
+          default: {}
+          additionalProperties:
+            type: string
+    QuantityDto:
+      type: object
+      required:
+        - amount
+        - unit
+      properties:
+        amount:
+          type: number
+          format: double
+        unit:
+          type: string
+    ImpactsDto:
+      type: object
+      required:
+        - ADPe
+        - ADPf
+        - AP
+        - GWP
+        - LU
+        - ODP
+        - PM
+        - POCP
+        - WU
+        - CTUe
+        - CTUh_c
+        - CTUh_nc
+        - Epf
+        - Epm
+        - Ept
+        - IR
+      properties:
+        ADPe:
+          $ref: '#/components/schemas/ImpactDto'
+        ADPf:
+          $ref: '#/components/schemas/ImpactDto'
+        AP:
+          $ref: '#/components/schemas/ImpactDto'
+        GWP:
+          $ref: '#/components/schemas/ImpactDto'
+        LU:
+          $ref: '#/components/schemas/ImpactDto'
+        ODP:
+          $ref: '#/components/schemas/ImpactDto'
+        PM:
+          $ref: '#/components/schemas/ImpactDto'
+        POCP:
+          $ref: '#/components/schemas/ImpactDto'
+        WU:
+          $ref: '#/components/schemas/ImpactDto'
+        CTUe:
+          $ref: '#/components/schemas/ImpactDto'
+        CTUh_c:
+          $ref: '#/components/schemas/ImpactDto'
+        CTUh_nc:
+          $ref: '#/components/schemas/ImpactDto'
+        Epf:
+          $ref: '#/components/schemas/ImpactDto'
+        Epm:
+          $ref: '#/components/schemas/ImpactDto'
+        Ept:
+          $ref: '#/components/schemas/ImpactDto'
+        IR:
+          $ref: '#/components/schemas/ImpactDto'
+    ImpactDto:
+      type: object
+      required:
+        - total
+      properties:
+        total:
+          $ref: '#/components/schemas/QuantityDto'
+    ServiceLayerDto:
+      type: object
+      required:
+        - internal_workload
+        - virtual_machines
+      properties:
+        internal_workload:
+          $ref: '#/components/schemas/InternalWorkloadDto'
+        virtual_machines:
+          type: array
+          items:
+            $ref: '#/components/schemas/VirtualMachineDto'
+    InternalWorkloadDto:
+      type: object
+      required:
+        - ram
+        - storage
+      properties:
+        ram:
+          $ref: '#/components/schemas/QuantityMemoryTimeDto'
+        storage:
+          $ref: '#/components/schemas/QuantityMemoryTimeDto'
+    VirtualMachineDto:
+      type: object
+      required:
+        - id
+        - ram
+        - storage
+        - meta
+      properties:
+        id:
+          type: string
+        ram:
+          $ref: '#/components/schemas/QuantityMemoryTimeDto'
+        storage:
+          $ref: '#/components/schemas/QuantityMemoryTimeDto'
+        meta:
+          type: object
+          default: {}
+          additionalProperties:
+            type: string
+    QuantityMemoryTimeDto:
+      type: object
+      required:
+        - amount
+        - unit
+      properties:
+        amount:
+          type: number
+          format: double
+        unit:
+          $ref: '#/components/schemas/MemoryTimeUnitsDto'
+    MemoryTimeUnitsDto:
+      type: string
+      enum:
+        - GB_hour
+
+
+
