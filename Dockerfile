@@ -16,8 +16,8 @@ FROM eclipse-temurin:17
 LABEL org.opencontainers.image.source=https://github.com/kleis-technology/cloud-assess
 LABEL org.opencontainers.image.description="Cloud assess image"
 LABEL org.opencontainers.image.licenses="MIT"
-LABEL vendor1="Resilio"
-LABEL vendor2="Kleis Technology Sàrl"
+LABEL vendor1="Kleis Technology Sàrl"
+LABEL vendor2="Resilio"
 
 ARG DEPENDENCY=/build/libs
 
