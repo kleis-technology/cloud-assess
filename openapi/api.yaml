@@ -58,7 +58,6 @@ components:
       required:
         - id
         - quantity
-        - meta
       properties:
         id:
           type: string
