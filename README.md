@@ -5,7 +5,9 @@ This is the official repository for Cloud Assess.
 ## LCA Models
 
 The LCA models are presented under the folder `models`.
-They are written in the `LCA as Code` language, and are directly loaded in the server to perform the assessments.
+They are written in the `LCA as Code` <a href="https://lca-as-code.com">language</a>, and are directly loaded in the server to perform the assessments.
+Note that the background data (emission factors for electricity, and equipments) are mock data.
+Please use the appropriate background data.
 
 ## Run locally
 
