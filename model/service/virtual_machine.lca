@@ -1,7 +1,5 @@
 process virtual_machine {
     params {
-        id = "vm"
-
         // VM usage
         ram_size = 16 GB * hour
         storage_size = 260 GB * hour
