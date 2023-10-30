@@ -13,7 +13,7 @@ Please use the appropriate background data.
 
 The server is available as a docker image.
 ```bash
-docker run -p 8080:8080 -v models:/models ghcr.io/kleis-technology/cloud-assess/cloud-assess-app:<version> 
+docker run -p 8080:8080 -v trusted_library:/trusted_library ghcr.io/kleis-technology/cloud-assess/cloud-assess-app:<version> 
 ```
 
 Test the server

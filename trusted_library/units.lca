@@ -1,0 +1,14 @@
+unit workload_slot {
+    symbol = "workload_slot"
+    dimension = "workload"
+}
+
+unit GB {
+    symbol = "GB"
+    dimension = "memory"
+}
+
+unit TB {
+    symbol = "TB"
+    alias_for = 1000 GB
+}
