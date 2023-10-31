@@ -1,0 +1,40 @@
+name: Run Gradle Test
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: test
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.properties.outputs.version }}
+      changelog: ${{ steps.properties.outputs.changelog }}
+    steps:
+      # Check out current repository
+      - name: Fetch Sources
+        uses: actions/checkout@v3.5.1
+
+      # Validate wrapper
+      - name: Gradle Wrapper Validation
+        uses: gradle/wrapper-validation-action@v1.0.6
+
+      # Setup Java 17 environment for the next steps
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: zulu
+          java-version: 17
+          cache: gradle
+
+      - name: Run Tests
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ./gradlew test
+

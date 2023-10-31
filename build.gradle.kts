@@ -17,17 +17,15 @@ java {
 }
 
 repositories {
-	mavenLocal() // TODO: Remove once ch.kleis.lcaac.{core, grammar} are publicly available.
 	mavenCentral()
 	maven {
 		name = "github"
-		url = uri("https://maven.pkg.github.com/kleis-technology/lca-plugin")
+		url = uri("https://maven.pkg.github.com/kleis-technology/cloud-assess")
 		credentials {
 			username = System.getenv("GITHUB_ACTOR")
 			password = System.getenv("GITHUB_TOKEN")
 		}
 	}
-
 }
 
 dependencies {
