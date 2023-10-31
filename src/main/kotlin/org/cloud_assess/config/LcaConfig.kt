@@ -1,4 +1,4 @@
-package org.cloud_assess
+package org.cloud_assess.config
 
 import ch.kleis.lcaac.core.lang.SymbolTable
 import ch.kleis.lcaac.core.lang.evaluator.Evaluator
@@ -13,13 +13,15 @@ import org.antlr.v4.runtime.CommonTokenStream
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.web.servlet.config.annotation.CorsRegistry
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
 import kotlin.io.path.isRegularFile
 
 @Configuration
-class Config {
+class LcaConfig {
     @Bean
     fun lcaFiles(
         @Value("\${lca.path}") modelDirectory: File,

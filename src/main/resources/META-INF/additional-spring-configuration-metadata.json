@@ -4,6 +4,16 @@
       "name": "lca.path",
       "type": "java.lang.String",
       "description": "Path to LCA as CODE model directory."
+    },
+    {
+      "name": "cors.allowed-origin",
+      "type": "java.lang.String",
+      "description": "CORS allowed origin."
+    },
+    {
+      "name": "cors.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Enable CORS."
     }
   ]
 }
