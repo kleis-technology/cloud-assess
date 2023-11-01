@@ -24,24 +24,46 @@ the environmental impacts of cloud services.
 
 ## Getting Started
 
-### Docker run
-
-The server is available as a docker image.
+First, you need to clone this repository:
 ```bash
-docker run -p 8080:8080 \
-  -v trusted_library:/trusted_library \
-  -e SPRING_PROFILES_ACTIVE='localhost' \
-  ghcr.io/kleis-technology/cloud-assess/cloud-assess-app:latest
+git checkout git@github.com:kleis-technology/cloud-assess.git
+cd cloud-assess
 ```
+All the commands in the sections below are to be run from the root of this repository.
+We assume that you will run these commands in bash. 
+If you are using another shell, please adapt the commands accordingly.
+
+
+### Docker-compose
+
+You can run the server using `docker-compose`.
+```bash
+docker compose up -d
+```
+
+The API specification is available in the folder `openapi`.
+For a more interactive visualisation of the API, the `docker-compose`
+also spins up a swagger ui instance. 
+Visit this [page](http://localhost) to explore the endpoints, DTOs and run example queries.
 
 ### Local build and run
 
-To build the server, you need to create [GitHub personal access token (classic)](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic) 
-with the permission `read:packages` to download packages from GitHub Package Registry.
-Then, execute
+#### Requirements
+
+To build the server, you will need 
+* Java 17 (temurin) environment
+* A [GitHub personal access token (classic)](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic) with the permission `read:packages` to download packages from GitHub Package Registry.
+
+Then, set up the following environment variables.
 ```bash
 export GITHUB_ACTOR=<your GitHub username>
 export GITHUB_TOKEN=<the token you just created>
+```
+
+#### Procedure
+
+From the root of the git repository, run
+```bash
 ./gradlew build
 ```
 
@@ -49,17 +71,8 @@ To run the server locally
 ```bash
 SPRING_PROFILES_ACTIVE=localhost ./gradlew bootRun
 ```
-The server should start listening requests on `localhost:8080`.
+The server should start listening for requests on `localhost:8080`.
 
-### Swagger UI
-
-The API specification is available in the folder `openapi`.
-For a more interactive visualisation of the API, run
-```bash
-docker run -p 80:8080 -e SWAGGER_JSON=/app/api.yaml -v ./openapi:/app swaggerapi/swagger-ui
-```
-and visit the Swagger UI [page](http://localhost). 
-There, you can explore the endpoints, DTOs and run example queries.
 
 ## First Assessment
 
@@ -105,7 +118,7 @@ but that are not directly associated with clients.
 
 Running this request yields an impact assessment with the 16 well-known LCA indicators.
 Of course, in this example, we ran the assessment for a single virtual machine,
-but nothing stops you from assessment as many virtual machines as you want.
+but nothing stops you from assessing as many virtual machines as you want.
 <details>
 <summary>
     Expand to see what the result looks like.
