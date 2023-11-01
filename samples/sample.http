@@ -27,21 +27,6 @@ Content-Type: application/json
         "region": "sofia",
         "env": "production"
       }
-    },
-    {
-      "id": "c2",
-      "ram": {
-        "amount": 16.0,
-        "unit": "GB_hour"
-      },
-      "storage": {
-        "amount": 2048.0,
-        "unit": "GB_hour"
-      },
-      "meta": {
-        "region": "sofia",
-        "env": "production"
-      }
     }
   ]
 }

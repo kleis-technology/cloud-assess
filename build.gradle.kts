@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "org.cloud_assess"
-version = "1.1"
+version = "1.2.0"
 
 java {
 	sourceCompatibility = JavaVersion.VERSION_17

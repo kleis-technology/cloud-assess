@@ -1,2 +1,5 @@
 lca:
   path: "trusted_library"
+cors:
+  enabled: false
+  allowed-origin: n/a

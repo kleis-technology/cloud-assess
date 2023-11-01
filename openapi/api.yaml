@@ -1,7 +1,10 @@
 openapi: "3.0.0"
 info:
   title: Cloud Assess
-  version: 1.0.0
+  version: 1.2.0
+servers:
+  - url: http://localhost:8080
+    description: Local server
 paths:
   /virtual_machines:
     post:
@@ -14,6 +17,35 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ServiceLayerDto'
+            example:
+              internal_workload:
+                ram:
+                  amount: 10.0
+                  unit: GB_hour
+                storage:
+                  amount: 50.0
+                  unit: GB_hour
+              virtual_machines:
+                - id: c1
+                  ram:
+                    amount: 32.0
+                    unit: GB_hour
+                  storage:
+                    amount: 1024.0
+                    unit: GB_hour
+                  meta:
+                    region: sofia
+                    env: production
+                - id: c2
+                  ram:
+                    amount: 16.0
+                    unit: GB_hour
+                  storage:
+                    amount: 2048.0
+                    unit: GB_hour
+                  meta:
+                    region: sofia
+                    env: production
       responses:
         '200':
           description: Assessment of virtual machines
