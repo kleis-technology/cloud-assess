@@ -1,0 +1,26 @@
+process email_received {
+    params {
+        nb_clients = 1 u
+    }
+    products {
+        1 KB * hour email_received
+    }
+    inputs {
+        1 KB * hour bandwidth from pool_network
+        1 hour / nb_clients email_receiving_compute from email_receiving_compute
+    }
+}
+
+process email_receiving_compute {
+    /*
+    This process is shared among instances of email_received
+    Same allocation issue as internal_workload w.r.t. virtual machines.
+    TODO: Decide on the allocation method.
+    */
+    products {
+        1 hour email_receiving_compute
+    }
+    inputs {
+        64 GB * hour ram from pool_ram
+    }
+}
