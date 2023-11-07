@@ -1,0 +1,26 @@
+process email_sent {
+    params {
+        nb_clients = 1 u
+    }
+    products {
+        1 KB * hour email_sent
+    }
+    inputs {
+        1 KB * hour bandwidth from pool_network
+        1 hour / nb_clients email_sending_compute from email_sending_compute
+    }
+}
+
+process email_sending_compute {
+    /*
+    This process is shared among instances of email_sent
+    Same allocation issue as internal_workload w.r.t. virtual machines.
+    TODO: Decide on the allocation method.
+    */
+    products {
+        1 hour email_sending_compute
+    }
+    inputs {
+        32 GB * hour ram from pool_ram
+    }
+}
