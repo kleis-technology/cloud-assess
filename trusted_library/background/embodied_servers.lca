@@ -1,3 +1,13 @@
+/*
+    SMALL
+*/
+variables {
+    small_ram_size = 384 GB
+    small_storage_size = 11.52 TB
+    small_amortization_period = 5 year
+    small_power = 400 W
+}
+
 process server_embodied {
     labels {
         id = "server_small"
@@ -28,6 +38,16 @@ process server_embodied {
     }
 }
 
+/*
+    MEDIUM
+*/
+variables {
+    medium_ram_size = 384 GB
+    medium_storage_size = 61.44 TB
+    medium_amortization_period = 5 year
+    medium_power = 400 W
+}
+
 process server_embodied {
     labels {
         id = "server_medium"
@@ -56,6 +76,16 @@ process server_embodied {
         23.680314019609003 m3_world_eq_deprived WU
         4091.890239715439 MJ_net_calorific_value TPE
     }
+}
+
+/*
+    LARGE
+*/
+variables {
+    large_ram_size = 768 GB
+    large_storage_size = 76.8 TB
+    large_amortization_period = 5 year
+    large_power = 400 W
 }
 
 process server_embodied {

@@ -1,0 +1,21 @@
+process pool_ram {
+    params {
+        q_small = 38 piece
+        q_medium = 62 piece
+        q_large = 3 piece
+    }
+    variables {
+        c1 = q_small * 1 hour * small_ram_size
+        c2 = q_medium * 1 hour * medium_ram_size
+        c3 = q_large * 1 hour * large_ram_size
+        total = c1 + c2 + c3
+    }
+    products {
+        total ram
+    }
+    inputs {
+        c1 ram from server_type match ( id = "server_small" )
+        c2 ram from server_type match ( id = "server_medium" )
+        c3 ram from server_type match ( id = "server_large" )
+    }
+}

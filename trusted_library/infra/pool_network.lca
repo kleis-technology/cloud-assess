@@ -1,0 +1,21 @@
+process pool_network {
+    params {
+        q_small = 10 piece
+        q_medium = 8 piece
+        q_large = 4 piece
+    }
+    variables {
+        c1 = q_small * 1 hour * small_switch_bandwidth
+        c2 = q_medium * 1 hour * medium_switch_bandwidth
+        c3 = q_large * 1 hour * large_switch_bandwidth
+        total = c1 + c2 + c3
+    }
+    products {
+        total bandwidth
+    }
+    inputs {
+        c1 bandwidth from switch_type match (id = "switch_small")
+        c2 bandwidth from switch_type match (id = "switch_medium")
+        c3 bandwidth from switch_type match (id = "switch_large")
+    }
+}

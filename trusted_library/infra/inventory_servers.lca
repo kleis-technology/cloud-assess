@@ -7,21 +7,15 @@ process server_type {
     labels {
         id = "server_medium"
     }
-    variables {
-        ram_size = 384 GB
-        storage_size = 61.44 TB
-        amortization_period = 5 year
-        power = 400 W
-    }
     products {
-        1 hour * ram_size ram allocate ram_allocation
-        1 hour * storage_size storage allocate storage_allocation
+        1 hour * medium_ram_size ram allocate ram_allocation
+        1 hour * medium_storage_size storage allocate storage_allocation
     }
     inputs {
         1 hour server from server(
                       id = "server_medium",
-                      amortization_period = amortization_period,
-                      power = power,
+                      amortization_period = medium_amortization_period,
+                      power = medium_power,
                       )
     }
 }
@@ -30,21 +24,15 @@ process server_type {
     labels {
         id = "server_small"
     }
-    variables {
-        ram_size = 384 GB
-        storage_size = 11.52 TB
-        amortization_period = 5 year
-        power = 400 W
-    }
     products {
-        1 hour * ram_size ram allocate ram_allocation
-        1 hour * storage_size storage allocate storage_allocation
+        1 hour * small_ram_size ram allocate ram_allocation
+        1 hour * small_storage_size storage allocate storage_allocation
     }
     inputs {
         1 hour server from server(
                       id = "server_small",
-                      amortization_period = amortization_period,
-                      power = power,
+                      amortization_period = small_amortization_period,
+                      power = small_power,
                       )
     }
 }
@@ -53,21 +41,15 @@ process server_type {
     labels {
         id = "server_large"
     }
-    variables {
-        ram_size = 768 GB
-        storage_size = 76.8 TB
-        amortization_period = 5 year
-        power = 400 W
-    }
     products {
-        1 hour * ram_size ram allocate ram_allocation
-        1 hour * storage_size storage allocate storage_allocation
+        1 hour * large_ram_size ram allocate ram_allocation
+        1 hour * large_storage_size storage allocate storage_allocation
     }
     inputs {
         1 hour server from server(
                       id = "server_large",
-                      amortization_period = amortization_period,
-                      power = power,
+                      amortization_period = large_amortization_period,
+                      power = large_power,
                       )
     }
 }
