@@ -1,0 +1,119 @@
+/*
+SMALL
+*/
+
+variables {
+    small_switch_bandwidth = 1 Gbit
+    small_switch_amortization_period = 5 year
+    small_switch_power = 100 W
+}
+
+process switch_embodied {
+    labels {
+        id = "switch_small"
+    }
+    products {
+        4 piece switch_embodied
+    }
+    impacts {
+        0.009010304785087925 kg_Sb_Eq ADPe
+        37603.90751808469 MJ_net_calorific_value ADPf
+        17.053827354655926 mol_H_p_Eq AP
+        42039.56347426383 CTUe CTUe
+        3.176426254390007e-7 CTUh CTUh_c
+        0.000018063258053918254 CTUh CTUh_nc
+        0.007868733717127221 kg_P_Eq Epf
+        2.0238109035289527 kg_N_Eq Epm
+        21.276455689734732 mol_N_Eq Ept
+        2855.502608725893 kg_CO2_Eq GWP
+        1.679569303154354 kg_CO2_Eq GWPf
+        2855.4500149299743 kg_CO2_Eq GWPlu
+        3.9445346938775514e-8 kBq_U235_Eq IR
+        87.64130408316379 u LU
+        9.990845276746803 kg_CFC_11_Eq ODP
+        0.0010498493607571768 disease_incidence PM
+        0.00009320215230664793 kg_NMVOC_Eq POCP
+        6.468493286421048 m3_world_eq_deprived WU
+        1111.1774479823594 MJ_net_calorific_value TPE
+    }
+}
+
+/*
+MEDIUM
+*/
+
+variables {
+    medium_switch_bandwidth = 2 Gbit
+    medium_switch_amortization_period = 5 year
+    medium_switch_power = 100 W
+}
+
+process switch_embodied {
+    labels {
+        id = "switch_medium"
+    }
+    products {
+        2 piece switch_embodied
+    }
+    impacts {
+        0.009010304785087925 kg_Sb_Eq ADPe
+        37603.90751808469 MJ_net_calorific_value ADPf
+        17.053827354655926 mol_H_p_Eq AP
+        42039.56347426383 CTUe CTUe
+        3.176426254390007e-7 CTUh CTUh_c
+        0.000018063258053918254 CTUh CTUh_nc
+        0.007868733717127221 kg_P_Eq Epf
+        2.0238109035289527 kg_N_Eq Epm
+        21.276455689734732 mol_N_Eq Ept
+        2855.502608725893 kg_CO2_Eq GWP
+        1.679569303154354 kg_CO2_Eq GWPf
+        2855.4500149299743 kg_CO2_Eq GWPlu
+        3.9445346938775514e-8 kBq_U235_Eq IR
+        87.64130408316379 u LU
+        9.990845276746803 kg_CFC_11_Eq ODP
+        0.0010498493607571768 disease_incidence PM
+        0.00009320215230664793 kg_NMVOC_Eq POCP
+        6.468493286421048 m3_world_eq_deprived WU
+        1111.1774479823594 MJ_net_calorific_value TPE
+    }
+}
+
+/*
+LARGE
+*/
+
+variables {
+    large_switch_bandwidth = 4 Gbit
+    large_switch_amortization_period = 5 year
+    large_switch_power = 100 W
+}
+
+process switch_embodied {
+    labels {
+        id = "switch_large"
+    }
+    products {
+        1 piece switch_embodied
+    }
+    impacts {
+        0.009010304785087925 kg_Sb_Eq ADPe
+        37603.90751808469 MJ_net_calorific_value ADPf
+        17.053827354655926 mol_H_p_Eq AP
+        42039.56347426383 CTUe CTUe
+        3.176426254390007e-7 CTUh CTUh_c
+        0.000018063258053918254 CTUh CTUh_nc
+        0.007868733717127221 kg_P_Eq Epf
+        2.0238109035289527 kg_N_Eq Epm
+        21.276455689734732 mol_N_Eq Ept
+        2855.502608725893 kg_CO2_Eq GWP
+        1.679569303154354 kg_CO2_Eq GWPf
+        2855.4500149299743 kg_CO2_Eq GWPlu
+        3.9445346938775514e-8 kBq_U235_Eq IR
+        87.64130408316379 u LU
+        9.990845276746803 kg_CFC_11_Eq ODP
+        0.0010498493607571768 disease_incidence PM
+        0.00009320215230664793 kg_NMVOC_Eq POCP
+        6.468493286421048 m3_world_eq_deprived WU
+        1111.1774479823594 MJ_net_calorific_value TPE
+    }
+}

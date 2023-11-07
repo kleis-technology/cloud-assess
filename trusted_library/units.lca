@@ -3,6 +3,16 @@ unit workload_slot {
     dimension = "workload"
 }
 
+unit KB {
+    symbol = "KB"
+    alias_for = 1e-3 MB
+}
+
+unit MB {
+    symbol = "MB"
+    alias_for = 1e-3 GB
+}
+
 unit GB {
     symbol = "GB"
     dimension = "memory"
@@ -12,3 +22,19 @@ unit TB {
     symbol = "TB"
     alias_for = 1000 GB
 }
+
+unit Kbit {
+    symbol = "Kbit"
+    alias_for = 1e-3 Mbit
+}
+
+unit Mbit {
+    symbol = "Mbit"
+    alias_for = 1e-3 Gbit
+}
+
+unit Gbit {
+    symbol = "Gbit"
+    alias_for = 0.125 GB
+}
+

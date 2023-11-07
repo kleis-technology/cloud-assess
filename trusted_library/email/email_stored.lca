@@ -1,0 +1,53 @@
+process email_stored {
+    params {
+        // my params
+    }
+    products {
+        1 KB * hour email_stored
+    }
+    inputs {
+        1 KB * hour database
+        1 KB * hour indexing
+    }
+}
+
+process database {
+    // TODO: Check
+    params {
+        storage_size = 12 TB * hour
+        ram_size = 32 GB * hour
+    }
+    products {
+        storage_size database
+    }
+    inputs {
+        // TODO: desadapt virtual machine from Exoscale
+        1 hour vm from virtual_machine(
+                  storage_size = storage_size,
+                  ram_size = ram_size,
+                  )
+    }
+}
+
+process indexing {
+/*
+    Indexing process is shared among instances of email_stored
+    Same allocation issue as internal_workload w.r.t. virtual machines.
+    TODO: Decide on the allocation method.
+*/
+    params {
+        storage_size = 100 GB * hour
+        ram_size = 64 GB * hour
+        indexing_capacity = 1 KB * hour
+    }
+    products {
+        indexing_capacity indexing
+    }
+    inputs {
+        // TODO: desadapt virtual machine from Exoscale
+        1 hour vm from virtual_machine(
+                  storage_size = storage_size,
+                  ram_size = ram_size,
+                  )
+    }
+}

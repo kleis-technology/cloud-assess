@@ -1,0 +1,22 @@
+process pool_storage {
+    params {
+        q_small = 38 piece
+        q_medium = 62 piece
+        q_large = 3 piece
+    }
+    variables {
+        c1 = q_small * 1 hour * small_storage_size
+        c2 = q_medium * 1 hour * medium_storage_size
+        c3 = q_large * 1 hour * large_storage_size
+        total = c1 + c2 + c3
+    }
+    products {
+        total storage
+    }
+    inputs {
+        c1 storage from server_type match ( id = "server_small" )
+        c2 storage from server_type match ( id = "server_medium" )
+        c3 storage from server_type match ( id = "server_large" )
+    }
+}
+

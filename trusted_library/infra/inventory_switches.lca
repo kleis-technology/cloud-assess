@@ -1,0 +1,47 @@
+process switch_type {
+    labels {
+        id = "switch_small"
+    }
+    variables {
+        dt = 1 hour
+    }
+    products {
+        1 hour * small_switch_bandwidth bandwidth
+    }
+    inputs {
+        dt / small_switch_amortization_period switch_embodied from switch_embodied match (id = id)
+        dt * small_switch_power electricity from electricity_mix match (geo = "GLO")
+    }
+}
+
+process switch_type {
+    labels {
+        id = "switch_medium"
+    }
+    variables {
+        dt = 1 hour
+    }
+    products {
+        1 hour * medium_switch_bandwidth bandwidth
+    }
+    inputs {
+        dt / medium_switch_amortization_period switch_embodied from switch_embodied match (id = id)
+        dt * medium_switch_power electricity from electricity_mix match (geo = "GLO")
+    }
+}
+
+process switch_type {
+    labels {
+        id = "switch_large"
+    }
+    variables {
+        dt = 1 hour
+    }
+    products {
+        1 hour * large_switch_bandwidth bandwidth
+    }
+    inputs {
+        dt / large_switch_amortization_period switch_embodied from switch_embodied match (id = id)
+        dt * large_switch_power electricity from electricity_mix match (geo = "GLO")
+    }
+}
