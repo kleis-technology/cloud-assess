@@ -20,7 +20,8 @@ the environmental impacts of cloud services.
 3. [How does it work?](#how-does-it-work)
    * [Trusted Library](#trusted-library)
    * [Adapt the models to your taste](#adapt-the-models-to-your-taste)
-4. [About us](#about-us)
+4. [License](#license)
+5. [About us](#about-us)
 
 ## Getting Started
 
@@ -305,6 +306,13 @@ Actually, the server's job can be decomposed as follows:
 * first, the server loads the models under the folder `trusted_library`
 * every API request is mapped to a query to these models
 * and the resulting assessment is returned to the client.
+
+## License
+
+The content of this repository is subject to [Apache 2 license](./LICENSE-2.0.txt).
+Note, however, that the server relies on two gradle packages `ch.kleis.lcaac.core` and `ch.kleis.lcaac.grammar`
+which are, currently, property of Kleis Technology. Kleis Technology is currently working on finding the appropriate license, 
+and welcomes any help on that topic. Feel free to reach out to us.
 
 ## About us
 
