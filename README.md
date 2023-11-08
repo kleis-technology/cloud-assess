@@ -73,6 +73,8 @@ SPRING_PROFILES_ACTIVE=localhost ./gradlew bootRun
 ```
 The server should start listening for requests on `localhost:8080`.
 
+Note that, if you are on Windows, use the command `./gradlew.bat` instead of `./gradlew`.
+
 
 ## First Assessment
 
