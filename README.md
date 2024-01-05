@@ -310,9 +310,6 @@ Actually, the server's job can be decomposed as follows:
 ## License
 
 The content of this repository is subject to [Apache 2 license](./LICENSE-2.0.txt).
-Note, however, that the server relies on two gradle packages `ch.kleis.lcaac.core` and `ch.kleis.lcaac.grammar`
-which are, currently, property of Kleis Technology. Kleis Technology is currently working on finding the appropriate license, 
-and welcomes any help on that topic. Feel free to reach out to us.
 
 ## About us
 
