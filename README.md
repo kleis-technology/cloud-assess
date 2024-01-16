@@ -282,6 +282,7 @@ The models under the folder `trusted_library` are directly loaded in the server
 to perform the assessments.
 A [tutorial](https://lca-as-code.com/book) is available if you want to learn
 more about the language itself.
+The source repository is available [here](https://github.com/kleis-technology/lcaac).
 
 
 The folder `trusted_library` comprises three folders.
