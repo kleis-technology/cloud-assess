@@ -14,9 +14,9 @@ process pool_ram {
         total ram
     }
     inputs {
-        c1 ram from server_type match ( id = "server_small" )
-        c2 ram from server_type match ( id = "server_medium" )
-        c3 ram from server_type match ( id = "server_large" )
+        c1 ram from shared_server match ( id = "server_small" )
+        c2 ram from shared_server match ( id = "server_medium" )
+        c3 ram from shared_server match ( id = "server_large" )
     }
 }
 
@@ -36,9 +36,9 @@ process pool_storage {
         total storage
     }
     inputs {
-        c1 storage from server_type match ( id = "server_small" )
-        c2 storage from server_type match ( id = "server_medium" )
-        c3 storage from server_type match ( id = "server_large" )
+        c1 storage from shared_server match ( id = "server_small" )
+        c2 storage from shared_server match ( id = "server_medium" )
+        c3 storage from shared_server match ( id = "server_large" )
     }
 }
 

@@ -1,9 +1,13 @@
+/*
+    A shared server represents a server as a resource providing RAM and storage.
+*/
+
 variables {
     ram_allocation = 75 percent
     storage_allocation = 25 percent
 }
 
-process server_type {
+process shared_server {
     labels {
         id = "server_medium"
     }
@@ -26,7 +30,7 @@ process server_type {
     }
 }
 
-process server_type {
+process shared_server {
     labels {
         id = "server_small"
     }
@@ -49,7 +53,7 @@ process server_type {
     }
 }
 
-process server_type {
+process shared_server {
     labels {
         id = "server_large"
     }
