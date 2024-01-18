@@ -72,21 +72,3 @@ process server_type {
     }
 }
 
-process server {
-    params {
-        id = "server_medium"
-        geo = "GLO"
-        amortization_period = 5 year
-        power = 400 W
-    }
-    variables {
-        dt = 1 hour
-    }
-    products {
-        dt server
-    }
-    inputs {
-        dt / amortization_period server_embodied from server_embodied match ( id = id )
-        dt * power electricity from electricity_mix match ( geo = geo )
-    }
-}
