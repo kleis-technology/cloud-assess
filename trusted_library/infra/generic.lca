@@ -1,0 +1,28 @@
+process pool_generic {
+    params {
+        service_level = 1 u * hour
+        q_small = 38 piece
+        q_medium = 62 piece
+        q_large = 3 piece
+    }
+    products {
+        service_level generic
+    }
+    inputs {
+        q_small * 1 hour server from server(
+                      id = "server_small",
+                      amortization_period = 5 year,
+                      power = 400 W,
+                      )
+        q_medium * 1 hour server from server(
+                      id = "server_medium",
+                      amortization_period = 5 year,
+                      power = 400 W,
+                      )
+        q_large * 1 hour server from server(
+                      id = "server_large",
+                      amortization_period = 5 year,
+                      power = 400 W,
+                      )
+    }
+}
