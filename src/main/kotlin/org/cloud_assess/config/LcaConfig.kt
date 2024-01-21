@@ -1,6 +1,6 @@
 package org.cloud_assess.config
 
-import ch.kleis.lcaac.core.datasource.BasicCsvSourceOperations
+import ch.kleis.lcaac.core.datasource.CsvSourceOperations
 import ch.kleis.lcaac.core.lang.SymbolTable
 import ch.kleis.lcaac.core.lang.evaluator.Evaluator
 import ch.kleis.lcaac.core.math.basic.BasicNumber
@@ -45,6 +45,6 @@ class LcaConfig {
         @Value("\${lca.path}") modelDirectory: File,
         symbolTable: SymbolTable<BasicNumber>,
     ): Evaluator<BasicNumber> {
-        return Evaluator(symbolTable, BasicOperations, BasicCsvSourceOperations(modelDirectory) )
+        return Evaluator(symbolTable, BasicOperations, CsvSourceOperations(modelDirectory, BasicOperations) )
     }
 }
