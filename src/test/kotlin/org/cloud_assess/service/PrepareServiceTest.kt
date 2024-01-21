@@ -42,9 +42,9 @@ class PrepareServiceTest {
                                     "storage_size" to tenGBHour,
                                     "internal_ram" to tenGBHour,
                                     "internal_storage" to tenGBHour,
-                                    "total_nb_clients" to EQuantityScale(
+                                    "nb_clients" to EQuantityScale(
                                         BasicNumber(1.0),
-                                        EDataRef("workload_slot"),
+                                        EDataRef("slot"),
                                     ),
                                 )
                             )

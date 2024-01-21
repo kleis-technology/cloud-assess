@@ -48,10 +48,12 @@ process pool_storage {
     }
     inputs {
         for_each row in inventory {
-            (
-                row["n_items"] * row["nb_disks_ssd"] * row["disk_ssd_size"]
-                + row["n_items"] * row["nb_disks_hdd"] * row["disk_hdd_size"]
-            ) * 1 hour storage from shared_server(row = row)
+            variables {
+                row_ssd = row["n_items"] * row["nb_disks_ssd"] * row["disk_ssd_size"]
+                row_hdd = row["n_items"] * row["nb_disks_hdd"] * row["disk_hdd_size"]
+                row_total = row_ssd + row_hdd
+            }
+            row_total * 1 hour storage from shared_server(row = row)
         }
     }
 }
