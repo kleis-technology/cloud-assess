@@ -13,7 +13,7 @@ class ExecutionService(
     private val evaluator: Evaluator<BasicNumber>,
 ) {
     fun run(expression: EProcessTemplateApplication<BasicNumber>): ContributionAnalysis<BasicNumber, BasicMatrix> {
-        val trace = evaluator.trace(expression)
+        val trace = evaluator.with(expression.template).trace(expression.template, expression.arguments)
         val systemValue = trace.getSystemValue()
         val entryPoint = trace.getEntryPoint()
         val program = ContributionAnalysisProgram(systemValue, entryPoint)

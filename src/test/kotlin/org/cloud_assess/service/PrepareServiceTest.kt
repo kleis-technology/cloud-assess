@@ -29,22 +29,24 @@ class PrepareServiceTest {
         assertThat(actual["c1"]?.template?.body?.products?.first()?.product?.name).isEqualTo("c1")
         assertThat(actual["c1"]?.template?.body?.inputs).isEqualTo(
             listOf(
-                ETechnoExchange(
-                    oneHour(),
-                    EProductSpec(
-                        name = "vm",
-                        fromProcess = FromProcess(
-                            name = "virtual_machine",
-                            matchLabels = MatchLabels(emptyMap()),
-                            arguments = mapOf(
-                                "ram_size" to tenGBHour,
-                                "storage_size" to tenGBHour,
-                                "internal_ram" to tenGBHour,
-                                "internal_storage" to tenGBHour,
-                                "total_nb_clients" to EQuantityScale(
-                                    BasicNumber(1.0),
-                                    EDataRef("workload_slot"),
-                                ),
+                ETechnoBlockEntry(
+                    ETechnoExchange(
+                        oneHour(),
+                        EProductSpec(
+                            name = "vm",
+                            fromProcess = FromProcess(
+                                name = "virtual_machine",
+                                matchLabels = MatchLabels(emptyMap()),
+                                arguments = mapOf(
+                                    "ram_size" to tenGBHour,
+                                    "storage_size" to tenGBHour,
+                                    "internal_ram" to tenGBHour,
+                                    "internal_storage" to tenGBHour,
+                                    "total_nb_clients" to EQuantityScale(
+                                        BasicNumber(1.0),
+                                        EDataRef("workload_slot"),
+                                    ),
+                                )
                             )
                         )
                     )

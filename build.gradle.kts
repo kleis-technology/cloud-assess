@@ -29,7 +29,7 @@ repositories {
 }
 
 dependencies {
-	val lcaacVersion = "1.3.2"
+	val lcaacVersion = "1.3.5-rc2"
 	implementation("ch.kleis.lcaac:core:$lcaacVersion")
 	implementation("ch.kleis.lcaac:grammar:$lcaacVersion")
 

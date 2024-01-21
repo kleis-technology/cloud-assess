@@ -1,5 +1,6 @@
 package org.cloud_assess.config
 
+import ch.kleis.lcaac.core.datasource.BasicCsvSourceOperations
 import ch.kleis.lcaac.core.lang.SymbolTable
 import ch.kleis.lcaac.core.lang.evaluator.Evaluator
 import ch.kleis.lcaac.core.math.basic.BasicNumber
@@ -13,8 +14,6 @@ import org.antlr.v4.runtime.CommonTokenStream
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.web.servlet.config.annotation.CorsRegistry
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -43,8 +42,9 @@ class LcaConfig {
 
     @Bean
     fun basicEvaluator(
+        @Value("\${lca.path}") modelDirectory: File,
         symbolTable: SymbolTable<BasicNumber>,
     ): Evaluator<BasicNumber> {
-        return Evaluator(symbolTable, BasicOperations)
+        return Evaluator(symbolTable, BasicOperations, BasicCsvSourceOperations(modelDirectory) )
     }
 }

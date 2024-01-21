@@ -28,10 +28,10 @@ class ParsingServiceTest {
             .product
             .referenceUnit as EUnitOf<BasicNumber>
         val quantity = referenceUnit.expression as EQuantityClosure<BasicNumber>
-        val actual = quantity.symbolTable.data.getValues().toList()
+        val actual = quantity.symbolTable.data
 
         // then
-        val expected = Prelude.units<BasicNumber>().getValues().toList()
+        val expected = Prelude.units<BasicNumber>()
         assertThat(actual).isEqualTo(expected)
     }
 }

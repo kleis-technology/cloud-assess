@@ -9,6 +9,7 @@ import ch.kleis.lcaac.core.lang.value.QuantityValue
 import ch.kleis.lcaac.core.lang.value.UnitValue
 import ch.kleis.lcaac.core.math.basic.BasicNumber
 import ch.kleis.lcaac.core.math.basic.BasicOperations
+import io.mockk.mockk
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
@@ -20,7 +21,7 @@ class ExecutionServiceTest {
             BasicNumber(1.0),
             EUnitLiteral(UnitSymbol.of("kg"), 1.0, Dimension.Companion.of("mass"))
         )
-        val main = EProcessTemplateApplication<BasicNumber>(
+        val main = EProcessTemplateApplication(
             EProcessTemplate(
                 emptyMap(),
                 emptyMap(),
@@ -30,13 +31,15 @@ class ExecutionServiceTest {
                         ETechnoExchange(oneKg, EProductSpec("main", oneKg))
                     ),
                     impacts = listOf(
-                        EImpact(EQuantityScale(BasicNumber(1.0), oneKg), EIndicatorSpec("GWP", oneKg))
+                        EImpactBlockEntry(
+                            EImpact(EQuantityScale(BasicNumber(1.0), oneKg), EIndicatorSpec("GWP", oneKg))
+                        )
                     )
                 )
             ),
             emptyMap()
         )
-        val evaluator = Evaluator(SymbolTable.empty(), BasicOperations)
+        val evaluator = Evaluator(SymbolTable.empty(), BasicOperations, mockk())
         val executionService = ExecutionService(evaluator)
 
         // when
