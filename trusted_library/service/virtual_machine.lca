@@ -5,36 +5,35 @@ process virtual_machine {
         storage_size = 260 GB * hour
 
         // internal workload usage
-        total_nb_clients = 176 workload_slot
+        nb_clients = 176 slot
         internal_ram = 1112 GB * hour
         internal_storage = 9820 GB * hour
-
-        // infra
-        q_small = 38 piece
-        q_medium = 62 piece
-        q_large = 3 piece
     }
     products {
         1 hour vm
     }
     inputs {
-        ram_size ram from pool_ram(
-                     q_small = q_small,
-                     q_medium = q_medium,
-                     q_large = q_large,
-                     )
-        storage_size storage from pool_storage(
-                             q_small = q_small,
-                             q_medium = q_medium,
-                             q_large = q_large,
-                             )
-        1 workload_slot workload from internal_workload(
-                                 total_slots = total_nb_clients,
-                                 ram_size = internal_ram,
-                                 storage_size = internal_storage,
-                                 q_small = q_small,
-                                 q_medium = q_medium,
-                                 q_large = q_large,
-                                 )
+        ram_size ram from pool_ram
+        storage_size storage from pool_storage
+        1 slot workload from internal_workload(
+            service_level = nb_clients,
+            ram_size = internal_ram,
+            storage_size = internal_storage,
+            )
+    }
+}
+
+process internal_workload {
+    params {
+        service_level = 159 slot
+        ram_size = 130 GB * hour
+        storage_size = 1 GB * hour
+    }
+    products {
+        service_level workload
+    }
+    inputs {
+        ram_size ram from pool_ram
+        storage_size storage from pool_storage
     }
 }

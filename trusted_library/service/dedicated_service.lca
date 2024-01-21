@@ -1,0 +1,11 @@
+process dedicated_service {
+    params {
+        service_level = 1 u
+    }
+    products {
+        service_level service
+    }
+    inputs {
+        1 p pool_dedicated
+    }
+}

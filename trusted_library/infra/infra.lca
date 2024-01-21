@@ -1,0 +1,57 @@
+process pool_dedicated {
+    products {
+        1 p pool_dedicated
+    }
+    inputs {
+        for_each row in inventory {
+            row["n_items"] * 1 hour server from dedicated_server(row = row)
+        }
+    }
+}
+
+process shared_server {
+    params {
+        row from inventory
+    }
+    variables {
+        ram_size = row["nb_rams"] * row["ram_size"]
+        storage_size = row["nb_disks_ssd"] * row["disk_ssd_size"] + row["nb_disks_hdd"] * row["disk_hdd_size"]
+    }
+    products {
+        1 hour * ram_size ram allocate row["ram_allocation"]
+        1 hour * storage_size storage allocate row["storage_allocation"]
+    }
+    inputs {
+        1 hour server from dedicated_server(row = row)
+    }
+}
+
+process pool_ram {
+    products {
+        sum(inventory, "n_items" * "nb_rams" * "ram_size") * 1 hour ram
+    }
+    inputs {
+        for_each row in inventory {
+            row["n_items"]  * row["nb_rams"] * row["ram_size"] * 1 hour ram from shared_server(row = row)
+        }
+    }
+}
+
+process pool_storage {
+    variables {
+        total_ssd = sum(inventory, "n_items" * "nb_disks_ssd" * "disk_ssd_size")
+        total_hdd = sum(inventory, "n_items" * "nb_disks_hdd" * "disk_hdd_size")
+        total_storage = total_ssd + total_hdd
+    }
+    products {
+        total_storage * 1 hour storage
+    }
+    inputs {
+        for_each row in inventory {
+            (
+                row["n_items"] * row["nb_disks_ssd"] * row["disk_ssd_size"]
+                + row["n_items"] * row["nb_disks_hdd"] * row["disk_hdd_size"]
+            ) * 1 hour storage from shared_server(row = row)
+        }
+    }
+}

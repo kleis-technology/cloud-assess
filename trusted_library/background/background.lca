@@ -1,0 +1,73 @@
+process electricity_mix {
+    labels {
+        geo = "GLO"
+    }
+    products {
+        1 kWh electricity
+    }
+    impacts {
+        0.00000271 kg_Sb_Eq ADPe
+        9.78 MJ_net_calorific_value ADPf
+        0.00389 mol_H_p_Eq AP
+        14.4 CTUe CTUe
+        2.04e-10 CTUh CTUh_c
+        7.73e-9 CTUh CTUh_nc
+        0.000383 kg_P_Eq Epf
+        0.000723 kg_N_Eq Epm
+        0.00728 mol_N_Eq Ept
+        0.762 kg_CO2_Eq GWP
+        0.00235 kg_CO2_Eq GWPf
+        0.758 kg_CO2_Eq GWPlu
+        0.00157 kBq_U235_Eq IR
+        0.109 u LU
+        1.63 kg_CFC_11_Eq ODP
+        3.18e-8 disease_incidence PM
+        2.82e-8 kg_NMVOC_Eq POCP
+        0.00195 m3_world_eq_deprived WU
+        0.12 MJ_net_calorific_value TPE
+    }
+}
+
+process embodied_server {
+    params {
+        row from inventory
+    }
+    products {
+        1 p server
+    }
+    impacts {
+        row["ADPe"] ADPe
+        row["ADPf"] ADPf
+        row["AP"] AP
+        row["CTUe"] CTUe
+        row["CTUh_c"] CTUh_c
+        row["CTUh_nc"] CTUh_nc
+        row["Epf"] Epf
+        row["Epm"] Epm
+        row["Ept"] Ept
+        row["GWP"] GWP
+        row["GWPf"] GWPf
+        row["GWPlu"] GWPlu
+        row["IR"] IR
+        row["LU"] LU
+        row["ODP"] ODP
+        row["PM"] PM
+        row["POCP"] POCP
+        row["WU"] WU
+        row["TPE"] TPE
+    }
+}
+
+process dedicated_server {
+    params {
+        row from inventory
+    }
+    products {
+        1 hour server
+    }
+    inputs {
+        1 hour / row["amortization_period"] server from embodied_server(row = row)
+        1 hour * row["power"] electricity from electricity_mix match (geo = "GLO")
+    }
+}
+
