@@ -2,12 +2,8 @@ datasource inventory {
     location = "background/inventory.csv"
     schema {
         "n_items" = 1 p
-        "nb_rams" = 12 p
-        "ram_size" = 32 GB
-        "nb_disks_ssd" = 1 p
-        "disk_ssd_size" = 1 TB
-        "nb_disks_hdd" = 0 p
-        "disk_hdd_size" = 1 TB
+        "ram_size" = 16 GB
+        "storage_size" = 1 TB
         "amortization_period" = 5 year
         "power" = 400 W
         "ram_allocation" = 75 percent
