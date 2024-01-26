@@ -23,7 +23,7 @@ class PrepareService(
                         1 hour vm from virtual_machine(
                             ram_size = ${it.ram.amount} GB * hour,
                             storage_size = ${it.storage.amount} GB * hour,
-                            total_nb_clients = ${nbClients.toDouble()} workload_slot,
+                            nb_clients = ${nbClients.toDouble()} slot,
                             internal_ram = ${svc.internalWorkload.ram.amount} GB * hour,
                             internal_storage = ${svc.internalWorkload.storage.amount} GB * hour,
                             )
