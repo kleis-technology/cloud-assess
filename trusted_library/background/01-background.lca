@@ -1,0 +1,82 @@
+process electricity_mix {
+    params {
+        geo = "GLO"
+    }
+    variables {
+        data = lookup electricity match geo = geo
+    }
+    products {
+        1 kWh electricity
+    }
+    impacts {
+        data.ADPe ADPe
+        data.ADPf ADPf
+        data.AP AP
+        data.CTUe CTUe
+        data.CTUh_c CTUh_c
+        data.CTUh_nc CTUh_nc
+        data.Epf Epf
+        data.Epm Epm
+        data.Ept Ept
+        data.GWP GWP
+        data.GWPf GWPf
+        data.GWPlu GWPlu
+        data.IR IR
+        data.LU LU
+        data.ODP ODP
+        data.PM PM
+        data.POCP POCP
+        data.WU WU
+        data.TPE TPE
+    }
+}
+
+process embodied_server {
+    params {
+        id = "small"
+    }
+    variables {
+        data = lookup inventory match id = id
+    }
+    products {
+        1 p server
+    }
+    impacts {
+        data.ADPe ADPe
+        data.ADPf ADPf
+        data.AP AP
+        data.CTUe CTUe
+        data.CTUh_c CTUh_c
+        data.CTUh_nc CTUh_nc
+        data.Epf Epf
+        data.Epm Epm
+        data.Ept Ept
+        data.GWP GWP
+        data.GWPf GWPf
+        data.GWPlu GWPlu
+        data.IR IR
+        data.LU LU
+        data.ODP ODP
+        data.PM PM
+        data.POCP POCP
+        data.WU WU
+        data.TPE TPE
+    }
+}
+
+process dedicated_server {
+    params {
+        id = "small"
+    }
+    variables {
+        data = lookup inventory match id = id
+    }
+    products {
+        1 hour server
+    }
+    inputs {
+        1 hour / data.amortization_period server from embodied_server(id = id)
+        1 hour * data.power electricity from electricity_mix match (geo = "GLO")
+    }
+}
+
