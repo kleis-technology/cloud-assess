@@ -1,0 +1,66 @@
+process paas_wrapper_pool_server_fn {
+    params {
+        id = "client_paas"
+        lc_step = "manufacturing"
+        ratio_cpu = 50 percent
+        ratio_ram = 50 percent
+    }
+    variables {
+        reserved_cpu = sum( paas_inventory match pool_id = id, nb_cores )
+        reserved_ram = sum( paas_inventory match pool_id = id, ram_size )
+    }
+    products {
+        reserved_ram ram allocate ratio_ram
+        reserved_cpu cpu allocate ratio_cpu
+    }
+    inputs {
+        paas_timewindow pool_server from pool_server_fn( id = id, lc_step = lc_step )
+    }
+}
+
+test pass_wrapper_pool_server_fn {
+    given {
+        for_each data from paas_inventory match pool_id = "client_paas" {
+            data.nb_cores cpu from paas_wrapper_pool_server_fn(
+                              id = "client_paas", lc_step = "manufacturing",
+                              ratio_cpu = 50 percent, ratio_ram = 50 percent )
+            data.ram_size ram from paas_wrapper_pool_server_fn(
+                              id = "client_paas", lc_step = "manufacturing",
+                              ratio_cpu = 80 percent, ratio_ram = 20 percent )
+        }
+
+        -1 paas_timewindow pool_server from pool_server_fn( id = "client_paas", lc_step = "manufacturing" )
+    }
+    assert {
+        GWP between -1e-4 kg_CO2_Eq and 1e-4 kg_CO2_Eq
+    }
+}
+
+process paas_wrapper_pool_network_fn {
+    params {
+        id = "client_paas"
+        lc_step = "manufacturing"
+    }
+    variables {
+        reserved_cpu = sum( paas_inventory match pool_id = id, nb_cores )
+    }
+    products {
+        reserved_cpu cpu
+    }
+    inputs {
+        paas_timewindow pool_network from pool_network_fn( id = id, lc_step = lc_step )
+    }
+}
+
+test pass_wrapper_pool_network_fn {
+    given {
+        for_each data from paas_inventory match pool_id = "client_paas" {
+            data.nb_cores cpu from paas_wrapper_pool_network_fn(id = "client_paas", lc_step = "manufacturing")
+        }
+
+        -1 paas_timewindow pool_network from pool_network_fn( id = "client_paas", lc_step = "manufacturing" )
+    }
+    assert {
+        GWP between -1e-4 kg_CO2_Eq and 1e-4 kg_CO2_Eq
+    }
+}

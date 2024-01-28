@@ -1,0 +1,15 @@
+process vm_wrapper_pool_network {
+    params {
+        id = "client"
+        lc_step = "manufacturing"
+    }
+    variables {
+        reserved_vcpu = sum( vm_inventory match pool_id = id, vcpu_size )
+    }
+    products {
+        reserved_vcpu vcpu
+    }
+    inputs {
+        vm_timewindow pool_network from pool_network_fn( id = id, lc_step = lc_step )
+    }
+}

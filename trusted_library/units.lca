@@ -1,3 +1,17 @@
+unit kW {
+    symbol = "kW"
+    alias_for = 1000 W
+}
+
+unit ton_CO2_Eq {
+    symbol = "ton_CO2_Eq"
+    alias_for = 1000 kg_CO2_Eq
+}
+unit g_CO2_Eq {
+    symbol = "g_CO2_Eq"
+    alias_for = 1e-3 kg_CO2_Eq
+}
+
 unit GB {
     symbol = "GB"
     dimension = "memory"
@@ -8,7 +22,17 @@ unit TB {
     alias_for = 1000 GB
 }
 
-unit slot {
-    symbol = "slot"
-    dimension = "slot"
+unit KB {
+    symbol = "KB"
+    alias_for = 1e-3 GB
+}
+
+unit core {
+    symbol = "core"
+    dimension = "core"
+}
+
+unit vCPU {
+    symbol = "vCPU"
+    dimension = "vCPU"
 }

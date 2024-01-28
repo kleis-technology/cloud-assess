@@ -1,0 +1,10 @@
+dc_id,scope,lc_step,GWP,ADPe,ADPf,AP,CTUe,CTUh_c,CTUh_nc,Epf,Epm,Ept,GWPf,GWPlu,IR,LU,ODP,PM,POCP,WU,TPE
+dc-01,architecture,manufacturing,1e4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+dc-01,technical,manufacturing,1e3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+dc-01,technical,transport,1e3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+dc-02,architecture,manufacturing,1e4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+dc-02,technical,manufacturing,1e3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+dc-02,technical,transport,1e3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+dc-03,architecture,manufacturing,1e4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+dc-03,technical,manufacturing,1e3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+dc-03,technical,transport,1e3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0

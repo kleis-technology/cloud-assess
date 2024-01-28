@@ -1,0 +1,59 @@
+datasource electricity_mix {
+    location = "data/01-hardware/electricity_mix.csv"
+    schema {
+        geo = "GLO"
+
+        ADPe = 0 kg_Sb_Eq
+        ADPf = 0 MJ_net_calorific_value
+        AP = 0 mol_H_p_Eq
+        CTUe = 0 CTUe
+        CTUh_c = 0 CTUh
+        CTUh_nc = 0 CTUh
+        Epf = 0 kg_P_Eq
+        Epm = 0 kg_N_Eq
+        Ept = 0 mol_N_Eq
+        GWP = 0 kg_CO2_Eq
+        GWPf = 0 kg_CO2_Eq
+        GWPlu = 0 kg_CO2_Eq
+        IR = 0 kBq_U235_Eq
+        LU = 0 u
+        ODP = 0 kg_CFC_11_Eq
+        PM = 0 disease_incidence
+        POCP = 0 kg_NMVOC_Eq
+        WU = 0 m3_world_eq_deprived
+        TPE = 0 MJ_net_calorific_value
+    }
+}
+
+process electricity_production {
+    params {
+        geo = "GLO"
+    }
+    variables {
+        data = lookup electricity_mix match geo = geo
+    }
+    products {
+        1 kWh electricity
+    }
+    impacts {
+        data.ADPe ADPe
+        data.ADPf ADPf
+        data.AP AP
+        data.CTUe CTUe
+        data.CTUh_c CTUh_c
+        data.CTUh_nc CTUh_nc
+        data.Epf Epf
+        data.Epm Epm
+        data.Ept Ept
+        data.GWP GWP
+        data.GWPf GWPf
+        data.GWPlu GWPlu
+        data.IR IR
+        data.LU LU
+        data.ODP ODP
+        data.PM PM
+        data.POCP POCP
+        data.WU WU
+        data.TPE TPE
+    }
+}

@@ -1,0 +1,94 @@
+/*
+ENTRYPOINT
+*/
+
+process pool_server {
+    params {
+        id = "client_vm"
+    }
+    products {
+        1 hour pool_server
+    }
+    inputs {
+        1 hour pool_server from pool_server_fn( id = id, lc_step = "manufacturing" )
+        1 hour pool_server from pool_server_fn( id = id, lc_step = "transport" )
+        1 hour pool_server from pool_server_fn( id = id, lc_step = "use" )
+    }
+}
+
+process pool_network {
+    params {
+        id = "client_network"
+    }
+    products {
+        1 hour pool_network
+    }
+    inputs {
+        1 hour pool_network from pool_network_fn( id = id, lc_step = "manufacturing" )
+        1 hour pool_network from pool_network_fn( id = id, lc_step = "transport" )
+        1 hour pool_network from pool_network_fn( id = id, lc_step = "use" )
+    }
+}
+
+process pool_hardware {
+    params {
+        id = "client_vm"
+    }
+    products {
+        1 hour pool_hardware
+    }
+    inputs {
+        1 hour pool_hardware from pool_hardware_fn( id = id, lc_step = "manufacturing" )
+        1 hour pool_hardware from pool_hardware_fn( id = id, lc_step = "transport" )
+        1 hour pool_hardware from pool_hardware_fn( id = id, lc_step = "use" )
+    }
+}
+
+/*
+PER LC STEP
+*/
+
+process pool_server_fn {
+    params {
+        id = "client_vm"
+        lc_step = "manufacturing"
+    }
+    products {
+        1 hour pool_server
+    }
+    inputs {
+        for_each server from hw_inventory match ( pool_id = id, kind = "server" ) {
+            1 hour server from server( id = server.id ) match ( lc_step = lc_step )
+        }
+    }
+}
+
+process pool_network_fn {
+    params {
+        id = "client_vm"
+        lc_step = "manufacturing"
+    }
+    products {
+        1 hour pool_network
+    }
+    inputs {
+        for_each network from hw_inventory match ( pool_id = id, kind = "network" ) {
+            1 hour network from network( id = network.id ) match ( lc_step = lc_step )
+        }
+    }
+}
+
+process pool_hardware_fn {
+    params {
+        id = "client_vm"
+        lc_step = "manufacturing"
+    }
+    products {
+        1 hour pool_hardware
+    }
+    inputs {
+        for_each hw from hw_inventory match ( pool_id = id ) {
+            1 hour hardware from hardware( id = hw.id, kind = hw.kind ) match ( lc_step = lc_step )
+        }
+    }
+}

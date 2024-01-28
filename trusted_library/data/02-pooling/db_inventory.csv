@@ -1,0 +1,4 @@
+id,pool_id,volume
+db-01,client_database,100
+db-02,client_database,200
+db-03,client_database,400

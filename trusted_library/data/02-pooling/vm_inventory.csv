@@ -1,0 +1,4 @@
+id,pool_id,vcpu_size,ram_size,storage_size,duration
+vm-01,client_vm,1,4,20,2
+vm-02,client_vm,2,16,400,4
+vm-03,client_vm,4,8,800,8
