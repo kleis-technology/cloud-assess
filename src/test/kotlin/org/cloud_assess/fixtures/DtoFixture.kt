@@ -1,50 +1,59 @@
 package org.cloud_assess.fixtures
 
-import org.cloud_assess.dto.request.*
-import org.cloud_assess.dto.response.*
+import org.cloud_assess.dto.*
 
+@Suppress("SameParameterValue")
 class DtoFixture {
     companion object {
-        fun serviceLayerDto(): ServiceLayerDto {
-            return ServiceLayerDto(
-                internalWorkloadDto(),
-                listOf(
-                    virtualMachineDto("c1"),
+        fun virtualMachineListDto(): VirtualMachineListDto {
+            return VirtualMachineListDto(
+                period = quantityHour(1.0),
+                virtualMachines = listOf(
+                    virtualMachineDto("vm-01"),
                 )
             )
         }
 
-        fun internalWorkloadDto(): InternalWorkloadDto {
-            return InternalWorkloadDto(
-                ram = quantityMemoryTime(10.0),
-                storage = quantityMemoryTime(10.0),
-            )
-        }
-
-        fun virtualMachineDto(id: String): VirtualMachineDto {
+        fun virtualMachineDto(
+            id: String = "vm-01",
+            poolId: String = "client_vm",
+            ram: Double = 10.0,
+            storage: Double = 10.0,
+            vcpu: Double = 1.0,
+        ): VirtualMachineDto {
             return VirtualMachineDto(
-                id,
-                ram = quantityMemoryTime(10.0),
-                storage = quantityMemoryTime(10.0),
+                id = id,
+                poolId = poolId,
+                ram = quantityMemory(ram),
+                storage = quantityMemory(storage),
+                vcpu = quantityVCPU(vcpu),
                 meta = mapOf(
                     "region" to "FR",
                 ),
             )
         }
 
-        fun quantityMemoryTime(amount: Double = 10.0): QuantityMemoryTimeDto {
-            return QuantityMemoryTimeDto(
+        private fun quantityVCPU(amount: Double = 1.0): QuantityVCPUDto {
+            return QuantityVCPUDto(amount, VCPUUnitsDto.vCPU)
+        }
+
+        private fun quantityMemory(amount: Double = 10.0): QuantityMemoryDto {
+            return QuantityMemoryDto(
                 amount,
-                MemoryTimeUnitsDto.GB_HOUR
+                MemoryUnitsDto.gB,
             )
+        }
+
+        private fun quantityHour(amount: Double = 1.0): QuantityTimeDto {
+            return QuantityTimeDto(1.0, TimeUnitsDto.hour)
         }
 
         fun assessmentDto(id: String): AssessmentDto {
             return AssessmentDto(
                 request = requestDto(id),
                 impacts = ImpactsDto(
-                    ADPe = impactDto(),
-                    ADPf = impactDto(),
+                    adPe = impactDto(),
+                    adPf = impactDto(),
                     AP = impactDto(),
                     GWP = impactDto(),
                     LU = impactDto(),
@@ -52,24 +61,24 @@ class DtoFixture {
                     PM = impactDto(),
                     POCP = impactDto(),
                     WU = impactDto(),
-                    CTUe = impactDto(),
-                    CTUh_c = impactDto(),
-                    CTUh_nc = impactDto(),
-                    Epf = impactDto(),
-                    Epm = impactDto(),
-                    Ept = impactDto(),
+                    ctUe = impactDto(),
+                    ctUhC = impactDto(),
+                    ctUhNc = impactDto(),
+                    epf = impactDto(),
+                    epm = impactDto(),
+                    ept = impactDto(),
                     IR = impactDto(),
                 )
             )
         }
 
-        fun impactDto(): ImpactDto {
+        private fun impactDto(): ImpactDto {
             return ImpactDto(
                 total = oneKgCO2eqDto(),
             )
         }
 
-        fun requestDto(id: String): RequestDto {
+        private fun requestDto(id: String): RequestDto {
             return RequestDto(
                 id = id,
                 quantity = oneHourDto(),
@@ -77,14 +86,14 @@ class DtoFixture {
             )
         }
 
-        fun oneHourDto(): QuantityDto {
+        private fun oneHourDto(): QuantityDto {
             return QuantityDto(
                 1.0,
                 "hour"
             )
         }
 
-        fun oneKgCO2eqDto(): QuantityDto {
+        private fun oneKgCO2eqDto(): QuantityDto {
             return QuantityDto(
                 1.0,
                 "kgCO2eq"

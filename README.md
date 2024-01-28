@@ -84,42 +84,38 @@ For instance, say we want to assess the environmental impact of using a virtual 
 The request takes the following form:
 ```json
 {
+  "period": {
+    "amount": 1.0,
+    "unit": "hour"
+  },
   "virtual_machines": [
     {
       "id": "c1",
+      "pool_id": "client_vm",
+      "vcpu": {
+        "amount": 1.0,
+        "unit": "vCPU"
+      },
       "ram": {
         "amount": 32.0,
-        "unit": "GB_hour"
+        "unit": "GB"
       },
       "storage": {
         "amount": 1024.0,
-        "unit": "GB_hour"
+        "unit": "GB"
       },
       "meta": {
         "region": "sofia",
         "env": "production"
       }
     }
-  ],
-  "internal_workload": {
-    "ram": {
-      "amount": 10.0,
-      "unit": "GB_hour"
-    },
-    "storage": {
-      "amount": 50.0,
-      "unit": "GB_hour"
-    }
-  }
+  ]
 }
 ```
 In this request, we specify the usage of our virtual machine in terms 
-of the quantity of RAM and storage used (in `GB * hour`). 
-The request also includes the so-called "internal workload":
-that represents the virtual machines that are necessary to operate the service
-but that are not directly associated with clients.
+of the quantity of RAM and storage used. 
 
-Running this request yields an impact assessment with the 16 well-known LCA indicators.
+Running this request yields an impact assessment with the common LCA indicators.
 Of course, in this example, we ran the assessment for a single virtual machine,
 but nothing stops you from assessing as many virtual machines as you want.
 <details>

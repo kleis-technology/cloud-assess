@@ -16,33 +16,37 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ServiceLayerDto'
+              $ref: '#/components/schemas/VirtualMachineListDto'
             example:
-              internal_workload:
-                ram:
-                  amount: 10.0
-                  unit: GB_hour
-                storage:
-                  amount: 50.0
-                  unit: GB_hour
+              period:
+                amount: 1.0
+                unit: hour
               virtual_machines:
                 - id: c1
+                  pool_id: client_vm
                   ram:
                     amount: 32.0
-                    unit: GB_hour
+                    unit: GB
                   storage:
                     amount: 1024.0
-                    unit: GB_hour
+                    unit: GB
+                  vcpu:
+                    amount: 1.0
+                    unit: vCPU
                   meta:
                     region: sofia
                     env: production
                 - id: c2
+                  pool_id: client_vm
                   ram:
                     amount: 16.0
-                    unit: GB_hour
+                    unit: GB
                   storage:
                     amount: 2048.0
-                    unit: GB_hour
+                    unit: GB
+                  vcpu:
+                    amount: 1.0
+                    unit: vCPU
                   meta:
                     region: sofia
                     env: production
@@ -68,7 +72,7 @@ components:
   schemas:
     VirtualMachineListAssessmentDto:
       type: object
-      required: 
+      required:
         - virtual_machines
       properties:
         virtual_machines:
@@ -97,7 +101,7 @@ components:
           $ref: '#/components/schemas/QuantityDto'
         meta:
           type: object
-          default: {}
+          default: { }
           additionalProperties:
             type: string
     QuantityDto:
@@ -170,48 +174,44 @@ components:
       properties:
         total:
           $ref: '#/components/schemas/QuantityDto'
-    ServiceLayerDto:
+    VirtualMachineListDto:
       type: object
       required:
-        - internal_workload
+        - period
         - virtual_machines
       properties:
-        internal_workload:
-          $ref: '#/components/schemas/InternalWorkloadDto'
+        period:
+          $ref: '#/components/schemas/QuantityTimeDto'
         virtual_machines:
           type: array
           items:
             $ref: '#/components/schemas/VirtualMachineDto'
-    InternalWorkloadDto:
-      type: object
-      required:
-        - ram
-        - storage
-      properties:
-        ram:
-          $ref: '#/components/schemas/QuantityMemoryTimeDto'
-        storage:
-          $ref: '#/components/schemas/QuantityMemoryTimeDto'
     VirtualMachineDto:
       type: object
       required:
         - id
+        - pool_id
         - ram
         - storage
+        - vcpu
         - meta
       properties:
         id:
           type: string
+        pool_id:
+          type: string
         ram:
-          $ref: '#/components/schemas/QuantityMemoryTimeDto'
+          $ref: '#/components/schemas/QuantityMemoryDto'
         storage:
-          $ref: '#/components/schemas/QuantityMemoryTimeDto'
+          $ref: '#/components/schemas/QuantityMemoryDto'
+        vcpu:
+          $ref: '#/components/schemas/QuantityVCPUDto'
         meta:
           type: object
-          default: {}
+          default: { }
           additionalProperties:
             type: string
-    QuantityMemoryTimeDto:
+    QuantityVCPUDto:
       type: object
       required:
         - amount
@@ -221,11 +221,42 @@ components:
           type: number
           format: double
         unit:
-          $ref: '#/components/schemas/MemoryTimeUnitsDto'
-    MemoryTimeUnitsDto:
+          $ref: '#/components/schemas/VCPUUnitsDto'
+    QuantityTimeDto:
+      type: object
+      required:
+        - amount
+        - unit
+      properties:
+        amount:
+          type: number
+          format: double
+        unit:
+          $ref: '#/components/schemas/TimeUnitsDto'
+    QuantityMemoryDto:
+      type: object
+      required:
+        - amount
+        - unit
+      properties:
+        amount:
+          type: number
+          format: double
+        unit:
+          $ref: '#/components/schemas/MemoryUnitsDto'
+    VCPUUnitsDto:
       type: string
       enum:
-        - GB_hour
+        - vCPU
+    MemoryUnitsDto:
+      type: string
+      enum:
+        - GB
+        - TB
+    TimeUnitsDto:
+      type: string
+      enum:
+        - hour
     HealthStatusDto:
       type: object
       properties:

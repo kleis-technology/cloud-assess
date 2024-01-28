@@ -1,15 +1,18 @@
 package org.cloud_assess.service
 
-import org.cloud_assess.dto.request.ServiceLayerDto
-import org.cloud_assess.dto.request.VirtualMachineDto
-import org.cloud_assess.dto.response.*
+import ch.kleis.lcaac.core.lang.value.QuantityValue
+import ch.kleis.lcaac.core.math.basic.BasicNumber
+import org.cloud_assess.dto.*
+import org.cloud_assess.model.Indicator
 import org.cloud_assess.model.VirtualMachineAnalysis
-import org.cloud_assess.dto.toQuantityDto
 import org.springframework.stereotype.Service
 
 @Service
 class MapperService {
-    fun map(analysis: Map<String, VirtualMachineAnalysis>, dto: ServiceLayerDto): VirtualMachineListAssessmentDto {
+    fun map(
+        analysis: Map<String, VirtualMachineAnalysis>,
+        dto: VirtualMachineListDto
+    ): VirtualMachineListAssessmentDto {
         return VirtualMachineListAssessmentDto(
             dto.virtualMachines.map {
                 val vmAnalysis = analysis[it.id] ?: throw IllegalStateException("")
@@ -24,17 +27,24 @@ class MapperService {
             total = quantity.toQuantityDto()
         )
     }
-    
+
+    private fun QuantityValue<BasicNumber>.toQuantityDto(): QuantityDto {
+        return QuantityDto(
+            this.amount.value,
+            this.unit.toString(),
+        )
+    }
+
     fun assessmentDto(analysis: VirtualMachineAnalysis, vm: VirtualMachineDto): AssessmentDto {
         return AssessmentDto(
             request = RequestDto(
                 id = vm.id,
-                quantity = QuantityDto(1.0, "hour"),
+                quantity = QuantityDto(analysis.period.amount, analysis.period.unit.value),
                 meta = vm.meta,
             ),
             impacts = ImpactsDto(
-                ADPe = impactDto(analysis, Indicator.ADPe),
-                ADPf = impactDto(analysis, Indicator.ADPf),
+                adPe = impactDto(analysis, Indicator.ADPe),
+                adPf = impactDto(analysis, Indicator.ADPf),
                 AP = impactDto(analysis, Indicator.AP),
                 GWP = impactDto(analysis, Indicator.GWP),
                 LU = impactDto(analysis, Indicator.LU),
@@ -42,12 +52,12 @@ class MapperService {
                 PM = impactDto(analysis, Indicator.PM),
                 POCP = impactDto(analysis, Indicator.POCP),
                 WU = impactDto(analysis, Indicator.WU),
-                CTUe = impactDto(analysis, Indicator.CTUe),
-                CTUh_c = impactDto(analysis, Indicator.CTUh_c),
-                CTUh_nc = impactDto(analysis, Indicator.CTUh_nc),
-                Epf = impactDto(analysis, Indicator.Epf),
-                Epm = impactDto(analysis, Indicator.Epm),
-                Ept = impactDto(analysis, Indicator.Ept),
+                ctUe = impactDto(analysis, Indicator.CTUe),
+                ctUhC = impactDto(analysis, Indicator.CTUh_c),
+                ctUhNc = impactDto(analysis, Indicator.CTUh_nc),
+                epf = impactDto(analysis, Indicator.Epf),
+                epm = impactDto(analysis, Indicator.Epm),
+                ept = impactDto(analysis, Indicator.Ept),
                 IR = impactDto(analysis, Indicator.IR),
             )
         )

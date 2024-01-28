@@ -6,11 +6,7 @@ import ch.kleis.lcaac.core.math.basic.BasicNumber
 
 class ModelFixture {
     companion object {
-        fun oneOf(ref: String): EQuantityScale<BasicNumber> {
-            return EQuantityScale(BasicNumber(1.0), EDataRef(ref))
-        }
-
-        fun onePiece(): EQuantityScale<BasicNumber> = oneOf("piece")
-        fun oneHour(): EQuantityScale<BasicNumber> = oneOf("hour")
+        fun oneHour(): EQuantityScale<BasicNumber> = EQuantityScale(BasicNumber(1.0), EDataRef("hour"))
+        fun oneUnit(): EQuantityScale<BasicNumber> = EQuantityScale(BasicNumber(1.0), EDataRef("u"))
     }
 }
