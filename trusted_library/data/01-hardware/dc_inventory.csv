@@ -1,0 +1,4 @@
+id,geo,reserved_power,lifespan
+dc-01,FR,100,25
+dc-02,CH,50,50
+dc-03,DE,500,50

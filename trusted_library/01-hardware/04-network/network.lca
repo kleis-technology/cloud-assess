@@ -1,0 +1,87 @@
+/*
+ENTRYPOINT
+*/
+
+process network {
+    params {
+        id = "net-01"
+    }
+    products {
+        1 hour network
+    }
+    inputs {
+        1 hour network from network(id = id) match (lc_step = "manufacturing")
+        1 hour network from network(id = id) match (lc_step = "transport")
+        1 hour network from network(id = id) match (lc_step = "use")
+    }
+}
+
+/*
+PER LC STEP
+
+TODO: It is exactly the same model as storage. Why?
+TODO: Why not including bandwidth or number of ports in functional unit?
+*/
+
+process network {
+    labels {
+        lc_step = "manufacturing"
+    }
+    params {
+        id = "net-01"
+    }
+    variables {
+        data = lookup hw_inventory match (id = id, kind = "network")
+    }
+    products {
+        data.lifespan network
+    }
+    inputs {
+        // share of impact from datacenter
+        data.lifespan * data.power datacenter from wrapper_dc_fn( id = data.dc_id, lc_step = lc_step )
+    }
+
+    // TODO: According to PCR, proper impacts are not included. Why?
+}
+
+process network {
+    labels {
+        lc_step = "transport"
+    }
+    params {
+        id = "net-01"
+    }
+    variables {
+        data = lookup hw_inventory match (id = id, kind = "network")
+    }
+    products {
+        data.lifespan network
+    }
+    inputs {
+        // share of impact from datacenter
+        data.lifespan * data.power datacenter from wrapper_dc_fn( id = data.dc_id, lc_step = lc_step )
+    }
+
+    // TODO: According to PCR, proper impacts are not included. Why?
+}
+
+process network {
+    labels {
+        lc_step = "use"
+    }
+    params {
+        id = "net-01"
+    }
+    variables {
+        data = lookup hw_inventory match (id = id, kind = "network")
+    }
+    products {
+        1 hour network
+    }
+    inputs {
+        // share of impact from datacenter
+        1 hour * data.power datacenter from wrapper_dc_fn( id = data.dc_id, lc_step = lc_step )
+    }
+
+    // TODO: According to PCR, proper impacts are not included. Why?
+}

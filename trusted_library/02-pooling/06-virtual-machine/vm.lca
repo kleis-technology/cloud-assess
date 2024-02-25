@@ -1,0 +1,63 @@
+datasource vm_inventory {
+    location = "data/02-pooling/vm_inventory.csv"
+    schema {
+        id = "vm-01"
+        pool_id = "client_vm"
+
+        // TODO: We assume these values are measured during a 1 hour window.
+        vcpu_size = 1 vCPU
+        ram_size = 4 GB
+        storage_size = 20 GB
+    }
+}
+
+variables {
+    vm_timewindow = 1 hour
+}
+
+/*
+ENTRYPOINT
+*/
+
+process vm {
+    params {
+        id = "vm-01"
+    }
+    products {
+        1 hour vm
+    }
+    inputs {
+        1 hour vm from vm_fn( id = id, lc_step = "manufacturing" )
+        1 hour vm from vm_fn( id = id, lc_step = "transport" )
+        1 hour vm from vm_fn( id = id, lc_step = "use" )
+    }
+}
+
+/*
+PER LC STEP
+*/
+
+process vm_fn {
+    params {
+        id = "vm-01"
+        lc_step = "manufacturing"
+    }
+    variables {
+        data = lookup vm_inventory match id = id
+    }
+    products {
+        vm_timewindow vm
+    }
+
+    // impacts from pool of servers
+    inputs {
+        data.ram_size ram from vm_wrapper_pool_server( id = data.pool_id ) match ( lc_step = lc_step )
+        data.vcpu_size vcpu from vm_wrapper_pool_server( id = data.pool_id ) match ( lc_step = lc_step )
+        data.storage_size storage from vm_wrapper_pool_server( id = data.pool_id ) match ( lc_step = lc_step )
+    }
+
+    // impacts from pool of network hardware
+    inputs {
+        data.vcpu_size vcpu from vm_wrapper_pool_network( id = data.pool_id, lc_step = lc_step )
+    }
+}

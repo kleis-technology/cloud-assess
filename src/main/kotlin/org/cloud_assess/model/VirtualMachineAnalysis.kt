@@ -6,19 +6,20 @@ import ch.kleis.lcaac.core.lang.value.ProductValue
 import ch.kleis.lcaac.core.lang.value.QuantityValue
 import ch.kleis.lcaac.core.math.basic.BasicMatrix
 import ch.kleis.lcaac.core.math.basic.BasicNumber
-import org.cloud_assess.dto.response.Indicator
+import org.cloud_assess.dto.QuantityTimeDto
 
 class VirtualMachineAnalysis(
-    private val id: String,
+    id: String,
+    val period: QuantityTimeDto,
     private val rawAnalysis: ContributionAnalysis<BasicNumber, BasicMatrix>,
 ) {
-    private val vm = rawAnalysis.getObservablePorts().getElements()
+    private val main = rawAnalysis.getObservablePorts().getElements()
         .filterIsInstance<ProductValue<BasicNumber>>()
-        .firstOrNull { it.name == "vm" }
+        .firstOrNull { it.name == "__main__" }
         ?: throw IllegalStateException("no impacts found for id=$id")
 
     fun contribution(target: Indicator): QuantityValue<BasicNumber> {
-        return rawAnalysis.getPortContribution(vm, indicator(target))
+        return rawAnalysis.getPortContribution(main, indicator(target))
     }
 
     private fun indicator(indicator: Indicator): IndicatorValue<BasicNumber> {

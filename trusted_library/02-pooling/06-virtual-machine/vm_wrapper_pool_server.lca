@@ -1,0 +1,99 @@
+/*
+The wrapper pool process is responsible for allocating
+the impact of the underlying pool of servers with respect
+to the cpu/ram/storage ratios.
+*/
+process vm_wrapper_pool_server {
+    labels {
+        lc_step = "manufacturing"
+    }
+    variables {
+        // manufacturing-specific allocation ratios
+        ratio_cpu = 10 percent
+        ratio_ram = 60 percent
+        ratio_storage = 30 percent
+    }
+    params {
+        id = "client_vm"
+    }
+    variables {
+        // According to PCR, allocation built with with respect to total "reserved" resources.
+        reserved_vcpu = sum( vm_inventory match pool_id = id, vcpu_size )
+        reserved_ram = sum( vm_inventory match pool_id = id, ram_size )
+        reserved_storage = sum( vm_inventory match pool_id = id, storage_size )
+    }
+    products {
+        reserved_ram ram allocate ratio_ram
+        reserved_vcpu vcpu allocate ratio_cpu
+        reserved_storage storage allocate ratio_storage
+    }
+    inputs {
+        vm_timewindow pool_server from pool_server_fn( id = id, lc_step = lc_step )
+    }
+}
+
+process vm_wrapper_pool_server {
+    labels {
+        lc_step = "transport"
+    }
+    variables {
+        /*
+        transport-specific allocation ratios
+
+        TODO: In PCR, the maximum ratio is used. This is incorrect as it introduced accounting distortions.
+        */
+        ratio_cpu = 20 percent
+        ratio_ram = 50 percent
+        ratio_storage = 30 percent
+    }
+    params {
+        id = "client_vm"
+    }
+    variables {
+        // According to PCR, allocation built with with respect to total "reserved" resources.
+        reserved_vcpu = sum( vm_inventory match pool_id = id, vcpu_size )
+        reserved_ram = sum( vm_inventory match pool_id = id, ram_size )
+        reserved_storage = sum( vm_inventory match pool_id = id, storage_size )
+    }
+    products {
+        reserved_ram ram allocate ratio_ram
+        reserved_vcpu vcpu allocate ratio_cpu
+        reserved_storage storage allocate ratio_storage
+    }
+    inputs {
+        vm_timewindow pool_server from pool_server_fn( id = id, lc_step = lc_step )
+    }
+}
+
+process vm_wrapper_pool_server {
+    labels {
+        lc_step = "use"
+    }
+    variables {
+        /*
+        transport-specific allocation ratios
+
+        TODO: In PCR, the maximum ratio is used. This is incorrect as it introduced accounting distortions.
+        */
+        ratio_cpu = 20 percent
+        ratio_ram = 50 percent
+        ratio_storage = 30 percent
+    }
+    params {
+        id = "client_vm"
+    }
+    variables {
+        // According to PCR, allocation built with with respect to total "reserved" resources.
+        reserved_vcpu = sum( vm_inventory match pool_id = id, vcpu_size )
+        reserved_ram = sum( vm_inventory match pool_id = id, ram_size )
+        reserved_storage = sum( vm_inventory match pool_id = id, storage_size )
+    }
+    products {
+        reserved_ram ram allocate ratio_ram
+        reserved_vcpu vcpu allocate ratio_cpu
+        reserved_storage storage allocate ratio_storage
+    }
+    inputs {
+        vm_timewindow pool_server from pool_server_fn( id = id, lc_step = lc_step )
+    }
+}

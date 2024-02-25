@@ -2,7 +2,6 @@ package org.cloud_assess.config
 
 import ch.kleis.lcaac.core.datasource.CsvSourceOperations
 import ch.kleis.lcaac.core.lang.SymbolTable
-import ch.kleis.lcaac.core.lang.evaluator.Evaluator
 import ch.kleis.lcaac.core.math.basic.BasicNumber
 import ch.kleis.lcaac.core.math.basic.BasicOperations
 import ch.kleis.lcaac.grammar.Loader
@@ -22,11 +21,13 @@ import kotlin.io.path.isRegularFile
 @Configuration
 class LcaConfig {
     @Bean
-    fun lcaFiles(
+    fun symbolTable(
         @Value("\${lca.path}") modelDirectory: File,
     ): SymbolTable<BasicNumber> {
         val files = Files.walk(Paths.get(modelDirectory.path))
-            .filter { it.isRegularFile() }
+            .filter {
+                it.isRegularFile() && it.fileName.toString().endsWith(".lca")
+            }
             .map {
                 val lexer = LcaLangLexer(CharStreams.fromStream(it.toFile().inputStream()))
                 val tokens = CommonTokenStream(lexer)
@@ -41,10 +42,7 @@ class LcaConfig {
     }
 
     @Bean
-    fun basicEvaluator(
+    fun csvSourceOps(
         @Value("\${lca.path}") modelDirectory: File,
-        symbolTable: SymbolTable<BasicNumber>,
-    ): Evaluator<BasicNumber> {
-        return Evaluator(symbolTable, BasicOperations, CsvSourceOperations(modelDirectory, BasicOperations) )
-    }
+    ): CsvSourceOperations<BasicNumber> = CsvSourceOperations(modelDirectory, BasicOperations)
 }

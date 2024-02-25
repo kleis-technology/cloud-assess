@@ -1,0 +1,13 @@
+
+test total_storage_space_should_match_impact {
+    given {
+        for_each data from storage_space_inventory {
+            ss_timewindow storage from storage_space( id = data.id )
+        }
+        -1 ss_timewindow pool_server from pool_server( id = "client_storage_space" )
+        -1 ss_timewindow pool_network from pool_network( id = "client_storage_space" )
+    }
+    assert {
+        GWP between -1e-6 kg_CO2_Eq and 1e-6 kg_CO2_Eq
+    }
+}

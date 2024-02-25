@@ -1,0 +1,58 @@
+datasource compute_inventory {
+    location = "data/02-pooling/compute_inventory.csv"
+    schema {
+        id = "comp-01" // e.g., a client id
+        pool_id = "client_compute"
+        nb_cores = 1 core
+    }
+}
+
+variables {
+    compute_timewindow = 1 hour
+}
+
+/*
+ENTRYPOINT
+
+TODO: Note that this functional unit aims at scientific computing.
+*/
+
+process compute {
+    params {
+        id = "comp-01"
+    }
+    products {
+        1 core * 1 hour compute
+    }
+    inputs {
+        1 core * hour compute from compute_fn( id = id, lc_step = "manufacturing" )
+        1 core * hour compute from compute_fn( id = id, lc_step = "transport" )
+        1 core * hour compute from compute_fn( id = id, lc_step = "use" )
+    }
+}
+
+/*
+PER LC STEP
+*/
+
+process compute_fn {
+    params {
+        id = "comp-01"
+        lc_step = "manufacturing"
+    }
+    variables {
+        data = lookup compute_inventory match id = id
+        total_nb_cores = sum( compute_inventory match pool_id = data.pool_id, nb_cores )
+    }
+    products {
+        data.nb_cores * compute_timewindow compute
+    }
+    // impacts from pool of servers
+    inputs {
+        data.nb_cores cpu from compute_wrapper_pool_server(id = data.pool_id, lc_step = lc_step)
+    }
+    // impacts from pool of network equipments
+    inputs {
+        data.nb_cores cpu from compute_wrapper_pool_network(id = data.pool_id, lc_step = lc_step)
+    }
+}

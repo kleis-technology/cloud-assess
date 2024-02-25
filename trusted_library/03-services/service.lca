@@ -1,0 +1,16 @@
+/*
+We model here a generic a service over a dedicated pool of equipments.
+*/
+
+process service {
+    params {
+        pool_id = "client_vm"
+        service_level = 1 u
+    }
+    products {
+        service_level * 1 hour service
+    }
+    inputs {
+        1 hour pool_hardware from pool_hardware( id = pool_id )
+    }
+}

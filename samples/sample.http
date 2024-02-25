@@ -2,26 +2,45 @@ POST http://localhost:8080/virtual_machines
 Content-Type: application/json
 
 {
-  "internal_workload": {
-    "ram": {
-      "amount": 10.0,
-      "unit": "GB_hour"
-    },
-    "storage": {
-      "amount": 50.0,
-      "unit": "GB_hour"
-    }
+  "period": {
+    "amount": 1.0,
+    "unit": "hour"
   },
   "virtual_machines": [
     {
       "id": "c1",
+      "pool_id": "client_vm",
       "ram": {
         "amount": 32.0,
-        "unit": "GB_hour"
+        "unit": "GB"
       },
       "storage": {
         "amount": 1024.0,
-        "unit": "GB_hour"
+        "unit": "GB"
+      },
+      "vcpu": {
+        "amount": 1.0,
+        "unit": "vCPU"
+      },
+      "meta": {
+        "region": "sofia",
+        "env": "production"
+      }
+    },
+    {
+      "id": "c2",
+      "pool_id": "client_vm",
+      "ram": {
+        "amount": 32.0,
+        "unit": "GB"
+      },
+      "storage": {
+        "amount": 1024.0,
+        "unit": "GB"
+      },
+      "vcpu": {
+        "amount": 1.0,
+        "unit": "vCPU"
       },
       "meta": {
         "region": "sofia",

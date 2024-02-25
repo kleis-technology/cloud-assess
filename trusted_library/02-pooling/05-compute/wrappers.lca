@@ -1,0 +1,32 @@
+// TODO: CAUTION: Not specified this way in the PCR: here we allocate wrt reserved cores during the time window.
+process compute_wrapper_pool_server {
+    params {
+        id = "client_compute"
+        lc_step = "manufacturing"
+    }
+    variables {
+        reserved_cpu = sum(compute_inventory match pool_id = id, nb_cores)
+    }
+    products {
+        reserved_cpu cpu
+    }
+    inputs {
+        compute_timewindow pool_server from pool_server_fn(id = id, lc_step = lc_step)
+    }
+}
+
+process compute_wrapper_pool_network {
+    params {
+        id = "client_compute"
+        lc_step = "manufacturing"
+    }
+    variables {
+         reserved_cpu = sum(compute_inventory match pool_id = id, nb_cores)
+    }
+    products {
+        reserved_cpu cpu
+    }
+    inputs {
+        compute_timewindow pool_network from pool_network_fn(id = id, lc_step = lc_step)
+    }
+}

@@ -1,0 +1,16 @@
+test vm_wrapper_pool_network {
+    variables {
+        id = "client_vm"
+
+        // According to PCR, allocation built with with respect to total "reserved" resources.
+        reserved_vcpu = sum( vm_inventory match pool_id = id, vcpu_size )
+    }
+    given {
+        reserved_vcpu vcpu from vm_wrapper_pool_network(id = id, lc_step = "manufacturing")
+
+        -1 vm_timewindow pool_network from pool_network_fn( id = id, lc_step = "manufacturing" )
+    }
+    assert {
+        GWP between -1e-6 kg_CO2_Eq and 1e-6 kg_CO2_Eq
+    }
+}
