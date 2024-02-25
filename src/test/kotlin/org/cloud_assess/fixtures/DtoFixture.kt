@@ -5,6 +5,31 @@ import org.cloud_assess.dto.*
 @Suppress("SameParameterValue")
 class DtoFixture {
     companion object {
+        fun poolListDto(): PoolListDto {
+            return PoolListDto(
+                period = quantityHour(1.0),
+                pools = listOf(
+                    poolDto("client_vm", 1.0),
+                )
+            )
+        }
+
+        fun poolDto(
+            id: String = "client_vm",
+            serviceLevel: Double = 1.0,
+        ): PoolDto {
+            return PoolDto(
+                id = id,
+                serviceLevel = QuantityDimensionlessDto(
+                    amount = serviceLevel,
+                    unit = DimensionlessUnitsDto.u,
+                ),
+                meta = mapOf(
+                    "region" to "FR",
+                ),
+            )
+        }
+
         fun virtualMachineListDto(): VirtualMachineListDto {
             return VirtualMachineListDto(
                 period = quantityHour(1.0),

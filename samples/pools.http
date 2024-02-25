@@ -1,0 +1,22 @@
+POST http://localhost:8080/pools/assess
+Content-Type: application/json
+
+{
+  "period": {
+    "amount": 1.0,
+    "unit": "hour"
+  },
+  "pools": [
+    {
+      "id": "client_vm",
+      "service_level": {
+        "amount": 10.0,
+        "unit": "u"
+      },
+      "meta": {
+        "region": "sofia",
+        "env": "production"
+      }
+    }
+  ]
+}

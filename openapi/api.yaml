@@ -173,11 +173,17 @@ components:
       required:
         - id
         - service_level
+        - meta
       properties:
         id:
           type: string
         service_level:
           $ref: '#/components/schemas/QuantityDimensionlessDto'
+        meta:
+          type: object
+          default: { }
+          additionalProperties:
+            type: string
     PoolListDto:
       type: object
       required:

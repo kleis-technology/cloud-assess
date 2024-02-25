@@ -1,4 +1,4 @@
-POST http://localhost:8080/virtual_machines
+POST http://localhost:8080/virtual_machines/assess
 Content-Type: application/json
 
 {
