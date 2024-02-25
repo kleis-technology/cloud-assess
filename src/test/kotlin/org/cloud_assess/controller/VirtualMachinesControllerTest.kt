@@ -49,7 +49,6 @@ class VirtualMachinesControllerTest {
     @Test
     fun virtualMachines_whenCorrectDto_then200() {
         // given
-        val vm = mockk<EProcessTemplateApplication<BasicNumber>>()
         val dto = virtualMachineListDto()
         val outputDto = VirtualMachineListAssessmentDto(
             virtualMachines = listOf(assessmentDto("c1"))
@@ -60,7 +59,7 @@ class VirtualMachinesControllerTest {
 
         // when/then
         mockMvc.perform(
-            post("/virtual_machines")
+            post("/virtual_machines/assess")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto))
         ).andExpect(status().isOk)
@@ -81,7 +80,7 @@ class VirtualMachinesControllerTest {
 
         // when/then
         mockMvc.perform(
-            post("/virtual_machines")
+            post("/virtual_machines/assess")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(dto)
         ).andExpect(status().isBadRequest)
