@@ -113,7 +113,7 @@ The request takes the following form:
 }
 ```
 In this request, we specify the usage of our virtual machine in terms 
-of the quantity of RAM and storage used. 
+of the quantity of resources used (ram, storage and vCPU).
 
 Running this request yields an impact assessment with the common LCA indicators.
 Of course, in this example, we ran the assessment for a single virtual machine,
@@ -251,8 +251,8 @@ The ambition of Cloud Assess is to offer a library of *transparent*,
 More precisely, this work builds on the existing [PCR](https://codde.fr/wp-content/uploads/2023/01/referentiel_rcp_datacenter_services_cloud.pdf)
 for data center and cloud services.
 The PCR defines 11 functional units, covering the hosting infrastructure (physical datacenter) up to 
-more abstract UFs, e.g., Software Services.
-Cloud Assess aims at covering the UFs at software level, but also UF that are not explicitly
+more abstract FUs, e.g., Software Services.
+Cloud Assess aims at covering the FUs at software level, but also FU that are not explicitly
 covered by the PCR
 
 | PCR No. | Functional Unit       | Status      |
@@ -263,8 +263,6 @@ covered by the PCR
 | 9       | Platform as a Service | planned     |
 | 10      | Function as a Service | planned     |
 | 11      | Software as a Service | planned     |
-| n/a     | Object storage        | in progress |
-| n/a     | Mail server           | in progress |
 
 These models are specified under the folder `trusted_library`.
 
@@ -281,28 +279,32 @@ more about the language itself.
 The source repository is available [here](https://github.com/kleis-technology/lcaac).
 
 
-The folder `trusted_library` comprises three folders.
-* `service` : this folder contains the definitions of the PCR models, e.g., 1 hour of a virtual machine.
-* `infra` : this folder contains intermediate models, e.g., pools of RAM or storage that aggregates the capabilities of the physical equipments.
-* `background` : this folder contains the emission factors of the physical layer. Note that the emission factors published in this repository are mock values.
-    Please, do not use them for real-world analysis.
+The folder `trusted_library` is organized as follows.
+* `01-hardware` : this folder contains the PCR models for the functional units 1 to 4.
+* `02-pooling` : this folder contains the PCR models for the functional units 5 to 8.
+* `03-services` : this folder contains the PCR models for functional units 9 and 10.
 
 Here is an illustration of this layering structure.
 
 <img alt="sankey" src="assets/sankey.png" width=800/>
 
-#### Editing the models
+#### Configuring the models
 
-You can edit the models in `trusted_library` with any text editor.
-In particular, you can fill in appropriate values for the `background`, or
-modify the default parameter values of intermediate processes.
+You can read and edit the models in `trusted_library` with any text editor.
+Unless you need to customize one of the functional units, there is no need to actually modify the models.
 
-You will soon recognize that the top processes, e.g. `virtual_machine`, 
-have parameters that are directly mapped to parameters in the server's API.
-Actually, the server's job can be decomposed as follows:
-* first, the server loads the models under the folder `trusted_library`
-* every API request is mapped to a query to these models
-* and the resulting assessment is returned to the client.
+The folder `trusted_library/data` contains inventory files (in CSV format),
+and associated emission factors. To adapt Cloud Assess you must fill in, at least, 
+the following inventories
+* `data/01-hardware/dc_inventory.csv` : this file lists the available datacenters.
+* `data/01-hardware/hw_inventory.csv` : this file lists the available hardware equipments.
+
+The following files should be filled with the relevant emission factors:
+* `data/01-hardware/dc_impacts.csv`
+* `data/01-hardware/hw_impacts.csv`
+* `data/01-hardware/electricity_mix.csv`
+
+Note that the emission factors presented in this repository are mock values.
 
 ## License
 
