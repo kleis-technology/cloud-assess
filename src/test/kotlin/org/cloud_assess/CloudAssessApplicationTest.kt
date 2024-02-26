@@ -48,7 +48,7 @@ class CloudAssessApplicationTest(
             val pool = actual[id]!!
             assertThat(pool.period).isEqualTo(QuantityTimeDto(1.0, TimeUnitsDto.hour))
             val gwp = pool.contribution(Indicator.GWP)
-            assertThat(gwp.amount.value).isCloseTo( 3.850511, Percentage.withPercentage(1e-3))
+            assertThat(gwp.amount.value).isCloseTo( 5.71403, Percentage.withPercentage(1e-3))
             assertThat(gwp.unit).isEqualTo(
                 UnitValue<BasicNumber>(
                     UnitSymbol.of("kg CO2-Eq"),
@@ -78,7 +78,7 @@ class CloudAssessApplicationTest(
             val vm = actual[id]!!
             assertThat(vm.period).isEqualTo(QuantityTimeDto(1.0, TimeUnitsDto.hour))
             val gwp = vm.contribution(Indicator.GWP)
-            assertThat(gwp.amount.value).isCloseTo(0.65994, Percentage.withPercentage(1e-3))
+            assertThat(gwp.amount.value).isCloseTo(0.971400, Percentage.withPercentage(1e-3))
             assertThat(gwp.unit).isEqualTo(
                 UnitValue<BasicNumber>(
                     UnitSymbol.of("kg CO2-Eq"),

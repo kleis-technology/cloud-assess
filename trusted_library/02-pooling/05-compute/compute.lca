@@ -28,6 +28,7 @@ process compute {
         1 core * hour compute from compute_fn( id = id, lc_step = "manufacturing" )
         1 core * hour compute from compute_fn( id = id, lc_step = "transport" )
         1 core * hour compute from compute_fn( id = id, lc_step = "use" )
+        1 core * hour compute from compute_fn( id = id, lc_step = "end-of-life" )
     }
 }
 

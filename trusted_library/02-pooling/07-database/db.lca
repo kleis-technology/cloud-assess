@@ -26,6 +26,7 @@ process db {
         1 hour db from db_fn( id = id, lc_step = "manufacturing" )
         1 hour db from db_fn( id = id, lc_step = "transport" )
         1 hour db from db_fn( id = id, lc_step = "use" )
+        1 hour db from db_fn( id = id, lc_step = "end-of-life" )
     }
 }
 

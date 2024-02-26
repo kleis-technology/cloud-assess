@@ -10,9 +10,10 @@ process server {
         1 hour server
     }
     inputs {
-        1 hour server from server(id = id) match ( lc_step = "manufacturing" )
-        1 hour server from server(id = id) match ( lc_step = "transport" )
-        1 hour server from server(id = id) match ( lc_step = "use" )
+        1 hour server from server( id = id ) match ( lc_step = "manufacturing" )
+        1 hour server from server( id = id ) match ( lc_step = "transport" )
+        1 hour server from server( id = id ) match ( lc_step = "use" )
+        1 hour server from server( id = id ) match ( lc_step = "end-of-life" )
     }
 }
 
@@ -28,7 +29,7 @@ process server {
         id = "srv-01"
     }
     variables {
-        data = lookup hw_inventory match (id = id, kind = "server")
+        data = lookup hw_inventory match ( id = id, kind = "server" )
     }
     products {
         data.lifespan server
@@ -72,7 +73,7 @@ process server {
         id = "srv-01"
     }
     variables {
-        data = lookup hw_inventory match (id = id, kind = "server")
+        data = lookup hw_inventory match ( id = id, kind = "server" )
     }
     products {
         data.lifespan server
@@ -116,7 +117,7 @@ process server {
         id = "srv-01"
     }
     variables {
-        data = lookup hw_inventory match (id = id, kind = "server")
+        data = lookup hw_inventory match ( id = id, kind = "server" )
     }
     products {
         1 hour server
@@ -151,3 +152,46 @@ process server {
     }
 }
 
+process server {
+    labels {
+        lc_step = "end-of-life"
+    }
+    params {
+        id = "srv-01"
+    }
+    variables {
+        data = lookup hw_inventory match ( id = id, kind = "server" )
+    }
+    products {
+        data.lifespan server
+    }
+    inputs {
+        // share of impact from datacenter
+        data.lifespan * data.power datacenter from wrapper_dc_fn( id = data.dc_id, lc_step = lc_step )
+    }
+
+    // proper server impacts
+    impacts {
+        for_each impact from hw_impacts match ( lc_step = lc_step, hw_id = id ) {
+            impact.ADPe ADPe
+            impact.ADPf ADPf
+            impact.AP AP
+            impact.CTUe CTUe
+            impact.CTUh_c CTUh_c
+            impact.CTUh_nc CTUh_nc
+            impact.Epf Epf
+            impact.Epm Epm
+            impact.Ept Ept
+            impact.GWP GWP
+            impact.GWPf GWPf
+            impact.GWPlu GWPlu
+            impact.IR IR
+            impact.LU LU
+            impact.ODP ODP
+            impact.PM PM
+            impact.POCP POCP
+            impact.WU WU
+            impact.TPE TPE
+        }
+    }
+}

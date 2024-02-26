@@ -21,6 +21,9 @@ process faas {
     }
     inputs {
         1 hour faas from faas_fn( id = id, lc_step = "manufacturing" )
+        1 hour faas from faas_fn( id = id, lc_step = "transport" )
+        1 hour faas from faas_fn( id = id, lc_step = "use" )
+        1 hour faas from faas_fn( id = id, lc_step = "end-of-life" )
     }
 }
 
@@ -36,6 +39,6 @@ process faas_fn {
         faas_timewindow faas
     }
     inputs {
-
+        // In progress
     }
 }

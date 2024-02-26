@@ -1,5 +1,5 @@
 /*
-    ENTRYPOINT
+ENTRYPOINT
 */
 
 process storage {
@@ -10,14 +10,15 @@ process storage {
         1 hour storage
     }
     inputs {
-        1 hour storage from storage match (lc_step = "manufacturing")
-        1 hour storage from storage match (lc_step = "transport")
-        1 hour storage from storage match (lc_step = "use")
+        1 hour storage from storage match ( lc_step = "manufacturing" )
+        1 hour storage from storage match ( lc_step = "transport" )
+        1 hour storage from storage match ( lc_step = "use" )
+        1 hour storage from storage match ( lc_step = "end-of-life" )
     }
 }
 
 /*
-    PER LC STEP
+PER LC STEP
 */
 
 process storage {
@@ -28,7 +29,7 @@ process storage {
         id = "sto-01"
     }
     variables {
-        data = lookup hw_inventory match (id = id, kind = "storage")
+        data = lookup hw_inventory match ( id = id, kind = "storage" )
     }
     products {
         data.lifespan storage
@@ -49,7 +50,7 @@ process storage {
         id = "sto-01"
     }
     variables {
-        data = lookup hw_inventory match (id = id, kind = "storage")
+        data = lookup hw_inventory match ( id = id, kind = "storage" )
     }
     products {
         data.lifespan storage
@@ -70,7 +71,7 @@ process storage {
         id = "sto-01"
     }
     variables {
-        data = lookup hw_inventory match (id = id, kind = "storage")
+        data = lookup hw_inventory match ( id = id, kind = "storage" )
     }
     products {
         1 hour storage
@@ -78,6 +79,27 @@ process storage {
     inputs {
         // share of impact from datacenter
         1 hour * data.power datacenter from wrapper_dc_fn( id = data.dc_id, lc_step = lc_step )
+    }
+
+    // TODO: According to PCR, proper impacts are not included. Why?
+}
+
+process storage {
+    labels {
+        lc_step = "end-of-life"
+    }
+    params {
+        id = "sto-01"
+    }
+    variables {
+        data = lookup hw_inventory match ( id = id, kind = "storage" )
+    }
+    products {
+        data.lifespan storage
+    }
+    inputs {
+        // share of impact from datacenter
+        data.lifespan * data.power datacenter from wrapper_dc_fn( id = data.dc_id, lc_step = lc_step )
     }
 
     // TODO: According to PCR, proper impacts are not included. Why?
