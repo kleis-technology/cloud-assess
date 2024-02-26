@@ -11,6 +11,8 @@ ARG APPJAR=build/libs/*.jar
 COPY ${APPJAR} app.jar
 RUN jar -xf ./app.jar
 
+COPY trusted_library trusted_library
+
 FROM eclipse-temurin:17
 
 LABEL org.opencontainers.image.source=https://github.com/kleis-technology/cloud-assess
@@ -24,5 +26,6 @@ ARG DEPENDENCY=/build/libs
 COPY --from=builder ${DEPENDENCY}/BOOT-INF/lib /app/lib
 COPY --from=builder ${DEPENDENCY}/META-INF /app/META-INF
 COPY --from=builder ${DEPENDENCY}/BOOT-INF/classes /app
+COPY --from=builder ${DEPENDENCY}/trusted_library /trusted_library
 
 CMD ["java","-Xmx4g", "-cp","app:app/lib/*","org.cloud_assess.ApplicationKt"]
