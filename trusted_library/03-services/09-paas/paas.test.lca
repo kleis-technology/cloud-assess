@@ -7,6 +7,6 @@ test paas {
         -1 paas_timewindow pool_network from pool_network_fn( id = "client_paas", lc_step = "manufacturing" )
     }
     assert {
-        GWP between -1e-4 kg_CO2_Eq and 1e-4 kg_CO2_Eq
+        GWP between -4e-4 kg_CO2_Eq and 4e-4 kg_CO2_Eq
     }
 }

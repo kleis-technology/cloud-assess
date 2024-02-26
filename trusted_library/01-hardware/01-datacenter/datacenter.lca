@@ -56,6 +56,7 @@ process datacenter {
         1 kWh datacenter from datacenter match ( lc_step = "manufacturing" )
         1 kWh datacenter from datacenter match ( lc_step = "transport" )
         1 kWh datacenter from datacenter match ( lc_step = "use" )
+        1 kWh datacenter from datacenter match ( lc_step = "end-of-life" )
     }
 }
 
@@ -157,4 +158,42 @@ process datacenter {
     }
 
     // TODO: Include maintenance, and other consumables, here if any
+}
+
+process datacenter {
+    labels {
+        lc_step = "end-of-life"
+    }
+    params {
+        id = "dc-01"
+    }
+    variables {
+        data = lookup dc_inventory match id = id
+    }
+    products {
+        data.reserved_power * data.lifespan datacenter
+    }
+    impacts {
+        for_each impact from dc_impacts match ( lc_step = "end-of-life", dc_id = id ) {
+            impact.ADPe ADPe
+            impact.ADPf ADPf
+            impact.AP AP
+            impact.CTUe CTUe
+            impact.CTUh_c CTUh_c
+            impact.CTUh_nc CTUh_nc
+            impact.Epf Epf
+            impact.Epm Epm
+            impact.Ept Ept
+            impact.GWP GWP
+            impact.GWPf GWPf
+            impact.GWPlu GWPlu
+            impact.IR IR
+            impact.LU LU
+            impact.ODP ODP
+            impact.PM PM
+            impact.POCP POCP
+            impact.WU WU
+            impact.TPE TPE
+        }
+    }
 }

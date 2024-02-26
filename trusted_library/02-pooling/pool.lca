@@ -13,6 +13,7 @@ process pool_server {
         1 hour pool_server from pool_server_fn( id = id, lc_step = "manufacturing" )
         1 hour pool_server from pool_server_fn( id = id, lc_step = "transport" )
         1 hour pool_server from pool_server_fn( id = id, lc_step = "use" )
+        1 hour pool_server from pool_server_fn( id = id, lc_step = "end-of-life" )
     }
 }
 
@@ -27,6 +28,7 @@ process pool_network {
         1 hour pool_network from pool_network_fn( id = id, lc_step = "manufacturing" )
         1 hour pool_network from pool_network_fn( id = id, lc_step = "transport" )
         1 hour pool_network from pool_network_fn( id = id, lc_step = "use" )
+        1 hour pool_network from pool_network_fn( id = id, lc_step = "end-of-life" )
     }
 }
 
@@ -41,6 +43,7 @@ process pool_hardware {
         1 hour pool_hardware from pool_hardware_fn( id = id, lc_step = "manufacturing" )
         1 hour pool_hardware from pool_hardware_fn( id = id, lc_step = "transport" )
         1 hour pool_hardware from pool_hardware_fn( id = id, lc_step = "use" )
+        1 hour pool_hardware from pool_hardware_fn( id = id, lc_step = "end-of-life" )
     }
 }
 

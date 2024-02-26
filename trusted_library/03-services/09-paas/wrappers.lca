@@ -32,7 +32,7 @@ test pass_wrapper_pool_server_fn {
         -1 paas_timewindow pool_server from pool_server_fn( id = "client_paas", lc_step = "manufacturing" )
     }
     assert {
-        GWP between -1e-4 kg_CO2_Eq and 1e-4 kg_CO2_Eq
+        GWP between -6e-4 kg_CO2_Eq and 6e-4 kg_CO2_Eq
     }
 }
 

@@ -10,9 +10,10 @@ process network {
         1 hour network
     }
     inputs {
-        1 hour network from network(id = id) match (lc_step = "manufacturing")
-        1 hour network from network(id = id) match (lc_step = "transport")
-        1 hour network from network(id = id) match (lc_step = "use")
+        1 hour network from network( id = id ) match ( lc_step = "manufacturing" )
+        1 hour network from network( id = id ) match ( lc_step = "transport" )
+        1 hour network from network( id = id ) match ( lc_step = "use" )
+        1 hour network from network( id = id ) match ( lc_step = "end-of-life" )
     }
 }
 
@@ -31,7 +32,7 @@ process network {
         id = "net-01"
     }
     variables {
-        data = lookup hw_inventory match (id = id, kind = "network")
+        data = lookup hw_inventory match ( id = id, kind = "network" )
     }
     products {
         data.lifespan network
@@ -52,7 +53,7 @@ process network {
         id = "net-01"
     }
     variables {
-        data = lookup hw_inventory match (id = id, kind = "network")
+        data = lookup hw_inventory match ( id = id, kind = "network" )
     }
     products {
         data.lifespan network
@@ -73,7 +74,7 @@ process network {
         id = "net-01"
     }
     variables {
-        data = lookup hw_inventory match (id = id, kind = "network")
+        data = lookup hw_inventory match ( id = id, kind = "network" )
     }
     products {
         1 hour network
@@ -81,6 +82,27 @@ process network {
     inputs {
         // share of impact from datacenter
         1 hour * data.power datacenter from wrapper_dc_fn( id = data.dc_id, lc_step = lc_step )
+    }
+
+    // TODO: According to PCR, proper impacts are not included. Why?
+}
+
+process network {
+    labels {
+        lc_step = "end-of-life"
+    }
+    params {
+        id = "net-01"
+    }
+    variables {
+        data = lookup hw_inventory match ( id = id, kind = "network" )
+    }
+    products {
+        data.lifespan network
+    }
+    inputs {
+        // share of impact from datacenter
+        data.lifespan * data.power datacenter from wrapper_dc_fn( id = data.dc_id, lc_step = lc_step )
     }
 
     // TODO: According to PCR, proper impacts are not included. Why?

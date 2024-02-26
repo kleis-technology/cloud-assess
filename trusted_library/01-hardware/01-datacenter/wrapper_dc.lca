@@ -24,6 +24,7 @@ process wrapper_dc {
         1 kWh datacenter from wrapper_dc_fn( id = id, lc_step = "manufacturing" )
         1 kWh datacenter from wrapper_dc_fn( id = id, lc_step = "transport" )
         1 kWh datacenter from wrapper_dc_fn( id = id, lc_step = "use" )
+        1 kWh datacenter from wrapper_dc_fn( id = id, lc_step = "end-of-life" )
     }
 }
 

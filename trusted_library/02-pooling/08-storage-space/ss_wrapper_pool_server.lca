@@ -78,3 +78,27 @@ process ss_wrapper_pool_server {
         ss_timewindow pool_server from pool_server_fn( id = id, lc_step = lc_step )
     }
 }
+
+process ss_wrapper_pool_server {
+    labels {
+        lc_step = "end-of-life"
+    }
+    params {
+        id = "client_storage_space"
+    }
+    variables {
+        ratio_storage = 80 percent
+        ratio_cpu = 20 percent
+    }
+    variables {
+        total_volume = sum( storage_space_inventory match pool_id = id, volume )
+        total_vcpu = sum( storage_space_inventory match pool_id = id, vcpu_size )
+    }
+    products {
+        total_volume storage allocate ratio_storage
+        total_vcpu vcpu allocate ratio_cpu
+    }
+    inputs {
+        ss_timewindow pool_server from pool_server_fn( id = id, lc_step = lc_step )
+    }
+}

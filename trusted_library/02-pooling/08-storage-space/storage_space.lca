@@ -27,6 +27,7 @@ process storage_space {
         1 hour storage from storage_space_fn( id = id, lc_step = "manufacturing" )
         1 hour storage from storage_space_fn( id = id, lc_step = "transport" )
         1 hour storage from storage_space_fn( id = id, lc_step = "use" )
+        1 hour storage from storage_space_fn( id = id, lc_step = "end-of-life" )
     }
 }
 

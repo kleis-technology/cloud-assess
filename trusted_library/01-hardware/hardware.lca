@@ -1,5 +1,5 @@
 /*
-    We model here a generic equipement.
+We model here a generic equipement.
 */
 
 datasource hw_inventory {
@@ -59,6 +59,7 @@ process hardware {
         1 hour hardware from hardware match ( lc_step = "manufacturing" )
         1 hour hardware from hardware match ( lc_step = "transport" )
         1 hour hardware from hardware match ( lc_step = "use" )
+        1 hour hardware from hardware match ( lc_step = "end-of-life" )
     }
 }
 
@@ -171,6 +172,50 @@ process hardware {
     inputs {
         // share of impact from datacenter
         1 hour * data.power datacenter from wrapper_dc_fn( id = data.dc_id, lc_step = lc_step )
+    }
+    // proper hardware impacts
+    impacts {
+        for_each impact from hw_impacts match ( lc_step = lc_step, hw_id = id ) {
+            impact.ADPe ADPe
+            impact.ADPf ADPf
+            impact.AP AP
+            impact.CTUe CTUe
+            impact.CTUh_c CTUh_c
+            impact.CTUh_nc CTUh_nc
+            impact.Epf Epf
+            impact.Epm Epm
+            impact.Ept Ept
+            impact.GWP GWP
+            impact.GWPf GWPf
+            impact.GWPlu GWPlu
+            impact.IR IR
+            impact.LU LU
+            impact.ODP ODP
+            impact.PM PM
+            impact.POCP POCP
+            impact.WU WU
+            impact.TPE TPE
+        }
+    }
+}
+
+process hardware {
+    labels {
+        lc_step = "end-of-life"
+    }
+    params {
+        id = "srv-01"
+        kind = "server"
+    }
+    variables {
+        data = lookup hw_inventory match ( id = id, kind = kind )
+    }
+    products {
+        data.lifespan hardware
+    }
+    inputs {
+        // share of impact from datacenter
+        data.lifespan * data.power datacenter from wrapper_dc_fn( id = data.dc_id, lc_step = lc_step )
     }
     // proper hardware impacts
     impacts {
