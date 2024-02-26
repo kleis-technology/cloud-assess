@@ -15,8 +15,12 @@ class MapperService {
     ): PoolListAssessmentDto {
         return PoolListAssessmentDto(
             dto.pools.map {
-                val poolAnalysis = analysis[it.id] ?: throw IllegalStateException("")
-                assessmentDto(poolAnalysis, it.id, it.meta)
+                val poolAnalysis = analysis[it.id] ?: throw IllegalStateException("Unknown pool '${it.id}'")
+                PoolAssessmentDto(
+                    period = dto.period,
+                    request = it,
+                    impacts = impactsDto(poolAnalysis),
+                )
             }
         )
     }
@@ -27,13 +31,17 @@ class MapperService {
     ): VirtualMachineListAssessmentDto {
         return VirtualMachineListAssessmentDto(
             dto.virtualMachines.map {
-                val vmAnalysis = analysis[it.id] ?: throw IllegalStateException("")
-                assessmentDto(vmAnalysis, it.id, it.meta)
+                val vmAnalysis = analysis[it.id] ?: throw IllegalStateException("Unknown virtual machines '${it.id}'")
+                VirtualMachineAssessmentDto(
+                    period = dto.period,
+                    request = it,
+                    impacts = impactsDto(vmAnalysis),
+                )
             }
         )
     }
 
-    fun impactDto(analysis: ResourceAnalysis, target: Indicator): ImpactDto {
+    private fun impactDto(analysis: ResourceAnalysis, target: Indicator): ImpactDto {
         val quantity = analysis.contribution(target)
         return ImpactDto(
             total = quantity.toQuantityDto()
@@ -47,31 +55,24 @@ class MapperService {
         )
     }
 
-    fun assessmentDto(analysis: ResourceAnalysis, id: String, meta: Map<String, String>): AssessmentDto {
-        return AssessmentDto(
-            request = RequestDto(
-                id = id,
-                quantity = QuantityDto(analysis.period.amount, analysis.period.unit.value),
-                meta = meta,
-            ),
-            impacts = ImpactsDto(
-                adPe = impactDto(analysis, Indicator.ADPe),
-                adPf = impactDto(analysis, Indicator.ADPf),
-                AP = impactDto(analysis, Indicator.AP),
-                GWP = impactDto(analysis, Indicator.GWP),
-                LU = impactDto(analysis, Indicator.LU),
-                ODP = impactDto(analysis, Indicator.ODP),
-                PM = impactDto(analysis, Indicator.PM),
-                POCP = impactDto(analysis, Indicator.POCP),
-                WU = impactDto(analysis, Indicator.WU),
-                ctUe = impactDto(analysis, Indicator.CTUe),
-                ctUhC = impactDto(analysis, Indicator.CTUh_c),
-                ctUhNc = impactDto(analysis, Indicator.CTUh_nc),
-                epf = impactDto(analysis, Indicator.Epf),
-                epm = impactDto(analysis, Indicator.Epm),
-                ept = impactDto(analysis, Indicator.Ept),
-                IR = impactDto(analysis, Indicator.IR),
-            )
+    private fun impactsDto(analysis: ResourceAnalysis): ImpactsDto {
+        return ImpactsDto(
+            adPe = impactDto(analysis, Indicator.ADPe),
+            adPf = impactDto(analysis, Indicator.ADPf),
+            AP = impactDto(analysis, Indicator.AP),
+            GWP = impactDto(analysis, Indicator.GWP),
+            LU = impactDto(analysis, Indicator.LU),
+            ODP = impactDto(analysis, Indicator.ODP),
+            PM = impactDto(analysis, Indicator.PM),
+            POCP = impactDto(analysis, Indicator.POCP),
+            WU = impactDto(analysis, Indicator.WU),
+            ctUe = impactDto(analysis, Indicator.CTUe),
+            ctUhC = impactDto(analysis, Indicator.CTUh_c),
+            ctUhNc = impactDto(analysis, Indicator.CTUh_nc),
+            epf = impactDto(analysis, Indicator.Epf),
+            epm = impactDto(analysis, Indicator.Epm),
+            ept = impactDto(analysis, Indicator.Ept),
+            IR = impactDto(analysis, Indicator.IR),
         )
     }
 }

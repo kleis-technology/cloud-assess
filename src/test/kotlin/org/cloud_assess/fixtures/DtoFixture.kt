@@ -73,48 +73,44 @@ class DtoFixture {
             return QuantityTimeDto(1.0, TimeUnitsDto.hour)
         }
 
-        fun assessmentDto(id: String): AssessmentDto {
-            return AssessmentDto(
-                request = requestDto(id),
-                impacts = ImpactsDto(
-                    adPe = impactDto(),
-                    adPf = impactDto(),
-                    AP = impactDto(),
-                    GWP = impactDto(),
-                    LU = impactDto(),
-                    ODP = impactDto(),
-                    PM = impactDto(),
-                    POCP = impactDto(),
-                    WU = impactDto(),
-                    ctUe = impactDto(),
-                    ctUhC = impactDto(),
-                    ctUhNc = impactDto(),
-                    epf = impactDto(),
-                    epm = impactDto(),
-                    ept = impactDto(),
-                    IR = impactDto(),
-                )
+        private fun impactsDto(): ImpactsDto = ImpactsDto(
+            adPe = impactDto(),
+            adPf = impactDto(),
+            AP = impactDto(),
+            GWP = impactDto(),
+            LU = impactDto(),
+            ODP = impactDto(),
+            PM = impactDto(),
+            POCP = impactDto(),
+            WU = impactDto(),
+            ctUe = impactDto(),
+            ctUhC = impactDto(),
+            ctUhNc = impactDto(),
+            epf = impactDto(),
+            epm = impactDto(),
+            ept = impactDto(),
+            IR = impactDto(),
+        )
+
+        fun virtualMachineAssessmentDto(id: String): VirtualMachineAssessmentDto {
+            return VirtualMachineAssessmentDto(
+                period = quantityHour(1.0),
+                request = virtualMachineDto(id),
+                impacts = impactsDto(),
+            )
+        }
+
+        fun poolAssessmentDto(id: String): PoolAssessmentDto {
+            return PoolAssessmentDto(
+                period = quantityHour(1.0),
+                request = poolDto(id),
+                impacts = impactsDto(),
             )
         }
 
         private fun impactDto(): ImpactDto {
             return ImpactDto(
                 total = oneKgCO2eqDto(),
-            )
-        }
-
-        private fun requestDto(id: String): RequestDto {
-            return RequestDto(
-                id = id,
-                quantity = oneHourDto(),
-                meta = emptyMap(),
-            )
-        }
-
-        private fun oneHourDto(): QuantityDto {
-            return QuantityDto(
-                1.0,
-                "hour"
             )
         }
 

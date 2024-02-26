@@ -1,13 +1,11 @@
 package org.cloud_assess.controller
 
-import ch.kleis.lcaac.core.lang.expression.EProcessTemplateApplication
-import ch.kleis.lcaac.core.math.basic.BasicNumber
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.mockk.every
 import io.mockk.mockk
 import org.cloud_assess.dto.VirtualMachineListAssessmentDto
 import org.cloud_assess.dto.VirtualMachineListDto
-import org.cloud_assess.fixtures.DtoFixture.Companion.assessmentDto
+import org.cloud_assess.fixtures.DtoFixture.Companion.virtualMachineAssessmentDto
 import org.cloud_assess.fixtures.DtoFixture.Companion.virtualMachineListDto
 import org.cloud_assess.service.MapperService
 import org.cloud_assess.service.VirtualMachineService
@@ -52,7 +50,7 @@ class VirtualMachinesControllerTest {
         // given
         val dto = virtualMachineListDto()
         val outputDto = VirtualMachineListAssessmentDto(
-            virtualMachines = listOf(assessmentDto("c1"))
+            virtualMachines = listOf(virtualMachineAssessmentDto("c1"))
         )
 
         every { virtualMachineService.analyze(any()) } returns mockk()

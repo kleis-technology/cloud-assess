@@ -5,7 +5,7 @@ import io.mockk.every
 import io.mockk.mockk
 import org.cloud_assess.dto.PoolListAssessmentDto
 import org.cloud_assess.dto.PoolListDto
-import org.cloud_assess.fixtures.DtoFixture.Companion.assessmentDto
+import org.cloud_assess.fixtures.DtoFixture.Companion.poolAssessmentDto
 import org.cloud_assess.fixtures.DtoFixture.Companion.poolListDto
 import org.cloud_assess.service.MapperService
 import org.cloud_assess.service.PoolService
@@ -49,7 +49,7 @@ class PoolsControllerTest {
         // given
         val dto = poolListDto()
         val outputDto = PoolListAssessmentDto(
-            pools = listOf(assessmentDto("client_vm"))
+            pools = listOf(poolAssessmentDto("client_vm"))
         )
 
         every { poolService.analyze(any()) } returns mockk()

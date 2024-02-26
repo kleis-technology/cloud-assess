@@ -63,7 +63,7 @@ components:
         pools:
           type: array
           items:
-            $ref: '#/components/schemas/AssessmentDto'
+            $ref: '#/components/schemas/PoolAssessmentDto'
     VirtualMachineListAssessmentDto:
       type: object
       required:
@@ -72,32 +72,33 @@ components:
         virtual_machines:
           type: array
           items:
-            $ref: '#/components/schemas/AssessmentDto'
-    AssessmentDto:
+            $ref: '#/components/schemas/VirtualMachineAssessmentDto'
+    PoolAssessmentDto:
       type: object
       required:
+        - period
         - request
         - impacts
       properties:
+        period:
+          $ref: '#/components/schemas/QuantityTimeDto'
         request:
-          $ref: '#/components/schemas/RequestDto'
+          $ref: '#/components/schemas/PoolDto'
         impacts:
           $ref: '#/components/schemas/ImpactsDto'
-    RequestDto:
+    VirtualMachineAssessmentDto:
       type: object
       required:
-        - id
-        - quantity
+        - period
+        - request
+        - impacts
       properties:
-        id:
-          type: string
-        quantity:
-          $ref: '#/components/schemas/QuantityDto'
-        meta:
-          type: object
-          default: { }
-          additionalProperties:
-            type: string
+        period:
+          $ref: '#/components/schemas/QuantityTimeDto'
+        request:
+          $ref: '#/components/schemas/VirtualMachineDto'
+        impacts:
+          $ref: '#/components/schemas/ImpactsDto'
     QuantityDto:
       type: object
       required:
