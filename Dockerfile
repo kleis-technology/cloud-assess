@@ -25,4 +25,4 @@ COPY --from=builder ${DEPENDENCY}/BOOT-INF/lib /app/lib
 COPY --from=builder ${DEPENDENCY}/META-INF /app/META-INF
 COPY --from=builder ${DEPENDENCY}/BOOT-INF/classes /app
 
-ENTRYPOINT ["java","-Xmx4g", "-cp","app:app/lib/*","org.cloud_assess.ApplicationKt"]
+CMD ["java","-Xmx4g", "-cp","app:app/lib/*","org.cloud_assess.ApplicationKt"]

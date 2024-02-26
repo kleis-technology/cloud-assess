@@ -1,14 +1,18 @@
 version: "3"
 services:
   app:
-    image: "ghcr.io/kleis-technology/cloud-assess/cloud-assess-app:latest"
+    image: "ghcr.io/kleis-technology/cloud-assess/cloud-assess-app:1.6.4"
     container_name: cloud-assess-app
     ports:
     - "8080:8080"
     volumes:
-      - ./trusted_library:/trusted_library
+      - ./trusted_library:/models
+      - ./trusted_library:/config
     environment:
-      - SPRING_PROFILES_ACTIVE=localhost
+      - LCA_MODELS=/models
+      - LCA_DATA=/config
+#      - CORS_ENABLED=true
+#      - CORS_ALLOWED_ORIGIN="http://localhost:3000"
   swagger_ui:
     image: "swaggerapi/swagger-ui"
     container_name: swagger-ui
