@@ -22,7 +22,7 @@ import kotlin.io.path.isRegularFile
 class LcaConfig {
     @Bean
     fun symbolTable(
-        @Value("\${lca.path}") modelDirectory: File,
+        @Value("\${lca.models}") modelDirectory: File,
     ): SymbolTable<BasicNumber> {
         val files = Files.walk(Paths.get(modelDirectory.path))
             .filter {
@@ -43,6 +43,6 @@ class LcaConfig {
 
     @Bean
     fun csvSourceOps(
-        @Value("\${lca.path}") modelDirectory: File,
+        @Value("\${lca.data}") modelDirectory: File,
     ): CsvSourceOperations<BasicNumber> = CsvSourceOperations(modelDirectory, BasicOperations)
 }
