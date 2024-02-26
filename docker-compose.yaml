@@ -6,11 +6,11 @@ services:
     ports:
     - "8080:8080"
     volumes:
-      - ./trusted_library:/models
+      - ./trusted_library:/library
       - ./trusted_library:/config
     environment:
-      - LCA_MODELS=/models
-      - LCA_DATA=/config
+      - LCA_LIBRARY=/library
+      - LCA_CONFIG=/config
 #      - CORS_ENABLED=true
 #      - CORS_ALLOWED_ORIGIN="http://localhost:3000"
   swagger_ui:

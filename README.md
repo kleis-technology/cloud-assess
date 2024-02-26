@@ -70,7 +70,7 @@ From the root of the git repository, run
 
 To run the server locally
 ```bash
-SPRING_PROFILES_ACTIVE=localhost ./gradlew bootRun
+./gradlew bootRun
 ```
 The server should start listening for requests on `localhost:8080`.
 
