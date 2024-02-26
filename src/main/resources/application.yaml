@@ -1,6 +1,0 @@
-lca:
-  models: "trusted_library"
-  data: "trusted_library"
-cors:
-  enabled: false
-  allowed-origin: n/a
