@@ -1,12 +1,30 @@
 openapi: "3.0.0"
 info:
   title: Cloud Assess
-  version: 1.2.0
+  version: 1.6.4
 servers:
   - url: http://localhost:8080
     description: Local server
 paths:
-  /virtual_machines:
+  /pools/assess:
+    post:
+      summary: Assess a collection of pools
+      operationId: assessPools
+      requestBody:
+        description: Collection of pools to assess
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PoolListDto'
+      responses:
+        '200':
+          description: Assessment of pools
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PoolListAssessmentDto'
+  /virtual_machines/assess:
     post:
       summary: Assess a collection of virtual machines
       operationId: assessVirtualMachines
@@ -17,39 +35,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/VirtualMachineListDto'
-            example:
-              period:
-                amount: 1.0
-                unit: hour
-              virtual_machines:
-                - id: c1
-                  pool_id: client_vm
-                  ram:
-                    amount: 32.0
-                    unit: GB
-                  storage:
-                    amount: 1024.0
-                    unit: GB
-                  vcpu:
-                    amount: 1.0
-                    unit: vCPU
-                  meta:
-                    region: sofia
-                    env: production
-                - id: c2
-                  pool_id: client_vm
-                  ram:
-                    amount: 16.0
-                    unit: GB
-                  storage:
-                    amount: 2048.0
-                    unit: GB
-                  vcpu:
-                    amount: 1.0
-                    unit: vCPU
-                  meta:
-                    region: sofia
-                    env: production
       responses:
         '200':
           description: Assessment of virtual machines
@@ -70,6 +55,15 @@ paths:
                 $ref: '#/components/schemas/HealthStatusDto'
 components:
   schemas:
+    PoolListAssessmentDto:
+      type: object
+      required:
+        - pools
+      properties:
+        pools:
+          type: array
+          items:
+            $ref: '#/components/schemas/PoolAssessmentDto'
     VirtualMachineListAssessmentDto:
       type: object
       required:
@@ -78,32 +72,33 @@ components:
         virtual_machines:
           type: array
           items:
-            $ref: '#/components/schemas/AssessmentDto'
-    AssessmentDto:
+            $ref: '#/components/schemas/VirtualMachineAssessmentDto'
+    PoolAssessmentDto:
       type: object
       required:
+        - period
         - request
         - impacts
       properties:
+        period:
+          $ref: '#/components/schemas/QuantityTimeDto'
         request:
-          $ref: '#/components/schemas/RequestDto'
+          $ref: '#/components/schemas/PoolDto'
         impacts:
           $ref: '#/components/schemas/ImpactsDto'
-    RequestDto:
+    VirtualMachineAssessmentDto:
       type: object
       required:
-        - id
-        - quantity
+        - period
+        - request
+        - impacts
       properties:
-        id:
-          type: string
-        quantity:
-          $ref: '#/components/schemas/QuantityDto'
-        meta:
-          type: object
-          default: { }
-          additionalProperties:
-            type: string
+        period:
+          $ref: '#/components/schemas/QuantityTimeDto'
+        request:
+          $ref: '#/components/schemas/VirtualMachineDto'
+        impacts:
+          $ref: '#/components/schemas/ImpactsDto'
     QuantityDto:
       type: object
       required:
@@ -174,6 +169,34 @@ components:
       properties:
         total:
           $ref: '#/components/schemas/QuantityDto'
+    PoolDto:
+      type: object
+      required:
+        - id
+        - service_level
+        - meta
+      properties:
+        id:
+          type: string
+        service_level:
+          $ref: '#/components/schemas/QuantityDimensionlessDto'
+        meta:
+          type: object
+          default: { }
+          additionalProperties:
+            type: string
+    PoolListDto:
+      type: object
+      required:
+        - period
+        - pools
+      properties:
+        period:
+          $ref: '#/components/schemas/QuantityTimeDto'
+        pools:
+          type: array
+          items:
+            $ref: '#/components/schemas/PoolDto'
     VirtualMachineListDto:
       type: object
       required:
@@ -244,10 +267,25 @@ components:
           format: double
         unit:
           $ref: '#/components/schemas/MemoryUnitsDto'
+    QuantityDimensionlessDto:
+      type: object
+      required:
+        - amount
+        - unit
+      properties:
+        amount:
+          type: number
+          format: double
+        unit:
+          $ref: '#/components/schemas/DimensionlessUnitsDto'
     VCPUUnitsDto:
       type: string
       enum:
         - vCPU
+    DimensionlessUnitsDto:
+      type: string
+      enum:
+        - u
     MemoryUnitsDto:
       type: string
       enum:

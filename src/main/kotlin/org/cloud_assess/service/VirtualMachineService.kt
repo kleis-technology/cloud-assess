@@ -9,7 +9,7 @@ import ch.kleis.lcaac.core.lang.register.DataKey
 import ch.kleis.lcaac.core.math.basic.BasicNumber
 import ch.kleis.lcaac.core.math.basic.BasicOperations
 import org.cloud_assess.dto.*
-import org.cloud_assess.model.VirtualMachineAnalysis
+import org.cloud_assess.model.ResourceAnalysis
 import org.cloud_assess.ops.OverrideDataSourceOperations
 import org.springframework.stereotype.Service
 
@@ -22,7 +22,7 @@ class VirtualMachineService(
     private val overrideTimeWindowParam = "vm_timewindow"
     private val overrideInventoryLocation = "data/02-pooling/vm_inventory.csv"
 
-    fun analyze(vms: VirtualMachineListDto): Map<String, VirtualMachineAnalysis> {
+    fun analyze(vms: VirtualMachineListDto): Map<String, ResourceAnalysis> {
         val period = vms.period
         val cases = cases(vms)
         val sourceOps = overriddenDataSource(vms)
@@ -42,7 +42,7 @@ class VirtualMachineService(
             val entryPoint = trace.getEntryPoint()
             val program = ContributionAnalysisProgram(systemValue, entryPoint)
             val rawAnalysis = program.run()
-            VirtualMachineAnalysis(it.key, period, rawAnalysis)
+            ResourceAnalysis(it.key, period, rawAnalysis)
         }
         return analysis
     }

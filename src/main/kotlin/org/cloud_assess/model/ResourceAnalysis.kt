@@ -8,14 +8,15 @@ import ch.kleis.lcaac.core.math.basic.BasicMatrix
 import ch.kleis.lcaac.core.math.basic.BasicNumber
 import org.cloud_assess.dto.QuantityTimeDto
 
-class VirtualMachineAnalysis(
+class ResourceAnalysis(
     id: String,
     val period: QuantityTimeDto,
     private val rawAnalysis: ContributionAnalysis<BasicNumber, BasicMatrix>,
+    private val entryPointRef: String = "__main__",
 ) {
     private val main = rawAnalysis.getObservablePorts().getElements()
         .filterIsInstance<ProductValue<BasicNumber>>()
-        .firstOrNull { it.name == "__main__" }
+        .firstOrNull { it.name == entryPointRef }
         ?: throw IllegalStateException("no impacts found for id=$id")
 
     fun contribution(target: Indicator): QuantityValue<BasicNumber> {
