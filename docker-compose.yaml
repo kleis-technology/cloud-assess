@@ -10,7 +10,7 @@ services:
     environment:
       - LCA_CONFIG=/config
 #      - CORS_ENABLED=true
-#      - CORS_ALLOWED_ORIGIN="http://localhost:3000"
+#      - CORS_ALLOWED_ORIGIN=http://localhost:3000
   swagger_ui:
     image: "swaggerapi/swagger-ui"
     container_name: swagger-ui
