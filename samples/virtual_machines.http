@@ -8,14 +8,14 @@ Content-Type: application/json
   },
   "virtual_machines": [
     {
-      "id": "c1",
+      "id": "vm-01",
       "pool_id": "client_vm",
       "ram": {
-        "amount": 32.0,
+        "amount": 4.0,
         "unit": "GB"
       },
       "storage": {
-        "amount": 1024.0,
+        "amount": 20.0,
         "unit": "GB"
       },
       "vcpu": {
@@ -28,18 +28,38 @@ Content-Type: application/json
       }
     },
     {
-      "id": "c2",
+      "id": "vm-02",
       "pool_id": "client_vm",
       "ram": {
-        "amount": 32.0,
+        "amount": 16.0,
         "unit": "GB"
       },
       "storage": {
-        "amount": 1024.0,
+        "amount": 400.0,
         "unit": "GB"
       },
       "vcpu": {
-        "amount": 1.0,
+        "amount": 2.0,
+        "unit": "vCPU"
+      },
+      "meta": {
+        "region": "sofia",
+        "env": "production"
+      }
+    },
+    {
+      "id": "vm-03",
+      "pool_id": "client_vm",
+      "ram": {
+        "amount": 8.0,
+        "unit": "GB"
+      },
+      "storage": {
+        "amount": 800.0,
+        "unit": "GB"
+      },
+      "vcpu": {
+        "amount": 4.0,
         "unit": "vCPU"
       },
       "meta": {
