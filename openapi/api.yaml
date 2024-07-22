@@ -6,6 +6,24 @@ servers:
   - url: http://localhost:8080
     description: Local server
 paths:
+  /experimental/trace:
+    post:
+      summary: Trace the impacts for a generic call
+      operationId: trace
+      requestBody:
+        description: A generic request
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TraceRequestDto'
+      responses:
+        '200':
+          description: Trace response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TraceResponseDto'
   /pools/assess:
     post:
       summary: Assess a collection of pools
@@ -169,6 +187,7 @@ components:
       properties:
         total:
           $ref: '#/components/schemas/QuantityDto'
+        # TODO: per lc step
     PoolDto:
       type: object
       required:
@@ -302,3 +321,128 @@ components:
           type: string
           enum:
             - UP
+    TraceRequestDto:
+      type: object
+      properties:
+        requestId:
+          type: string
+        options:
+          $ref: '#/components/schemas/TraceRequestOptionsDto'
+        product:
+          type: object
+          properties:
+            quantity:
+              $ref: '#/components/schemas/QuantityDto'
+            name:
+              type: string
+        fromProcess:
+          type: object
+          properties:
+            name:
+              type: string
+            params:
+              type: array
+              items:
+                $ref: '#/components/schemas/ParameterDto'
+            labels:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProcessLabelDto'
+        globals:
+          type: array
+          items:
+            $ref: '#/components/schemas/ParameterDto'
+        datasources:
+          type: array
+          items:
+            $ref: '#/components/schemas/DatasourceDto'
+
+
+    TraceResponseDto:
+      type: object
+      properties:
+        requestId:
+          type: string
+        trace:
+          type: array
+          items:
+            $ref: '#/components/schemas/TraceResponseRowDto'
+    TraceResponseRowDto:
+      type: object
+      properties:
+        depth:
+          type: integer
+        product:
+          type: object
+          properties:
+            quantity:
+              $ref: '#/components/schemas/QuantityDto'
+            name:
+              type: string
+        fromProcess:
+          type: object
+          properties:
+            name:
+              type: string
+            params:
+              type: array
+              items:
+                $ref: '#/components/schemas/ParameterDto'
+            labels:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProcessLabelDto'
+        impacts:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImpactsDto'
+
+
+    ParameterDto:
+      type: object
+      properties:
+        name:
+          type: string
+        value:
+          $ref: '#/components/schemas/QuantityDto'
+
+    ProcessLabelDto:
+      type: object
+      properties:
+        name:
+          type: string
+        value:
+          type: string
+
+    DatasourceDto:
+      type: object
+      properties:
+        name:
+          type: string
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/DatasourceRowDto'
+    DatasourceRowDto:
+      type: object
+      properties:
+        entries:
+          type: array
+          items:
+            $ref: '#/components/schemas/DatasourceCellDto'
+    DatasourceCellDto:
+      type: object
+      properties:
+        name:
+          type: string
+        value:
+          oneOf:
+            - type: string
+            - type: number
+    TraceRequestOptionsDto:
+      type: object
+      properties:
+        useDefaultDatasourceIfNotProvided:
+          type: boolean
+          default: false
+
