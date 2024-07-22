@@ -30,7 +30,7 @@ repositories {
 }
 
 dependencies {
-    val lcaacVersion = "1.6.4"
+    val lcaacVersion = "1.6.7"
     implementation("ch.kleis.lcaac:core:$lcaacVersion")
     implementation("ch.kleis.lcaac:grammar:$lcaacVersion")
 
@@ -49,6 +49,8 @@ dependencies {
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
     testImplementation("io.mockk:mockk:1.13.4")
+
+    implementation("com.charleskorn.kaml:kaml:0.59.0")
 }
 
 tasks.withType<KotlinCompile> {
