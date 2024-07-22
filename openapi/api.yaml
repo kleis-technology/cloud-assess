@@ -6,9 +6,9 @@ servers:
   - url: http://localhost:8080
     description: Local server
 paths:
-  /experimental/trace:
+  /debug/trace:
     post:
-      summary: Trace the impacts for a generic call
+      summary: Trace the impacts for a generic request
       operationId: trace
       requestBody:
         description: A generic request
