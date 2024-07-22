@@ -16,14 +16,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TraceRequestDto'
+              $ref: '#/components/schemas/TraceRequestListDto'
       responses:
         '200':
           description: Trace response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TraceResponseDto'
+                $ref: '#/components/schemas/TraceResponseListDto'
   /pools/assess:
     post:
       summary: Assess a collection of pools
@@ -321,6 +321,13 @@ components:
           type: string
           enum:
             - UP
+    TraceRequestListDto:
+      type: object
+      properties:
+        elements:
+          type: array
+          items:
+            $ref: '#/components/schemas/TraceRequestDto'
     TraceRequestDto:
       type: object
       properties:
@@ -357,6 +364,13 @@ components:
           items:
             $ref: '#/components/schemas/DatasourceDto'
 
+    TraceResponseListDto:
+      type: object
+      properties:
+        elements:
+          type: array
+          items:
+            $ref: '#/components/schemas/TraceResponseDto'
 
     TraceResponseDto:
       type: object
