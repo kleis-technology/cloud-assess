@@ -419,18 +419,18 @@ components:
       properties:
         name:
           type: string
-        content:
+        records:
           type: array
           items:
-            $ref: '#/components/schemas/DatasourceRowDto'
-    DatasourceRowDto:
+            $ref: '#/components/schemas/DatasourceRecordDto'
+    DatasourceRecordDto:
       type: object
       properties:
         entries:
           type: array
           items:
-            $ref: '#/components/schemas/DatasourceCellDto'
-    DatasourceCellDto:
+            $ref: '#/components/schemas/DatasourceEntryDto'
+    DatasourceEntryDto:
       type: object
       properties:
         name:
