@@ -1,7 +1,7 @@
 package org.cloud_assess.service
 
 import ch.kleis.lcaac.core.assessment.ContributionAnalysisProgram
-import ch.kleis.lcaac.core.datasource.CsvSourceOperations
+import ch.kleis.lcaac.core.datasource.DefaultDataSourceOperations
 import ch.kleis.lcaac.core.lang.SymbolTable
 import ch.kleis.lcaac.core.lang.evaluator.Evaluator
 import ch.kleis.lcaac.core.lang.expression.EProcessTemplateApplication
@@ -16,13 +16,14 @@ import org.springframework.stereotype.Service
 @Service
 class PoolService(
     private val parsingService: ParsingService,
-    private val csvSourceOperations: CsvSourceOperations<BasicNumber>,
+    private val defaultDataSourceOperations: DefaultDataSourceOperations<BasicNumber>,
     private val symbolTable: SymbolTable<BasicNumber>,
 ) {
+
     fun analyze(pools: PoolListDto): Map<String, ResourceAnalysis> {
         val period = pools.period
         val cases = cases(pools)
-        val evaluator = Evaluator(symbolTable, BasicOperations, csvSourceOperations)
+        val evaluator = Evaluator(symbolTable, BasicOperations, defaultDataSourceOperations)
         val analysis = cases.mapValues {
             val trace = evaluator.with(it.value.template).trace(it.value.template, it.value.arguments)
             val systemValue = trace.getSystemValue()

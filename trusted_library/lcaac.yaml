@@ -1,0 +1,8 @@
+name: Cloud Assess Trusted Library
+description: Reference models for Cloud Assess
+connectors:
+  - name: csv
+    cache:
+      enabled: true
+    options:
+      directory: .

@@ -1,7 +1,8 @@
 package org.cloud_assess.service
 
 import ch.kleis.lcaac.core.assessment.ContributionAnalysisProgram
-import ch.kleis.lcaac.core.datasource.CsvSourceOperations
+import ch.kleis.lcaac.core.datasource.DefaultDataSourceOperations
+import ch.kleis.lcaac.core.datasource.OverriddenDataSourceOperations
 import ch.kleis.lcaac.core.lang.SymbolTable
 import ch.kleis.lcaac.core.lang.evaluator.Evaluator
 import ch.kleis.lcaac.core.lang.expression.*
@@ -10,17 +11,16 @@ import ch.kleis.lcaac.core.math.basic.BasicNumber
 import ch.kleis.lcaac.core.math.basic.BasicOperations
 import org.cloud_assess.dto.*
 import org.cloud_assess.model.ResourceAnalysis
-import org.cloud_assess.ops.OverrideDataSourceOperations
 import org.springframework.stereotype.Service
 
 @Service
 class VirtualMachineService(
     private val parsingService: ParsingService,
-    private val csvSourceOperations: CsvSourceOperations<BasicNumber>,
+    private val defaultDataSourceOperations: DefaultDataSourceOperations<BasicNumber>,
     private val symbolTable: SymbolTable<BasicNumber>,
 ) {
     private val overrideTimeWindowParam = "vm_timewindow"
-    private val overrideInventoryLocation = "data/02-pooling/vm_inventory.csv"
+    private val overriddenDataSourceName = "vm_inventory"
 
     fun analyze(vms: VirtualMachineListDto): Map<String, ResourceAnalysis> {
         val period = vms.period
@@ -71,8 +71,8 @@ class VirtualMachineService(
 
     private fun overriddenDataSource(
         vms: VirtualMachineListDto
-    ): OverrideDataSourceOperations {
-        val sequence = vms.virtualMachines.asSequence()
+    ): OverriddenDataSourceOperations<BasicNumber> {
+        val records = vms.virtualMachines
             .map { vm ->
                 ERecord(
                     mapOf(
@@ -84,11 +84,13 @@ class VirtualMachineService(
                     )
                 )
             }
-        return OverrideDataSourceOperations(
-            override = mapOf(
-                overrideInventoryLocation to sequence
-            ),
-            defaultSourceOps = csvSourceOperations,
+        val content = mapOf(
+            overriddenDataSourceName to records
+        )
+        return OverriddenDataSourceOperations(
+            content,
+            BasicOperations,
+            defaultDataSourceOperations,
         )
     }
 
