@@ -1,14 +1,28 @@
 package org.cloud_assess.service
 
+import ch.kleis.lcaac.core.lang.evaluator.EvaluationTrace
+import ch.kleis.lcaac.core.lang.expression.EProcessTemplateApplication
 import ch.kleis.lcaac.core.lang.value.QuantityValue
 import ch.kleis.lcaac.core.math.basic.BasicNumber
 import org.cloud_assess.dto.*
 import org.cloud_assess.model.Indicator
 import org.cloud_assess.model.ResourceAnalysis
+import org.cloud_assess.model.ResourceTrace
 import org.springframework.stereotype.Service
 
 @Service
 class MapperService {
+    fun map(request: TraceRequestDto): EProcessTemplateApplication<BasicNumber> {
+        TODO()
+    }
+
+    fun map(
+        analysis: Map<String, ResourceTrace>,
+        dto: TraceRequestListDto,
+    ): TraceResponseListDto {
+        TODO()
+    }
+
     fun map(
         analysis: Map<String, ResourceAnalysis>,
         dto: PoolListDto

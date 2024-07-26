@@ -323,6 +323,8 @@ components:
             - UP
     TraceRequestListDto:
       type: object
+      required:
+        - elements
       properties:
         elements:
           type: array
@@ -330,37 +332,27 @@ components:
             $ref: '#/components/schemas/TraceRequestDto'
     TraceRequestDto:
       type: object
+      required:
+        - requestId
+        - product
+        - fromProcess
       properties:
         requestId:
           type: string
         options:
-          $ref: '#/components/schemas/TraceRequestOptionsDto'
+          $ref: '#/components/schemas/OptionsDto'
         product:
-          type: object
-          properties:
-            quantity:
-              $ref: '#/components/schemas/QuantityDto'
-            name:
-              type: string
+          $ref: '#/components/schemas/ProductDemandDto'
         fromProcess:
-          type: object
-          properties:
-            name:
-              type: string
-            params:
-              type: array
-              items:
-                $ref: '#/components/schemas/ParameterDto'
-            labels:
-              type: array
-              items:
-                $ref: '#/components/schemas/ProcessLabelDto'
+          $ref: '#/components/schemas/FromProcessDto'
         globals:
           type: array
+          default: [ ]
           items:
             $ref: '#/components/schemas/ParameterDto'
         datasources:
           type: array
+          default: [ ]
           items:
             $ref: '#/components/schemas/DatasourceDto'
 
@@ -387,76 +379,96 @@ components:
         depth:
           type: integer
         product:
-          type: object
-          properties:
-            quantity:
-              $ref: '#/components/schemas/QuantityDto'
-            name:
-              type: string
+          $ref: '#/components/schemas/ProductDemandDto'
         fromProcess:
-          type: object
-          properties:
-            name:
-              type: string
-            params:
-              type: array
-              items:
-                $ref: '#/components/schemas/ParameterDto'
-            labels:
-              type: array
-              items:
-                $ref: '#/components/schemas/ProcessLabelDto'
+          $ref: '#/components/schemas/FromProcessDto'
         impacts:
           type: array
           items:
             $ref: '#/components/schemas/ImpactsDto'
-
-
     ParameterDto:
       type: object
+      required:
+        - name
+        - value
       properties:
         name:
           type: string
         value:
           $ref: '#/components/schemas/QuantityDto'
-
     ProcessLabelDto:
       type: object
+      required:
+        - name
+        - value
       properties:
         name:
           type: string
         value:
           type: string
-
     DatasourceDto:
       type: object
+      required:
+        - name
+        - records
       properties:
         name:
           type: string
         records:
           type: array
+          default: [ ]
           items:
-            $ref: '#/components/schemas/DatasourceRecordDto'
-    DatasourceRecordDto:
+            $ref: '#/components/schemas/RecordDto'
+    RecordDto:
       type: object
+      required:
+        - elements
       properties:
-        entries:
+        elements:
           type: array
           items:
-            $ref: '#/components/schemas/DatasourceEntryDto'
-    DatasourceEntryDto:
+            $ref: '#/components/schemas/EntryDto'
+    EntryDto:
       type: object
+      required:
+        - name
+        - value
       properties:
         name:
           type: string
         value:
-          oneOf:
-            - type: string
-            - type: number
-    TraceRequestOptionsDto:
+          type: EntryValueDto # string or number
+    OptionsDto:
       type: object
       properties:
         useDefaultDatasourceIfNotProvided:
           type: boolean
           default: false
+    ProductDemandDto:
+      type: object
+      required:
+        - quantity
+        - name
+      properties:
+        quantity:
+          $ref: '#/components/schemas/QuantityDto'
+        name:
+          type: string
+    FromProcessDto:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+        params:
+          type: array
+          default: [ ]
+          items:
+            $ref: '#/components/schemas/ParameterDto'
+        labels:
+          type: array
+          default: [ ]
+          items:
+            $ref: '#/components/schemas/ProcessLabelDto'
 

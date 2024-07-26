@@ -86,6 +86,9 @@ openApiGenerate {
     )
     inputSpec.set("$rootDir/openapi/api.yaml")
     outputDir.set("$buildDir/generated")
+    importMappings.set(mapOf(
+        "EntryValueDto" to " org.cloud_assess.dto.EntryValueDto"
+    ))
 }
 
 openApiValidate {
