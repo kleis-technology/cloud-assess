@@ -1,16 +1,21 @@
 package org.cloud_assess.service.debug
 
+import ch.kleis.lcaac.core.assessment.ContributionAnalysisProgram
 import ch.kleis.lcaac.core.datasource.DefaultDataSourceOperations
 import ch.kleis.lcaac.core.lang.SymbolTable
-import ch.kleis.lcaac.core.lang.evaluator.EvaluationTrace
+import ch.kleis.lcaac.core.lang.evaluator.Evaluator
+import ch.kleis.lcaac.core.lang.expression.EProcessTemplateApplication
 import ch.kleis.lcaac.core.math.basic.BasicNumber
+import ch.kleis.lcaac.core.math.basic.BasicOperations
 import org.cloud_assess.dto.TraceRequestDto
 import org.cloud_assess.dto.TraceRequestListDto
 import org.cloud_assess.model.ResourceTrace
+import org.cloud_assess.service.ParsingService
 import org.springframework.stereotype.Service
 
 @Service
 class TraceService(
+    private val parsingService: ParsingService,
     private val defaultDataSourceOperations: DefaultDataSourceOperations<BasicNumber>,
     private val symbolTable: SymbolTable<BasicNumber>,
 ) {
@@ -19,18 +24,54 @@ class TraceService(
             .associate { it.requestId to analyze(it) }
     }
 
-    private fun analyze(request: TraceRequestDto): ResourceTrace {
+    fun analyze(request: TraceRequestDto): ResourceTrace {
         /*
-            product from process
-                parameters
-                labels
             merge globals into symbol table
             override datasources
          */
 
+        val processApplication = prepare(request)
+        val evaluator = Evaluator(symbolTable, BasicOperations, defaultDataSourceOperations)
+        val trace = evaluator.with(processApplication.template)
+            .trace(processApplication.template, processApplication.arguments)
+        val systemValue = trace.getSystemValue()
+        val entryPoint = trace.getEntryPoint()
+        val program = ContributionAnalysisProgram(systemValue, entryPoint)
+        val analysis = program.run()
+
         return ResourceTrace(
             id = request.requestId,
-            rawTrace = EvaluationTrace.empty(),
+            rawTrace = trace,
+            contributionAnalysis = analysis,
         )
+    }
+
+    private fun prepare(request: TraceRequestDto): EProcessTemplateApplication<BasicNumber> {
+        val quantity = "${request.product.quantity.amount} ${request.product.quantity.unit}"
+        val processName = request.fromProcess.name
+        val processParams = request.fromProcess.params?.joinToString(", ") {
+            "${it.name} = ${it.value.amount} ${it.value.unit}"
+        }?.let {
+            if (it.isBlank()) ""
+            else "($it)"
+        } ?: ""
+        val processLabels = request.fromProcess.labels?.joinToString {
+            "${it.name} = ${it.value}"
+        }?.let {
+            if (it.isBlank()) ""
+            else "match ($it)"
+        } ?: ""
+
+        val content = """
+            process __main__ {
+                products {
+                    1 u __main__
+                }
+                inputs {
+                    $quantity from $processName${processParams} $processLabels
+                }
+            }
+        """.trimIndent()
+        return parsingService.processTemplateApplication(content)
     }
 }

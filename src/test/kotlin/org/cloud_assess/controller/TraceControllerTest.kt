@@ -84,7 +84,7 @@ class TraceControllerTest {
         val outputDto = TraceResponseListDto(
             elements = emptyList(),
         )
-        every { traceService.analyze(any()) } returns mockk()
+        every { traceService.analyze(any<TraceRequestListDto>()) } returns mockk()
         every { mapperService.map(any(), any<TraceRequestListDto>()) } returns outputDto
 
 
