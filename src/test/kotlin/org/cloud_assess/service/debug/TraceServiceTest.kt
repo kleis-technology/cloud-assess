@@ -1,6 +1,7 @@
 package org.cloud_assess.service.debug
 
 import ch.kleis.lcaac.core.lang.SymbolTable
+import ch.kleis.lcaac.core.lang.value.QuantityValue
 import ch.kleis.lcaac.core.math.basic.BasicNumber
 import ch.kleis.lcaac.core.math.basic.BasicOperations
 import ch.kleis.lcaac.core.prelude.Prelude
@@ -12,11 +13,10 @@ import io.mockk.mockk
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.assertj.core.api.Assertions.assertThat
-import org.cloud_assess.dto.FromProcessDto
-import org.cloud_assess.dto.ProductDemandDto
-import org.cloud_assess.dto.QuantityDto
-import org.cloud_assess.dto.TraceRequestDto
+import org.cloud_assess.dto.*
 import org.cloud_assess.fixtures.DtoFixture
+import org.cloud_assess.fixtures.QuantityFixture
+import org.cloud_assess.model.Indicator
 import org.cloud_assess.service.ParsingService
 import org.junit.jupiter.api.Test
 
@@ -57,7 +57,7 @@ class TraceServiceTest {
         // given
         val symbolTable = prepare("""
             process p {
-                product {
+                products {
                     1 kg p
                 }
                 impacts {
@@ -89,7 +89,7 @@ class TraceServiceTest {
         // given
         val symbolTable = prepare("""
             process p {
-                product {
+                products {
                     1 kg p
                 }
                 impacts {
@@ -113,5 +113,72 @@ class TraceServiceTest {
 
         // then
         assertThat(actual.getRequestId()).isEqualTo("r01")
+    }
+
+    @Test
+    fun analyze_singleRequest_simpleCase_hasCorrectImpact() {
+        // given
+        val symbolTable = prepare("""
+            process p {
+                products {
+                    1 kg p
+                }
+                impacts {
+                    1 kg GWP
+                }
+            }
+        """.trimIndent())
+        val service = TraceService(
+            parsingService,
+            mockk(),
+            symbolTable,
+        )
+        val request = TraceRequestDto(
+            requestId = "r01",
+            product = ProductDemandDto(QuantityDto(1.0, "kg"), "p"),
+            fromProcess = FromProcessDto("p"),
+        )
+
+        // when
+        val actual = service.analyze(request)
+
+        // then
+        assertThat(actual.contribution(Indicator.GWP)).isEqualTo(
+            QuantityFixture.oneKg,
+        )
+    }
+
+    @Test
+    fun analyze_singleRequest_withGlobals_isNotEmpty() {
+        // given
+        val symbolTable = prepare("""
+            process p {
+                products {
+                    1 kg p
+                }
+                impacts {
+                    x GWP
+                }
+            }
+        """.trimIndent())
+        val service = TraceService(
+            parsingService,
+            mockk(),
+            symbolTable,
+        )
+        val request = TraceRequestDto(
+            requestId = "r01",
+            product = ProductDemandDto(QuantityDto(1.0, "kg"), "p"),
+            fromProcess = FromProcessDto("p"),
+            globals = listOf(
+                ParameterDto("x", QuantityDto(1.0, "kg"))
+            )
+        )
+
+        // when
+        val actual = service.analyze(request)
+
+        // then success
+        assertThat(actual.isEmpty()).isFalse()
     }
 }

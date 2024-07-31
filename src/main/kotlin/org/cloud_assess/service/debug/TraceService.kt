@@ -4,7 +4,11 @@ import ch.kleis.lcaac.core.assessment.ContributionAnalysisProgram
 import ch.kleis.lcaac.core.datasource.DefaultDataSourceOperations
 import ch.kleis.lcaac.core.lang.SymbolTable
 import ch.kleis.lcaac.core.lang.evaluator.Evaluator
+import ch.kleis.lcaac.core.lang.expression.EDataRef
 import ch.kleis.lcaac.core.lang.expression.EProcessTemplateApplication
+import ch.kleis.lcaac.core.lang.expression.EQuantityScale
+import ch.kleis.lcaac.core.lang.register.DataKey
+import ch.kleis.lcaac.core.lang.register.DataRegister
 import ch.kleis.lcaac.core.math.basic.BasicNumber
 import ch.kleis.lcaac.core.math.basic.BasicOperations
 import org.cloud_assess.dto.TraceRequestDto
@@ -26,12 +30,14 @@ class TraceService(
 
     fun analyze(request: TraceRequestDto): ResourceTrace {
         /*
-            merge globals into symbol table
             override datasources
          */
 
         val processApplication = prepare(request)
-        val evaluator = Evaluator(symbolTable, BasicOperations, defaultDataSourceOperations)
+        val symbolTablesWithGlobals = symbolTable.copy(
+            data = globals(symbolTable.data, request),
+        )
+        val evaluator = Evaluator(symbolTablesWithGlobals, BasicOperations, defaultDataSourceOperations)
         val trace = evaluator.with(processApplication.template)
             .trace(processApplication.template, processApplication.arguments)
         val systemValue = trace.getSystemValue()
@@ -44,6 +50,19 @@ class TraceService(
             rawTrace = trace,
             contributionAnalysis = analysis,
         )
+    }
+
+    private fun globals(dataRegister: DataRegister<BasicNumber>, request: TraceRequestDto): DataRegister<BasicNumber> {
+        val requestGlobals = request.globals ?: emptyList()
+        return requestGlobals.fold(dataRegister) { register, parameter ->
+            register.override(
+                DataKey(parameter.name),
+                EQuantityScale(
+                    BasicNumber(parameter.value.amount),
+                    EDataRef(parameter.value.unit),
+                )
+            )
+        }
     }
 
     private fun prepare(request: TraceRequestDto): EProcessTemplateApplication<BasicNumber> {
