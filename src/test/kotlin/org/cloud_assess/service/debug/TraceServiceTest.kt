@@ -19,6 +19,8 @@ import org.cloud_assess.fixtures.QuantityFixture
 import org.cloud_assess.model.Indicator
 import org.cloud_assess.service.ParsingService
 import org.junit.jupiter.api.Test
+import java.lang.Double.parseDouble
+import java.lang.NumberFormatException
 
 class TraceServiceTest {
 
@@ -38,6 +40,10 @@ class TraceServiceTest {
         // given
         val symbolTable = prepare("""
             // nothing
+            datasource inventory {
+                schema {
+                }
+            }
         """.trimIndent())
         val requestList = DtoFixture.traceRequestList(3)
         val service = TraceService(parsingService, mockk(), symbolTable)
@@ -180,5 +186,82 @@ class TraceServiceTest {
 
         // then success
         assertThat(actual.isEmpty()).isFalse()
+    }
+
+    @Test
+    fun analyze_singleRequest_withOnlineDataSources_isNotEmpty() {
+        // given
+        val symbolTable = prepare("""
+            datasource inventory {
+                schema {
+                    id = "s00"
+                    WU = 0 l
+                    GWP = 0 kg
+                }
+            }
+            process p {
+                products {
+                    1 kg p
+                }
+                variables {
+                    data = lookup inventory match (id = "s01")
+                }
+                impacts {
+                    data.GWP GWP
+                }
+            }
+        """.trimIndent())
+        val service = TraceService(
+            parsingService,
+            mockk(),
+            symbolTable,
+        )
+        val request = TraceRequestDto(
+            requestId = "r01",
+            product = ProductDemandDto(QuantityDto(1.0, "kg"), "p"),
+            fromProcess = FromProcessDto("p"),
+            datasources = listOf(
+                DatasourceDto(
+                    name = "inventory",
+                    records = records("""
+                        id,WU,GWP,other
+                        s00,4.0,2.0,pool-01
+                        s01,3.0,1.0,pool-01
+                    """.trimIndent())
+                )
+            )
+        )
+
+        // when
+        val actual = service.analyze(request)
+
+        // then success
+        assertThat(actual.isEmpty()).isFalse()
+    }
+
+    private fun records(
+        content: String
+    ): List<RecordDto> {
+        val lines = content.lines()
+        val header = lines[0].trim(',').split(',')
+        val rest = lines.drop(1)
+        return rest.map { line ->
+            val entries = line.trim(' ')
+                .split(',')
+                .mapIndexed { idx, it ->
+                    try {
+                        EntryDto(
+                            name = header[idx],
+                            value = VNum(parseDouble(it))
+                        )
+                    } catch (e: NumberFormatException) {
+                        EntryDto(
+                            name = header[idx],
+                            value = VStr(it)
+                        )
+                    }
+                }
+            RecordDto(entries)
+        }
     }
 }
