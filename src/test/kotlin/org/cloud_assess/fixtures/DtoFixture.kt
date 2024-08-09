@@ -5,6 +5,43 @@ import org.cloud_assess.dto.*
 @Suppress("SameParameterValue")
 class DtoFixture {
     companion object {
+        fun traceRequestList(size: Int = 3): TraceRequestListDto {
+            return TraceRequestListDto((1..size).map { traceRequestDto("r$it") })
+        }
+
+        private fun traceRequestDto(id: String = "r00"): TraceRequestDto {
+            return TraceRequestDto(
+                requestId = id,
+                demand = DemandDto(
+                    productName = "vm",
+                    processName = "vm",
+                    quantity = QuantityDto(1.0, "hour"),
+                ),
+                options = OptionsDto(
+                    useDefaultDatasourceIfNotProvided = false,
+                ),
+                globals = listOf(
+                    ParameterDto(
+                        "x",
+                        PVNum(1.0, "kg"),
+                    )
+                ),
+                datasources = listOf(
+                    DatasourceDto(
+                        name = "inventory",
+                        records = listOf(
+                            RecordDto(
+                                listOf(
+                                    EntryDto("x", VNum(1.0))
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+        }
+
+
         fun poolListDto(): PoolListDto {
             return PoolListDto(
                 period = quantityHour(1.0),

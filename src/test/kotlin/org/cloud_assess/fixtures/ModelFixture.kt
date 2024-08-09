@@ -3,6 +3,7 @@ package org.cloud_assess.fixtures
 import ch.kleis.lcaac.core.lang.expression.EDataRef
 import ch.kleis.lcaac.core.lang.expression.EQuantityScale
 import ch.kleis.lcaac.core.math.basic.BasicNumber
+import org.cloud_assess.model.ResourceTrace
 
 class ModelFixture {
     companion object {

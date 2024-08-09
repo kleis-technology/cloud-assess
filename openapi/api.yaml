@@ -6,6 +6,24 @@ servers:
   - url: http://localhost:8080
     description: Local server
 paths:
+  /debug/trace:
+    post:
+      summary: Trace the impacts for a generic request
+      operationId: trace
+      requestBody:
+        description: A generic request
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TraceRequestListDto'
+      responses:
+        '200':
+          description: Trace response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TraceResponseListDto'
   /pools/assess:
     post:
       summary: Assess a collection of pools
@@ -169,6 +187,7 @@ components:
       properties:
         total:
           $ref: '#/components/schemas/QuantityDto'
+        # TODO: per lc step
     PoolDto:
       type: object
       required:
@@ -302,3 +321,162 @@ components:
           type: string
           enum:
             - UP
+    TraceRequestListDto:
+      type: object
+      required:
+        - elements
+      properties:
+        elements:
+          type: array
+          items:
+            $ref: '#/components/schemas/TraceRequestDto'
+    TraceRequestDto:
+      type: object
+      required:
+        - requestId
+        - demand
+      properties:
+        requestId:
+          type: string
+        options:
+          $ref: '#/components/schemas/OptionsDto'
+        demand:
+          $ref: '#/components/schemas/DemandDto'
+        globals:
+          type: array
+          default: [ ]
+          items:
+            $ref: '#/components/schemas/ParameterDto'
+        datasources:
+          type: array
+          default: [ ]
+          items:
+            $ref: '#/components/schemas/DatasourceDto'
+
+    TraceResponseListDto:
+      type: object
+      properties:
+        elements:
+          type: array
+          items:
+            $ref: '#/components/schemas/TraceResponseDto'
+
+    TraceResponseDto:
+      type: object
+      properties:
+        requestId:
+          type: string
+        trace:
+          type: array
+          items:
+            $ref: '#/components/schemas/TraceResponseRowDto'
+    TraceResponseRowDto:
+      type: object
+      required:
+        - depth
+      properties:
+        depth:
+          type: integer
+        name:
+          type: string
+        processName:
+          type: string
+        params:
+          type: array
+          default: [ ]
+          items:
+            $ref: '#/components/schemas/ParameterDto'
+        labels:
+          type: array
+          default: [ ]
+          items:
+            $ref: '#/components/schemas/ProcessLabelDto'
+        compartment:
+          type: string
+        subCompartment:
+          type: string
+        supply:
+          $ref: '#/components/schemas/QuantityDto'
+        impacts:
+          $ref: '#/components/schemas/ImpactsDto'
+    ParameterDto:
+      type: object
+      required:
+        - name
+        - value
+      properties:
+        name:
+          type: string
+        value:
+          type: ParameterValueDto
+    ProcessLabelDto:
+      type: object
+      required:
+        - name
+        - value
+      properties:
+        name:
+          type: string
+        value:
+          type: string
+    DatasourceDto:
+      type: object
+      required:
+        - name
+        - records
+      properties:
+        name:
+          type: string
+        records:
+          type: array
+          default: [ ]
+          items:
+            $ref: '#/components/schemas/RecordDto'
+    RecordDto:
+      type: object
+      required:
+        - elements
+      properties:
+        elements:
+          type: array
+          items:
+            $ref: '#/components/schemas/EntryDto'
+    EntryDto:
+      type: object
+      required:
+        - name
+        - value
+      properties:
+        name:
+          type: string
+        value:
+          type: EntryValueDto # string or number
+    OptionsDto:
+      type: object
+      properties:
+        useDefaultDatasourceIfNotProvided:
+          type: boolean
+          default: false
+    DemandDto:
+      required:
+        - quantity
+        - productName
+        - processName
+      properties:
+        productName:
+          type: string
+        quantity:
+          $ref: '#/components/schemas/QuantityDto'
+        processName:
+          type: string
+        params:
+          type: array
+          default: [ ]
+          items:
+            $ref: '#/components/schemas/ParameterDto'
+        labels:
+          type: array
+          default: [ ]
+          items:
+            $ref: '#/components/schemas/ProcessLabelDto'
+
