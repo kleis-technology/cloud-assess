@@ -37,7 +37,7 @@ class TraceService(
             defaultDataSourceOperations,
         )
         val evaluator = Evaluator(symbolTablesWithGlobals, BasicOperations, sourceOps)
-        val trace = evaluator.with(processApplication.template)
+        val trace = evaluator
             .trace(processApplication.template, processApplication.arguments)
         val systemValue = trace.getSystemValue()
         val entryPoint = trace.getEntryPoint()
@@ -98,40 +98,38 @@ class TraceService(
         return requestGlobals.fold(dataRegister) { register, parameter ->
             register.override(
                 DataKey(parameter.name),
-                EQuantityScale(
-                    BasicNumber(parameter.value.amount),
-                    EDataRef(parameter.value.unit),
-                )
+                parameter(parameter)
             )
         }
     }
 
-    private fun prepare(request: TraceRequestDto): EProcessTemplateApplication<BasicNumber> {
-        val quantity = "${request.product.quantity.amount} ${request.product.quantity.unit}"
-        val processName = request.fromProcess.name
-        val processParams = request.fromProcess.params?.joinToString(", ") {
-            "${it.name} = ${it.value.amount} ${it.value.unit}"
-        }?.let {
-            if (it.isBlank()) ""
-            else "($it)"
-        } ?: ""
-        val processLabels = request.fromProcess.labels?.joinToString {
-            "${it.name} = ${it.value}"
-        }?.let {
-            if (it.isBlank()) ""
-            else "match ($it)"
-        } ?: ""
-
-        val content = """
-            process __main__ {
-                products {
-                    1 u __main__
-                }
-                inputs {
-                    $quantity from $processName${processParams} $processLabels
-                }
+    private fun parameter(parameter: ParameterDto): DataExpression<BasicNumber> {
+        return when(parameter.value.type) {
+            ParameterValueDto.Type.string -> parameter.value.value?.let { EStringLiteral(it) }
+                ?: throw IllegalArgumentException("missing string value in parameter '${parameter.name}'")
+            ParameterValueDto.Type.quantity -> {
+                val amount = parameter.value.amount
+                    ?: throw IllegalArgumentException("missing amount in parameter '${parameter.name}'")
+                val unit = parameter.value.unit
+                    ?.let { parsingService.data(it) }
+                    ?: throw IllegalArgumentException("missing unit in parameter '${parameter.name}'")
+                EQuantityScale(
+                    BasicNumber(amount),
+                    unit,
+                )
             }
-        """.trimIndent()
-        return parsingService.processTemplateApplication(content)
+        }
+    }
+
+    private fun prepare(request: TraceRequestDto): EProcessTemplateApplication<BasicNumber> {
+        val demand = request.demand
+        val template = symbolTable.getTemplate(
+            demand.processName,
+            demand.labels?.associate { it.name to it.value } ?: emptyMap(),
+        ) ?: throw IllegalArgumentException("unknown process name '${demand.processName}'")
+        val arguments = demand.params?.associate {
+            it.name to parameter(it)
+        } ?: emptyMap()
+        return EProcessTemplateApplication(template, arguments)
     }
 }

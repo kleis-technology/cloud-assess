@@ -1,26 +1,130 @@
 package org.cloud_assess.service
 
-import ch.kleis.lcaac.core.lang.evaluator.EvaluationTrace
 import ch.kleis.lcaac.core.lang.expression.EProcessTemplateApplication
-import ch.kleis.lcaac.core.lang.value.QuantityValue
+import ch.kleis.lcaac.core.lang.value.*
 import ch.kleis.lcaac.core.math.basic.BasicNumber
 import org.cloud_assess.dto.*
 import org.cloud_assess.model.Indicator
 import org.cloud_assess.model.ResourceAnalysis
 import org.cloud_assess.model.ResourceTrace
+import org.cloud_assess.model.ResourceTraceElement
 import org.springframework.stereotype.Service
 
 @Service
 class MapperService {
-    fun map(request: TraceRequestDto): EProcessTemplateApplication<BasicNumber> {
-        TODO()
-    }
-
     fun map(
         analysis: Map<String, ResourceTrace>,
         dto: TraceRequestListDto,
     ): TraceResponseListDto {
-        TODO()
+        return TraceResponseListDto(
+            analysis.entries.toList()
+                .map { traceResponseDto(it) }
+        )
+    }
+
+    private fun traceResponseDto(entry: Map.Entry<String, ResourceTrace>): TraceResponseDto {
+        val requestId = entry.key
+        val resourceTrace = entry.value
+        return TraceResponseDto(
+            requestId = requestId,
+            trace = resourceTrace.getElements()
+                .map { traceResponseRowDto(it) }
+        )
+    }
+
+    private fun traceResponseRowDto(element: ResourceTraceElement): TraceResponseRowDto {
+        return when (val target = element.target) {
+            is IndicatorValue -> TraceResponseRowDto(
+                depth = element.depth,
+                name = target.name,
+                supply = element.supply.toQuantityDto(),
+                impacts = impactsDto(element.impacts)
+            )
+
+            is ProductValue -> TraceResponseRowDto(
+                depth = element.depth,
+                name = target.name,
+                processName = target.fromProcessRef?.name,
+                params = target.fromProcessRef?.arguments?.mapNotNull {
+                    parameterDto(it)
+                },
+                labels = target.fromProcessRef?.matchLabels?.map {
+                    processLabelDto(it)
+                },
+                supply = element.supply.toQuantityDto(),
+                impacts = impactsDto(element.impacts)
+            )
+
+            is FullyQualifiedSubstanceValue -> TraceResponseRowDto(
+                depth = element.depth,
+                name = target.name,
+                compartment = target.compartment,
+                subCompartment = target.subcompartment,
+                supply = element.supply.toQuantityDto(),
+                impacts = impactsDto(element.impacts)
+            )
+
+            is PartiallyQualifiedSubstanceValue -> TraceResponseRowDto(
+                depth = element.depth,
+                name = target.name,
+                supply = element.supply.toQuantityDto(),
+                impacts = impactsDto(element.impacts)
+            )
+        }
+    }
+
+    private fun processLabelDto(it: Map.Entry<String, StringValue<BasicNumber>>) =
+        ProcessLabelDto(
+            name = it.key,
+            value = it.value.s,
+        )
+
+    private fun parameterDto(it: Map.Entry<String, DataValue<BasicNumber>>) =
+        when (val value = it.value) {
+            is QuantityValue -> ParameterDto(
+                name = it.key,
+                value = ParameterValueDto(
+                    type = ParameterValueDto.Type.quantity,
+                    amount = value.amount.value,
+                    unit = value.unit.toString(),
+                )
+            )
+
+            is StringValue -> ParameterDto(
+                name = it.key,
+                value = ParameterValueDto(
+                    type = ParameterValueDto.Type.string,
+                    value = value.s,
+                )
+            )
+
+            is RecordValue -> null
+        }
+
+    private fun impactsDto(impacts: Map<Indicator, QuantityValue<BasicNumber>?>): ImpactsDto {
+        return ImpactsDto(
+            adPe = impactDto(impacts, Indicator.ADPe),
+            adPf = impactDto(impacts, Indicator.ADPf),
+            AP = impactDto(impacts, Indicator.AP),
+            GWP = impactDto(impacts, Indicator.GWP),
+            LU = impactDto(impacts, Indicator.LU),
+            ODP = impactDto(impacts, Indicator.ODP),
+            PM = impactDto(impacts, Indicator.PM),
+            POCP = impactDto(impacts, Indicator.POCP),
+            WU = impactDto(impacts, Indicator.WU),
+            ctUe = impactDto(impacts, Indicator.CTUe),
+            ctUhC = impactDto(impacts, Indicator.CTUh_c),
+            ctUhNc = impactDto(impacts, Indicator.CTUh_nc),
+            epf = impactDto(impacts, Indicator.Epf),
+            epm = impactDto(impacts, Indicator.Epm),
+            ept = impactDto(impacts, Indicator.Ept),
+            IR = impactDto(impacts, Indicator.IR),
+        )
+    }
+    
+    private fun impactDto(impacts: Map<Indicator, QuantityValue<BasicNumber>?>, indicator: Indicator): ImpactDto {
+        return impacts[indicator]?.let { ImpactDto(total = it.toQuantityDto()) }
+            ?: ImpactDto(total = QuantityDto(amount = 0.0, unit = ""))
     }
 
     fun map(

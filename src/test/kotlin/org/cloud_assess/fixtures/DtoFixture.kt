@@ -9,22 +9,25 @@ class DtoFixture {
             return TraceRequestListDto((1..size).map { traceRequestDto("r$it") })
         }
 
-        fun traceRequestDto(id: String = "r00"): TraceRequestDto {
+        private fun traceRequestDto(id: String = "r00"): TraceRequestDto {
             return TraceRequestDto(
                 requestId = id,
-                product = ProductDemandDto(
-                    QuantityDto(1.0, "kg"),
-                    "vm",
-                ),
-                fromProcess = FromProcessDto(
-                    name = "vm",
+                demand = DemandDto(
+                    productName = "vm",
+                    processName = "vm",
+                    quantity = QuantityDto(1.0, "hour"),
                 ),
                 options = OptionsDto(
                     useDefaultDatasourceIfNotProvided = false,
                 ),
                 globals = listOf(
                     ParameterDto(
-                        "x", QuantityDto(1.0, "kg"),
+                        "x",
+                        ParameterValueDto(
+                            type = ParameterValueDto.Type.quantity,
+                            amount = 1.0,
+                            unit = "kg",
+                        ),
                     )
                 ),
                 datasources = listOf(
