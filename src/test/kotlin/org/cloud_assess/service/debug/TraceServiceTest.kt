@@ -160,7 +160,7 @@ class TraceServiceTest {
         )
 
         // when
-        val actual = service.analyze(request).getElements()[0]
+        val actual = service.analyze(request).getElements()[1]
 
         // then
         assertThat(actual.impacts[Indicator.GWP]).isEqualTo(
@@ -203,7 +203,7 @@ class TraceServiceTest {
 
         // when
         val actual = service.analyze(request)
-            .getElements()[0]
+            .getElements()[1]
 
         // then success
         assertThat(actual.impacts[Indicator.GWP]).isEqualTo(
@@ -245,7 +245,7 @@ class TraceServiceTest {
         )
 
         // when
-        val actual = service.analyze(request).getElements()[0]
+        val actual = service.analyze(request).getElements()[1]
 
         // then success
         assertThat(actual.target.getDisplayName())
@@ -284,7 +284,7 @@ class TraceServiceTest {
 
         // when
         val actual = service.analyze(request)
-            .getElements()[0]
+            .getElements()[1]
 
         // then success
         assertThat(actual.impacts[Indicator.GWP]).isEqualTo(
@@ -326,7 +326,7 @@ class TraceServiceTest {
         )
 
         // when
-        val actual = service.analyze(request).getElements()[0]
+        val actual = service.analyze(request).getElements()[1]
 
         // then success
         assertThat(actual.target.getDisplayName())
