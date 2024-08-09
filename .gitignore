@@ -8,3 +8,5 @@ build
 local
 .local
 .clients
+
+**/node_modules
