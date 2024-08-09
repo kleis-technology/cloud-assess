@@ -11,6 +11,7 @@ class ResourceTrace(
     private val id: String,
     private val rawTrace: EvaluationTrace<BasicNumber>,
     private val contributionAnalysis: ContributionAnalysis<BasicNumber, BasicMatrix>,
+    private val entryPointRef: String = "__main__",
 ) {
     fun getRequestId(): String = id
     fun isEmpty(): Boolean = rawTrace.getNumberOfProcesses() == 0

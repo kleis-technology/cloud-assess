@@ -38,6 +38,7 @@ class TraceService(
         )
         val evaluator = Evaluator(symbolTablesWithGlobals, BasicOperations, sourceOps)
         val trace = evaluator
+            .with(processApplication.template)
             .trace(processApplication.template, processApplication.arguments)
         val systemValue = trace.getSystemValue()
         val entryPoint = trace.getEntryPoint()
@@ -104,25 +105,55 @@ class TraceService(
     }
 
     private fun parameter(parameter: ParameterDto): DataExpression<BasicNumber> {
-        return when(parameter.value) {
+        return when (parameter.value) {
             is PVNum -> {
                 val amount = parameter.value.amount
                 val unit = parsingService.data(parameter.value.unit)
                 EQuantityScale(BasicNumber(amount), unit)
             }
+
             is PVStr -> EStringLiteral(parameter.value.value)
         }
     }
 
     private fun prepare(request: TraceRequestDto): EProcessTemplateApplication<BasicNumber> {
         val demand = request.demand
-        val template = symbolTable.getTemplate(
-            demand.processName,
-            demand.labels?.associate { it.name to it.value } ?: emptyMap(),
-        ) ?: throw IllegalArgumentException("unknown process name '${demand.processName}'")
+        val quantity = demand.quantity
         val arguments = demand.params?.associate {
             it.name to parameter(it)
         } ?: emptyMap()
-        return EProcessTemplateApplication(template, arguments)
+        val labels = MatchLabels<BasicNumber>(
+            demand.labels?.associate { it.name to EStringLiteral(it.value) }
+                ?: emptyMap())
+
+        return EProcessTemplateApplication(
+            template = EProcessTemplate(
+                body = EProcess(
+                    "__main__",
+                    products = listOf(
+                        ETechnoExchange(
+                            quantity = EQuantityScale(BasicNumber(1.0), EDataRef("u")),
+                            product = EProductSpec("__main__", referenceUnit = EDataRef("u")),
+                        )
+                    ),
+                    inputs = listOf(
+                        ETechnoBlockEntry(
+                            ETechnoExchange(
+                                quantity = EQuantityScale(BasicNumber(quantity.amount), EDataRef(quantity.unit)),
+                                product = EProductSpec(
+                                    demand.productName,
+                                    fromProcess = FromProcess(
+                                        demand.processName,
+                                        matchLabels = labels,
+                                        arguments = arguments,
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            ),
+            arguments = emptyMap(),
+        )
     }
 }

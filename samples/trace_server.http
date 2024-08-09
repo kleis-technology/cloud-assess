@@ -9,7 +9,7 @@ Content-Type: application/json
         "productName": "server",
         "processName": "server",
         "quantity": {
-          "amount": 1.0,
+          "amount": 10.0,
           "unit": "hour"
         },
         "params": [
