@@ -1,0 +1,24 @@
+POST http://localhost:8080/debug/trace
+Content-Type: application/json
+
+{
+  "elements": [
+    {
+      "requestId": "r01",
+      "demand": {
+        "productName": "server",
+        "processName": "server",
+        "quantity": {
+          "amount": 1.0,
+          "unit": "hour"
+        },
+        "params": [
+          {
+            "name": "id",
+            "value": "srv-02"
+          }
+        ]
+      }
+    }
+  ]
+}
