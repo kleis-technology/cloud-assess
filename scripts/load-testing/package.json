@@ -3,12 +3,16 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "compile": "tsc",
+    "generate:dtos": "openapi-generator-cli generate -i ../../openapi/api.yaml -g typescript-fetch -o . --global-property=models",
+    "test": "jest"
   },
   "author": "",
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "@openapitools/openapi-generator-cli": "^2.13.4",
+    "ts-jest": "^29.2.4",
     "typescript": "^5.5.4"
   }
 }
