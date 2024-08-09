@@ -408,7 +408,7 @@ components:
         name:
           type: string
         value:
-          $ref: '#/components/schemas/ParameterValueDto'
+          type: ParameterValueDto
     ProcessLabelDto:
       type: object
       required:
@@ -479,21 +479,4 @@ components:
           default: [ ]
           items:
             $ref: '#/components/schemas/ProcessLabelDto'
-    ParameterValueDto:
-      type: object
-      required:
-        - type
-      properties:
-        type:
-          enum:
-            - string
-            - quantity
-        value:
-          type: string
-        amount:
-          type: number
-          format: double
-        unit:
-          type: string
-
 
