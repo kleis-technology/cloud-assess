@@ -334,17 +334,14 @@ components:
       type: object
       required:
         - requestId
-        - product
-        - fromProcess
+        - demand
       properties:
         requestId:
           type: string
         options:
           $ref: '#/components/schemas/OptionsDto'
-        product:
-          $ref: '#/components/schemas/ProductDemandDto'
-        fromProcess:
-          $ref: '#/components/schemas/FromProcessDto'
+        demand:
+          $ref: '#/components/schemas/DemandDto'
         globals:
           type: array
           default: [ ]
@@ -375,17 +372,33 @@ components:
             $ref: '#/components/schemas/TraceResponseRowDto'
     TraceResponseRowDto:
       type: object
+      required:
+        - depth
       properties:
         depth:
           type: integer
-        product:
-          $ref: '#/components/schemas/ProductDemandDto'
-        fromProcess:
-          $ref: '#/components/schemas/FromProcessDto'
-        impacts:
+        name:
+          type: string
+        processName:
+          type: string
+        params:
           type: array
+          default: [ ]
           items:
-            $ref: '#/components/schemas/ImpactsDto'
+            $ref: '#/components/schemas/ParameterDto'
+        labels:
+          type: array
+          default: [ ]
+          items:
+            $ref: '#/components/schemas/ProcessLabelDto'
+        compartment:
+          type: string
+        subCompartment:
+          type: string
+        supply:
+          $ref: '#/components/schemas/QuantityDto'
+        impacts:
+          $ref: '#/components/schemas/ImpactsDto'
     ParameterDto:
       type: object
       required:
@@ -395,7 +408,7 @@ components:
         name:
           type: string
         value:
-          $ref: '#/components/schemas/QuantityDto'
+          $ref: '#/components/schemas/ParameterValueDto'
     ProcessLabelDto:
       type: object
       required:
@@ -444,22 +457,17 @@ components:
         useDefaultDatasourceIfNotProvided:
           type: boolean
           default: false
-    ProductDemandDto:
-      type: object
+    DemandDto:
       required:
         - quantity
-        - name
+        - productName
+        - processName
       properties:
+        productName:
+          type: string
         quantity:
           $ref: '#/components/schemas/QuantityDto'
-        name:
-          type: string
-    FromProcessDto:
-      type: object
-      required:
-        - name
-      properties:
-        name:
+        processName:
           type: string
         params:
           type: array
@@ -471,4 +479,21 @@ components:
           default: [ ]
           items:
             $ref: '#/components/schemas/ProcessLabelDto'
+    ParameterValueDto:
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          enum:
+            - string
+            - quantity
+        value:
+          type: string
+        amount:
+          type: number
+          format: double
+        unit:
+          type: string
+
 
