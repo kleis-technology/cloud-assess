@@ -23,17 +23,6 @@ export const VCPUUnitsDto = {
 export type VCPUUnitsDto = typeof VCPUUnitsDto[keyof typeof VCPUUnitsDto];
 
 
-export function instanceOfVCPUUnitsDto(value: any): boolean {
-    for (const key in VCPUUnitsDto) {
-        if (Object.prototype.hasOwnProperty.call(VCPUUnitsDto, key)) {
-            if (VCPUUnitsDto[key] === value) {
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
 export function VCPUUnitsDtoFromJSON(json: any): VCPUUnitsDto {
     return VCPUUnitsDtoFromJSONTyped(json, false);
 }

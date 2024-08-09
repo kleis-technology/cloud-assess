@@ -24,17 +24,6 @@ export const MemoryUnitsDto = {
 export type MemoryUnitsDto = typeof MemoryUnitsDto[keyof typeof MemoryUnitsDto];
 
 
-export function instanceOfMemoryUnitsDto(value: any): boolean {
-    for (const key in MemoryUnitsDto) {
-        if (Object.prototype.hasOwnProperty.call(MemoryUnitsDto, key)) {
-            if (MemoryUnitsDto[key] === value) {
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
 export function MemoryUnitsDtoFromJSON(json: any): MemoryUnitsDto {
     return MemoryUnitsDtoFromJSONTyped(json, false);
 }
