@@ -104,20 +104,13 @@ class TraceService(
     }
 
     private fun parameter(parameter: ParameterDto): DataExpression<BasicNumber> {
-        return when(parameter.value.type) {
-            ParameterValueDto.Type.string -> parameter.value.value?.let { EStringLiteral(it) }
-                ?: throw IllegalArgumentException("missing string value in parameter '${parameter.name}'")
-            ParameterValueDto.Type.quantity -> {
+        return when(parameter.value) {
+            is PVNum -> {
                 val amount = parameter.value.amount
-                    ?: throw IllegalArgumentException("missing amount in parameter '${parameter.name}'")
-                val unit = parameter.value.unit
-                    ?.let { parsingService.data(it) }
-                    ?: throw IllegalArgumentException("missing unit in parameter '${parameter.name}'")
-                EQuantityScale(
-                    BasicNumber(amount),
-                    unit,
-                )
+                val unit = parsingService.data(parameter.value.unit)
+                EQuantityScale(BasicNumber(amount), unit)
             }
+            is PVStr -> EStringLiteral(parameter.value.value)
         }
     }
 

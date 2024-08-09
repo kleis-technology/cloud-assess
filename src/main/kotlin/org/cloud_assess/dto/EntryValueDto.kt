@@ -13,11 +13,11 @@ class EntryValueDtoDeserializer : JsonDeserializer<EntryValueDto>() {
 
     override fun deserialize(parser: JsonParser?, context: DeserializationContext?): EntryValueDto {
         val node = parser?.codec?.readTree<JsonNode>(parser)
-            ?: throw IllegalArgumentException("invalid datasource entry value")
+            ?: throw IllegalArgumentException("invalid entry value")
         return when {
             node.isNumber -> VNum(node.asDouble())
             node.isTextual -> VStr(node.asText())
-            else -> throw IllegalArgumentException("invalid datasource entry value")
+            else -> throw IllegalArgumentException("invalid entry value")
         }
     }
 }
@@ -31,7 +31,7 @@ class EntryValueDtoSerializer : JsonSerializer<EntryValueDto>() {
         return when(dto) {
             is VNum -> generator.writeNumber(dto.value)
             is VStr -> generator.writeString(dto.value)
-            null -> throw IllegalStateException("missing field value")
+            null -> generator.writeNull()
         }
     }
 }

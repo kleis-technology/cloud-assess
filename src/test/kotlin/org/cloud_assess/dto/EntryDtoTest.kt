@@ -1,21 +1,36 @@
 package org.cloud_assess.dto
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.module.SimpleModule
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.assertj.core.api.Assertions.assertThat
 import org.cloud_assess.config.MapperConfig
-import org.cloud_assess.config.WebConfig
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.context.annotation.Bean
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
 @ExtendWith(SpringExtension::class)
-@ContextConfiguration(classes = [MapperConfig::class])
-class DatasourceEntryDtoTest(
+class EntryDtoTest(
     @Autowired
     private val objectMapper: ObjectMapper,
 ) {
+    @TestConfiguration
+    class MapperConfig {
+        @Bean
+        fun objectMapper(): ObjectMapper {
+            val objectMapper = jacksonObjectMapper()
+            val sm = SimpleModule()
+            sm.addDeserializer(EntryValueDto::class.java, EntryValueDtoDeserializer())
+            sm.addSerializer(EntryValueDto::class.java, EntryValueDtoSerializer())
+            objectMapper.registerModule(sm)
+            return objectMapper
+        }
+    }
+
 
     @Test
     fun string() {
@@ -28,10 +43,10 @@ class DatasourceEntryDtoTest(
         """.trimIndent()
 
         // when
-        val actual = objectMapper.readValue(json, DatasourceEntryDto::class.java)
+        val actual = objectMapper.readValue(json, EntryDto::class.java)
 
         // then
-        val expected = DatasourceEntryDto(
+        val expected = EntryDto(
             name = "x",
             value = VStr("abc"),
         )
@@ -49,10 +64,10 @@ class DatasourceEntryDtoTest(
         """.trimIndent()
 
         // when
-        val actual = objectMapper.readValue(json, DatasourceEntryDto::class.java)
+        val actual = objectMapper.readValue(json, EntryDto::class.java)
 
         // then
-        val expected = DatasourceEntryDto(
+        val expected = EntryDto(
             name = "x",
             value = VNum(1.0),
         )

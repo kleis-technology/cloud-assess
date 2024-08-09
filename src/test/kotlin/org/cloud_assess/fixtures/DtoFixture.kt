@@ -23,11 +23,7 @@ class DtoFixture {
                 globals = listOf(
                     ParameterDto(
                         "x",
-                        ParameterValueDto(
-                            type = ParameterValueDto.Type.quantity,
-                            amount = 1.0,
-                            unit = "kg",
-                        ),
+                        PVNum(1.0, "kg"),
                     )
                 ),
                 datasources = listOf(

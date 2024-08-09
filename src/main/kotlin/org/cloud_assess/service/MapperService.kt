@@ -1,6 +1,5 @@
 package org.cloud_assess.service
 
-import ch.kleis.lcaac.core.lang.expression.EProcessTemplateApplication
 import ch.kleis.lcaac.core.lang.value.*
 import ch.kleis.lcaac.core.math.basic.BasicNumber
 import org.cloud_assess.dto.*
@@ -83,17 +82,12 @@ class MapperService {
         when (val value = it.value) {
             is QuantityValue -> ParameterDto(
                 name = it.key,
-                value = ParameterValueDto(
-                    type = ParameterValueDto.Type.quantity,
-                    amount = value.amount.value,
-                    unit = value.unit.toString(),
-                )
+                value = PVNum(value.amount.value, value.unit.toString()),
             )
 
             is StringValue -> ParameterDto(
                 name = it.key,
-                value = ParameterValueDto(
-                    type = ParameterValueDto.Type.string,
+                value = PVStr(
                     value = value.s,
                 )
             )
@@ -101,6 +95,7 @@ class MapperService {
             is RecordValue -> null
         }
 
+    @Suppress("DuplicatedCode")
     private fun impactsDto(impacts: Map<Indicator, QuantityValue<BasicNumber>?>): ImpactsDto {
         return ImpactsDto(
             adPe = impactDto(impacts, Indicator.ADPe),
@@ -173,6 +168,7 @@ class MapperService {
         )
     }
 
+    @Suppress("DuplicatedCode")
     private fun impactsDto(analysis: ResourceAnalysis): ImpactsDto {
         return ImpactsDto(
             adPe = impactDto(analysis, Indicator.ADPe),

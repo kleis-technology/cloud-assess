@@ -196,7 +196,7 @@ class TraceServiceTest {
                 quantity = QuantityDto(1.0, "kg"),
                 processName = "p",
                 params = listOf(
-                    ParameterDto("x", ParameterValueDto(type = ParameterValueDto.Type.quantity, amount = 1.0, unit = "kg"))
+                    ParameterDto("x", PVNum(1.0, "kg")),
                 )
             ),
         )
@@ -239,7 +239,7 @@ class TraceServiceTest {
                 quantity = QuantityDto(1.0, "kg"),
                 processName = "p",
                 params = listOf(
-                    ParameterDto("my_name", ParameterValueDto(type = ParameterValueDto.Type.string, value = "foo"))
+                    ParameterDto("my_name", PVStr("foo")),
                 )
             ),
         )
@@ -278,7 +278,7 @@ class TraceServiceTest {
                 processName = "p",
             ),
             globals = listOf(
-                ParameterDto("x", ParameterValueDto(type = ParameterValueDto.Type.quantity, amount = 1.0, unit = "kg"))
+                ParameterDto("x", PVNum(1.0, "kg")),
             )
         )
 
@@ -321,7 +321,7 @@ class TraceServiceTest {
                 processName = "p",
             ),
             globals = listOf(
-                ParameterDto("x", ParameterValueDto(type = ParameterValueDto.Type.string, value = "foo"))
+                ParameterDto("x", PVStr("foo")),
             )
         )
 
