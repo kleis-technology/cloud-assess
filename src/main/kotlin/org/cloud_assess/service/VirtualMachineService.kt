@@ -3,9 +3,15 @@ package org.cloud_assess.service
 import ch.kleis.lcaac.core.assessment.ContributionAnalysisProgram
 import ch.kleis.lcaac.core.datasource.DefaultDataSourceOperations
 import ch.kleis.lcaac.core.datasource.OverriddenDataSourceOperations
+import ch.kleis.lcaac.core.datasource.in_memory.InMemNum
+import ch.kleis.lcaac.core.datasource.in_memory.InMemStr
+import ch.kleis.lcaac.core.datasource.in_memory.InMemoryDatasource
 import ch.kleis.lcaac.core.lang.SymbolTable
 import ch.kleis.lcaac.core.lang.evaluator.Evaluator
-import ch.kleis.lcaac.core.lang.expression.*
+import ch.kleis.lcaac.core.lang.expression.DataExpression
+import ch.kleis.lcaac.core.lang.expression.EDataRef
+import ch.kleis.lcaac.core.lang.expression.EProcessTemplateApplication
+import ch.kleis.lcaac.core.lang.expression.EQuantityScale
 import ch.kleis.lcaac.core.lang.register.DataKey
 import ch.kleis.lcaac.core.math.basic.BasicNumber
 import ch.kleis.lcaac.core.math.basic.BasicOperations
@@ -74,18 +80,16 @@ class VirtualMachineService(
     ): OverriddenDataSourceOperations<BasicNumber> {
         val records = vms.virtualMachines
             .map { vm ->
-                ERecord(
                     mapOf(
-                        "id" to EStringLiteral(vm.id),
-                        "pool_id" to EStringLiteral(vm.poolId),
-                        "ram_size" to vm.ram.toDataExpression(),
-                        "storage_size" to vm.storage.toDataExpression(),
-                        "vcpu_size" to vm.vcpu.toDataExpression(),
+                        "id" to InMemStr(vm.id),
+                        "pool_id" to InMemStr(vm.poolId),
+                        "ram_size" to InMemNum(vm.ram.amount), // TODO: handle user units
+                        "storage_size" to InMemNum(vm.storage.amount),
+                        "vcpu_size" to InMemNum(vm.vcpu.amount),
                     )
-                )
             }
         val content = mapOf(
-            overriddenDataSourceName to records
+            overriddenDataSourceName to InMemoryDatasource(records)
         )
         return OverriddenDataSourceOperations(
             content,

@@ -3,6 +3,10 @@ package org.cloud_assess.service.debug
 import ch.kleis.lcaac.core.assessment.ContributionAnalysisProgram
 import ch.kleis.lcaac.core.datasource.DefaultDataSourceOperations
 import ch.kleis.lcaac.core.datasource.OverriddenDataSourceOperations
+import ch.kleis.lcaac.core.datasource.in_memory.InMemNum
+import ch.kleis.lcaac.core.datasource.in_memory.InMemStr
+import ch.kleis.lcaac.core.datasource.in_memory.InMemoryDatasource
+import ch.kleis.lcaac.core.datasource.in_memory.InMemoryRecord
 import ch.kleis.lcaac.core.lang.SymbolTable
 import ch.kleis.lcaac.core.lang.evaluator.Evaluator
 import ch.kleis.lcaac.core.lang.expression.*
@@ -52,46 +56,24 @@ class TraceService(
         )
     }
 
-    private fun overriddenDatasources(request: TraceRequestDto): Map<String, List<ERecord<BasicNumber>>> {
+    private fun overriddenDatasources(request: TraceRequestDto): Map<String, InMemoryDatasource> {
         val datasources = request.datasources ?: emptyList()
         return datasources
             .associate {
-                val schema = this.symbolTable.getDataSource(it.name)?.schema
-                    ?: throw IllegalArgumentException("unknown datasource '${it.name}'")
-                it.name to it.records.map { r -> record(schema, r) }
-            }
-    }
-
-    private fun record(schema: Map<String, DataExpression<BasicNumber>>, record: RecordDto): ERecord<BasicNumber> {
-        return ERecord(
-            record.elements
-                .filter {
-                    schema.containsKey(it.name)
-                }
-                .associate {
-                    val defaultValue = schema[it.name]
-                        ?: throw IllegalArgumentException("unknown column '${it.name}'")
-                    it.name to entry(defaultValue, it.value)
-                }
-        )
-    }
-
-    private fun entry(defaultValue: DataExpression<BasicNumber>, entry: EntryValueDto): DataExpression<BasicNumber> {
-        return when (entry) {
-            is VNum -> when (defaultValue) {
-                is QuantityExpression<*> -> EQuantityScale(
-                    BasicNumber(entry.value),
-                    EUnitOf(defaultValue),
+                it.name to InMemoryDatasource(
+                    records = it.records.map { r -> record(r) }
                 )
-
-                else -> throw IllegalArgumentException("expecting type 'number', found 'string'")
             }
+    }
 
-            is VStr -> when (defaultValue) {
-                is StringExpression -> EStringLiteral(entry.value)
-                else -> throw IllegalArgumentException("expecting type 'string', found 'number'")
+    private fun record(record: RecordDto): InMemoryRecord {
+        return record.elements
+            .associate { entry ->
+                entry.name to when (entry.value) {
+                    is VNum -> InMemNum(entry.value.value)
+                    is VStr -> InMemStr(entry.value.value)
+                }
             }
-        }
     }
 
     private fun globals(dataRegister: DataRegister<BasicNumber>, request: TraceRequestDto): DataRegister<BasicNumber> {
