@@ -309,6 +309,7 @@ components:
       type: string
       enum:
         - GB
+        - TB
     TimeUnitsDto:
       type: string
       enum:
