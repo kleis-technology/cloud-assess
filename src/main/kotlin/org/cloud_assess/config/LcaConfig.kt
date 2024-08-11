@@ -2,7 +2,9 @@ package org.cloud_assess.config
 
 import ch.kleis.lcaac.core.config.LcaacConfig
 import ch.kleis.lcaac.core.datasource.ConnectorFactory
+import ch.kleis.lcaac.core.datasource.DataSourceConnector
 import ch.kleis.lcaac.core.datasource.DefaultDataSourceOperations
+import ch.kleis.lcaac.core.datasource.cache.SourceOpsCache
 import ch.kleis.lcaac.core.lang.SymbolTable
 import ch.kleis.lcaac.core.math.basic.BasicNumber
 import ch.kleis.lcaac.core.math.basic.BasicOperations
@@ -63,15 +65,41 @@ class LcaConfig {
     }
 
     @Bean
-    fun defaultDataSourceOperations(
+    fun connectorFactory(
         lcaacConfig: LcaacConfig,
         @Value("\${LCA_CONFIG:trusted_library}") modelDirectory: File,
+    ): ConnectorFactory<BasicNumber> {
+        return ConnectorFactory(modelDirectory.path, lcaacConfig, BasicOperations)
+    }
+
+    @Bean
+    fun defaultConnectors(
+        factory: ConnectorFactory<BasicNumber>
+    ): Map<String, DataSourceConnector<BasicNumber>> = factory.buildConnectors()
+
+    @Bean
+    fun defaultConnectorsCache(
+        defaultConnectors: Map<String, DataSourceConnector<BasicNumber>>,
+    ): Map<String, SourceOpsCache<BasicNumber>> = defaultConnectors
+        .filter { it.value.getConfig().cache.enabled }
+        .mapValues {
+            SourceOpsCache(
+                it.value.getConfig().cache.maxSize,
+                it.value.getConfig().cache.maxRecordsPerCacheLine,
+            )
+        }
+
+    @Bean
+    fun defaultDataSourceOperations(
+        lcaacConfig: LcaacConfig,
+        defaultConnectors: Map<String, DataSourceConnector<BasicNumber>>,
+        defaultConnectorsCache: Map<String, SourceOpsCache<BasicNumber>>,
     ): DefaultDataSourceOperations<BasicNumber> {
-        val factory = ConnectorFactory(modelDirectory.path, lcaacConfig, BasicOperations)
         return DefaultDataSourceOperations(
             ops = BasicOperations,
             config = lcaacConfig,
-            connectors = factory.buildConnectors(),
+            connectors = defaultConnectors,
+            cache = defaultConnectorsCache,
         )
     }
 }

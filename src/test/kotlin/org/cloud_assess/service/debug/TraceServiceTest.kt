@@ -1,5 +1,7 @@
 package org.cloud_assess.service.debug
 
+import ch.kleis.lcaac.core.config.LcaacConfig
+import ch.kleis.lcaac.core.datasource.DefaultDataSourceOperations
 import ch.kleis.lcaac.core.lang.SymbolTable
 import ch.kleis.lcaac.core.math.basic.BasicNumber
 import ch.kleis.lcaac.core.math.basic.BasicOperations
@@ -7,6 +9,7 @@ import ch.kleis.lcaac.grammar.Loader
 import ch.kleis.lcaac.grammar.LoaderOption
 import ch.kleis.lcaac.grammar.parser.LcaLangLexer
 import ch.kleis.lcaac.grammar.parser.LcaLangParser
+import io.mockk.every
 import io.mockk.mockk
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
@@ -51,7 +54,9 @@ class TraceServiceTest {
             }
         """.trimIndent())
         val requestList = DtoFixture.traceRequestList(3)
-        val service = TraceService(parsingService, mockk(), symbolTable)
+        val sourceOps = mockk<DefaultDataSourceOperations<BasicNumber>>()
+        every { sourceOps.overrideWith(any()) } returns sourceOps
+        val service = TraceService(parsingService, sourceOps, symbolTable)
 
         // when
         val actual = service.analyze(requestList).keys
@@ -76,9 +81,11 @@ class TraceServiceTest {
                 }
             }
         """.trimIndent())
+        val sourceOps = mockk<DefaultDataSourceOperations<BasicNumber>>()
+        every { sourceOps.overrideWith(any()) } returns sourceOps
         val service = TraceService(
             parsingService,
-            mockk(),
+            sourceOps,
             symbolTable,
         )
         val request = TraceRequestDto(
@@ -111,9 +118,11 @@ class TraceServiceTest {
                 }
             }
         """.trimIndent())
+        val sourceOps = mockk<DefaultDataSourceOperations<BasicNumber>>()
+        every { sourceOps.overrideWith(any()) } returns sourceOps
         val service = TraceService(
             parsingService,
-            mockk(),
+            sourceOps,
             symbolTable,
         )
         val request = TraceRequestDto(
@@ -145,9 +154,11 @@ class TraceServiceTest {
                 }
             }
         """.trimIndent())
+        val sourceOps = mockk<DefaultDataSourceOperations<BasicNumber>>()
+        every { sourceOps.overrideWith(any()) } returns sourceOps
         val service = TraceService(
             parsingService,
-            mockk(),
+            sourceOps,
             symbolTable,
         )
         val request = TraceRequestDto(
@@ -184,9 +195,11 @@ class TraceServiceTest {
                 }
             }
         """.trimIndent())
+        val sourceOps = mockk<DefaultDataSourceOperations<BasicNumber>>()
+        every { sourceOps.overrideWith(any()) } returns sourceOps
         val service = TraceService(
             parsingService,
-            mockk(),
+            sourceOps,
             symbolTable,
         )
         val request = TraceRequestDto(
@@ -227,9 +240,11 @@ class TraceServiceTest {
                 }
             }
         """.trimIndent())
+        val sourceOps = mockk<DefaultDataSourceOperations<BasicNumber>>()
+        every { sourceOps.overrideWith(any()) } returns sourceOps
         val service = TraceService(
             parsingService,
-            mockk(),
+            sourceOps,
             symbolTable,
         )
         val request = TraceRequestDto(
@@ -265,9 +280,11 @@ class TraceServiceTest {
                 }
             }
         """.trimIndent())
+        val sourceOps = mockk<DefaultDataSourceOperations<BasicNumber>>()
+        every { sourceOps.overrideWith(any()) } returns sourceOps
         val service = TraceService(
             parsingService,
-            mockk(),
+            sourceOps,
             symbolTable,
         )
         val request = TraceRequestDto(
@@ -308,9 +325,11 @@ class TraceServiceTest {
                 }
             }
         """.trimIndent())
+        val sourceOps = mockk<DefaultDataSourceOperations<BasicNumber>>()
+        every { sourceOps.overrideWith(any()) } returns sourceOps
         val service = TraceService(
             parsingService,
-            mockk(),
+            sourceOps,
             symbolTable,
         )
         val request = TraceRequestDto(
@@ -356,9 +375,14 @@ class TraceServiceTest {
                 }
             }
         """.trimIndent())
+        val sourceOps = DefaultDataSourceOperations(
+            ops = BasicOperations,
+            config = LcaacConfig(),
+            connectors = emptyMap(),
+        )
         val service = TraceService(
             parsingService,
-            mockk(),
+            sourceOps,
             symbolTable,
         )
         val request = TraceRequestDto(

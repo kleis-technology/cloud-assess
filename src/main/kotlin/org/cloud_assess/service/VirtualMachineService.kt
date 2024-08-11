@@ -2,19 +2,16 @@ package org.cloud_assess.service
 
 import ch.kleis.lcaac.core.assessment.ContributionAnalysisProgram
 import ch.kleis.lcaac.core.datasource.DefaultDataSourceOperations
-import ch.kleis.lcaac.core.datasource.in_memory.*
+import ch.kleis.lcaac.core.datasource.in_memory.InMemoryConnector
+import ch.kleis.lcaac.core.datasource.in_memory.InMemoryConnectorKeys
+import ch.kleis.lcaac.core.datasource.in_memory.InMemoryDatasource
 import ch.kleis.lcaac.core.lang.SymbolTable
 import ch.kleis.lcaac.core.lang.evaluator.Evaluator
-import ch.kleis.lcaac.core.lang.expression.DataExpression
-import ch.kleis.lcaac.core.lang.expression.EDataRef
-import ch.kleis.lcaac.core.lang.expression.EProcessTemplateApplication
-import ch.kleis.lcaac.core.lang.expression.EQuantityScale
+import ch.kleis.lcaac.core.lang.expression.*
 import ch.kleis.lcaac.core.lang.register.DataKey
 import ch.kleis.lcaac.core.math.basic.BasicNumber
 import ch.kleis.lcaac.core.math.basic.BasicOperations
-import org.cloud_assess.dto.QuantityTimeDto
-import org.cloud_assess.dto.TimeUnitsDto
-import org.cloud_assess.dto.VirtualMachineListDto
+import org.cloud_assess.dto.*
 import org.cloud_assess.model.ResourceAnalysis
 import org.springframework.stereotype.Service
 
@@ -83,12 +80,14 @@ class VirtualMachineService(
     ): DefaultDataSourceOperations<BasicNumber> {
         val records = vms.virtualMachines
             .map { vm ->
-                mapOf(
-                    "id" to InMemStr(vm.id),
-                    "pool_id" to InMemStr(vm.poolId),
-                    "ram_size" to InMemNum(vm.ram.amount), // TODO: handle user units
-                    "storage_size" to InMemNum(vm.storage.amount),
-                    "vcpu_size" to InMemNum(vm.vcpu.amount),
+                ERecord(
+                    mapOf(
+                        "id" to vm.id.toDataExpression(),
+                        "pool_id" to vm.poolId.toDataExpression(),
+                        "ram_size" to vm.ram.toDataExpression(),
+                        "storage_size" to vm.storage.toDataExpression(),
+                        "vcpu_size" to vm.vcpu.toDataExpression(),
+                    )
                 )
             }
         val content = mapOf(
@@ -97,14 +96,28 @@ class VirtualMachineService(
         val inMemoryConnector = InMemoryConnector(
             config = InMemoryConnectorKeys.defaultConfig(cacheEnabled = true, cacheSize = 1024),
             content = content,
-            ops = BasicOperations,
         )
         return defaultDataSourceOperations.overrideWith(inMemoryConnector)
     }
 
+    private fun String.toDataExpression(): DataExpression<BasicNumber> = EStringLiteral(this)
+
     private fun QuantityTimeDto.toDataExpression(): DataExpression<BasicNumber> {
         return when (this.unit) {
             TimeUnitsDto.hour -> EQuantityScale(BasicNumber(this.amount), EDataRef("hour"))
+        }
+    }
+
+    private fun QuantityMemoryDto.toDataExpression(): DataExpression<BasicNumber> {
+        return when (this.unit) {
+            MemoryUnitsDto.gB -> EQuantityScale(BasicNumber(this.amount), EDataRef("GB"))
+            MemoryUnitsDto.tB -> EQuantityScale(BasicNumber(this.amount), EDataRef("TB"))
+        }
+    }
+
+    private fun QuantityVCPUDto.toDataExpression(): DataExpression<BasicNumber> {
+        return when (this.unit) {
+            VCPUUnitsDto.vCPU -> EQuantityScale(BasicNumber(this.amount), EDataRef("vCPU"))
         }
     }
 }

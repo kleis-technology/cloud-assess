@@ -2,7 +2,9 @@ package org.cloud_assess.service.debug
 
 import ch.kleis.lcaac.core.assessment.ContributionAnalysisProgram
 import ch.kleis.lcaac.core.datasource.DefaultDataSourceOperations
-import ch.kleis.lcaac.core.datasource.in_memory.*
+import ch.kleis.lcaac.core.datasource.in_memory.InMemoryConnector
+import ch.kleis.lcaac.core.datasource.in_memory.InMemoryConnectorKeys
+import ch.kleis.lcaac.core.datasource.in_memory.InMemoryDatasource
 import ch.kleis.lcaac.core.lang.SymbolTable
 import ch.kleis.lcaac.core.lang.evaluator.Evaluator
 import ch.kleis.lcaac.core.lang.expression.*
@@ -38,7 +40,6 @@ class TraceService(
         val inMemoryConnector = InMemoryConnector(
             config = InMemoryConnectorKeys.defaultConfig(cacheEnabled = true, cacheSize = 1024),
             content = content,
-            ops = BasicOperations,
         )
         val sourceOps = defaultDataSourceOperations
             .overrideWith(inMemoryConnector)
@@ -58,24 +59,45 @@ class TraceService(
         )
     }
 
-    private fun overriddenDatasources(request: TraceRequestDto): Map<String, InMemoryDatasource> {
+    private fun getSchemaOf(name: String): Map<String, DataExpression<BasicNumber>> {
+        return symbolTable.getDataSource(name)
+            ?.schema
+            ?: throw IllegalArgumentException("unknown datasource '$name'")
+    }
+
+    private fun overriddenDatasources(request: TraceRequestDto): Map<String, InMemoryDatasource<BasicNumber>> {
         val datasources = request.datasources ?: emptyList()
         return datasources
             .associate {
+                val schema = getSchemaOf(it.name)
                 it.name to InMemoryDatasource(
-                    records = it.records.map { r -> record(r) }
+                    records = it.records.map { r -> record(schema, r) }
                 )
             }
     }
 
-    private fun record(record: RecordDto): InMemoryRecord {
+    private fun record(schema: Map<String, DataExpression<BasicNumber>>, record: RecordDto): ERecord<BasicNumber> {
         return record.elements
-            .associate { entry ->
-                entry.name to when (entry.value) {
-                    is VNum -> InMemNum(entry.value.value)
-                    is VStr -> InMemStr(entry.value.value)
-                }
+            .filter {
+                schema.containsKey(it.name)
             }
+            .associate { entry ->
+                entry.name to entry.toDataExpression(schema)
+            }.let { ERecord(it) }
+    }
+
+    private fun EntryDto.toDataExpression(schema: Map<String, DataExpression<BasicNumber>>): DataExpression<BasicNumber> {
+        return when (val defaultValue = schema[this.name]) {
+            is QuantityExpression<*> -> when (val v = this.value) {
+                is VNum -> EQuantityScale(BasicNumber(v.value), EUnitOf(defaultValue))
+                is VStr -> throw IllegalArgumentException("invalid value for entry '${this.name}': expected 'number', found 'string'")
+            }
+            is EStringLiteral -> when (val v = this.value) {
+                is VNum -> throw IllegalArgumentException("invalid value for entry '${this.name}': expected 'string', found 'number'")
+                is VStr -> EStringLiteral(v.value)
+            }
+            else -> throw IllegalArgumentException("invalid datasource column '${this.name}'")
+        }
     }
 
     private fun globals(dataRegister: DataRegister<BasicNumber>, request: TraceRequestDto): DataRegister<BasicNumber> {
