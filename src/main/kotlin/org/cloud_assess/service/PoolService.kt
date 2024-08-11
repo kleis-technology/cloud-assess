@@ -20,18 +20,22 @@ class PoolService(
     private val symbolTable: SymbolTable<BasicNumber>,
 ) {
 
+    @Suppress("DuplicatedCode")
     fun analyze(pools: PoolListDto): Map<String, ResourceAnalysis> {
         val period = pools.period
         val cases = cases(pools)
         val evaluator = Evaluator(symbolTable, BasicOperations, defaultDataSourceOperations)
-        val analysis = cases.mapValues {
-            val trace = evaluator.with(it.value.template).trace(it.value.template, it.value.arguments)
-            val systemValue = trace.getSystemValue()
-            val entryPoint = trace.getEntryPoint()
-            val program = ContributionAnalysisProgram(systemValue, entryPoint)
-            val rawAnalysis = program.run()
-            ResourceAnalysis(it.key, period, rawAnalysis)
-        }
+        val analysis = cases
+            .entries.parallelStream()
+            .map {
+                val trace = evaluator.with(it.value.template).trace(it.value.template, it.value.arguments)
+                val systemValue = trace.getSystemValue()
+                val entryPoint = trace.getEntryPoint()
+                val program = ContributionAnalysisProgram(systemValue, entryPoint)
+                val rawAnalysis = program.run()
+                mapOf(it.key to ResourceAnalysis(it.key, period, rawAnalysis))
+            }.reduce { acc, element -> acc.plus(element) }
+            .orElse(emptyMap())
         return analysis
     }
 

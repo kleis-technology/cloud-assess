@@ -2,11 +2,7 @@ package org.cloud_assess.service.debug
 
 import ch.kleis.lcaac.core.assessment.ContributionAnalysisProgram
 import ch.kleis.lcaac.core.datasource.DefaultDataSourceOperations
-import ch.kleis.lcaac.core.datasource.OverriddenDataSourceOperations
-import ch.kleis.lcaac.core.datasource.in_memory.InMemNum
-import ch.kleis.lcaac.core.datasource.in_memory.InMemStr
-import ch.kleis.lcaac.core.datasource.in_memory.InMemoryDatasource
-import ch.kleis.lcaac.core.datasource.in_memory.InMemoryRecord
+import ch.kleis.lcaac.core.datasource.in_memory.*
 import ch.kleis.lcaac.core.lang.SymbolTable
 import ch.kleis.lcaac.core.lang.evaluator.Evaluator
 import ch.kleis.lcaac.core.lang.expression.*
@@ -26,8 +22,11 @@ class TraceService(
     private val symbolTable: SymbolTable<BasicNumber>,
 ) {
     fun analyze(request: TraceRequestListDto): Map<String, ResourceTrace> {
-        return request.elements
-            .associate { it.requestId to analyze(it) }
+        return request.elements.parallelStream()
+            .map {
+                mapOf(it.requestId to analyze(it))
+            }.reduce { acc, element -> acc.plus(element) }
+            .orElse(emptyMap())
     }
 
     fun analyze(request: TraceRequestDto): ResourceTrace {
@@ -35,11 +34,14 @@ class TraceService(
         val symbolTablesWithGlobals = symbolTable.copy(
             data = globals(symbolTable.data, request),
         )
-        val sourceOps = OverriddenDataSourceOperations(
-            overriddenDatasources(request),
-            BasicOperations,
-            defaultDataSourceOperations,
+        val content = overriddenDatasources(request)
+        val inMemoryConnector = InMemoryConnector(
+            config = InMemoryConnectorKeys.defaultConfig(cacheEnabled = true, cacheSize = 1024),
+            content = content,
+            ops = BasicOperations,
         )
+        val sourceOps = defaultDataSourceOperations
+            .overrideWith(inMemoryConnector)
         val evaluator = Evaluator(symbolTablesWithGlobals, BasicOperations, sourceOps)
         val trace = evaluator
             .with(processApplication.template)

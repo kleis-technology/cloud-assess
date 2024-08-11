@@ -67,10 +67,11 @@ class LcaConfig {
         lcaacConfig: LcaacConfig,
         @Value("\${LCA_CONFIG:trusted_library}") modelDirectory: File,
     ): DefaultDataSourceOperations<BasicNumber> {
-        val connectorFactory = ConnectorFactory(modelDirectory.path, lcaacConfig, BasicOperations)
+        val factory = ConnectorFactory(modelDirectory.path, lcaacConfig, BasicOperations)
         return DefaultDataSourceOperations(
-            BasicOperations,
-            connectorFactory,
+            ops = BasicOperations,
+            config = lcaacConfig,
+            connectors = factory.buildConnectors(),
         )
     }
 }
