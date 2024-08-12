@@ -11,27 +11,27 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 
-//@SpringBootTest
-//@Tag("Performance")
-//class PerformanceTest(
-//    @Autowired
-//    private val virtualMachineService: VirtualMachineService,
-//) {
-//    @Test
-//    fun virtualMachines() {
-//        // given
-//        val n = 400
-//        val vms = VirtualMachineListDto(
-//            period = QuantityTimeDto(1.0, TimeUnitsDto.hour),
-//            virtualMachines = (1..n).map {
-//                DtoFixture.virtualMachineDto("vm-$it", "client_vm")
-//            },
-//        )
-//
-//        // when
-//        val actual = virtualMachineService.analyze(vms)
-//
-//        // then
-//        assertThat(actual).hasSize(n)
-//    }
-//}
+@SpringBootTest
+@Tag("Performance")
+class PerformanceTest(
+    @Autowired
+    private val virtualMachineService: VirtualMachineService,
+) {
+    @Test
+    fun virtualMachines() {
+        // given
+        val n = 2000
+        val vms = VirtualMachineListDto(
+            period = QuantityTimeDto(1.0, TimeUnitsDto.hour),
+            virtualMachines = (1..n).map {
+                DtoFixture.virtualMachineDto("vm-$it", "client_vm")
+            },
+        )
+
+        // when
+        val actual = virtualMachineService.analyze(vms)
+
+        // then
+        assertThat(actual).hasSize(n)
+    }
+}
