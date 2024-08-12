@@ -7,14 +7,20 @@ import ch.kleis.lcaac.core.datasource.in_memory.InMemoryConnectorKeys
 import ch.kleis.lcaac.core.datasource.in_memory.InMemoryDatasource
 import ch.kleis.lcaac.core.lang.SymbolTable
 import ch.kleis.lcaac.core.lang.evaluator.Evaluator
+import ch.kleis.lcaac.core.lang.evaluator.ToValue
+import ch.kleis.lcaac.core.lang.evaluator.reducer.DataExpressionReducer
 import ch.kleis.lcaac.core.lang.expression.*
 import ch.kleis.lcaac.core.lang.register.DataKey
 import ch.kleis.lcaac.core.lang.register.DataRegister
+import ch.kleis.lcaac.core.lang.register.DataSourceRegister
+import ch.kleis.lcaac.core.lang.value.DataValue
+import ch.kleis.lcaac.core.lang.value.RecordValue
 import ch.kleis.lcaac.core.math.basic.BasicNumber
 import ch.kleis.lcaac.core.math.basic.BasicOperations
 import org.cloud_assess.dto.*
 import org.cloud_assess.model.ResourceTrace
 import org.cloud_assess.service.ParsingService
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 
 @Service
@@ -22,11 +28,30 @@ class TraceService(
     private val parsingService: ParsingService,
     private val defaultDataSourceOperations: DefaultDataSourceOperations<BasicNumber>,
     private val symbolTable: SymbolTable<BasicNumber>,
+    @Value("\${COMPUTE_JOB_SIZE:100}")
+    private val jobSize: Int = 100,
 ) {
+    private val dataReducer = DataExpressionReducer(
+        dataRegister = symbolTable.data,
+        dataSourceRegister = DataSourceRegister.empty(),
+        ops = BasicOperations,
+        sourceOps = defaultDataSourceOperations,
+    )
+    private fun localEval(expression: DataExpression<BasicNumber>): DataValue<BasicNumber> {
+        val data = dataReducer.reduce(expression)
+        return with(ToValue(BasicOperations)) {
+            data.toValue()
+        }
+    }
+
     fun analyze(request: TraceRequestListDto): Map<String, ResourceTrace> {
-        return request.elements.parallelStream()
-            .map {
-                mapOf(it.requestId to analyze(it))
+        return request.elements
+            .chunked(jobSize)
+            .parallelStream()
+            .map { job ->
+                job.map {
+                    mapOf(it.requestId to analyze(it))
+                }.fold(emptyMap<String, ResourceTrace>()) { acc, element -> acc.plus(element) }
             }.reduce { acc, element -> acc.plus(element) }
             .orElse(emptyMap())
     }
@@ -76,14 +101,14 @@ class TraceService(
             }
     }
 
-    private fun record(schema: Map<String, DataExpression<BasicNumber>>, record: RecordDto): ERecord<BasicNumber> {
+    private fun record(schema: Map<String, DataExpression<BasicNumber>>, record: RecordDto): RecordValue<BasicNumber> {
         return record.elements
             .filter {
                 schema.containsKey(it.name)
             }
             .associate { entry ->
-                entry.name to entry.toDataExpression(schema)
-            }.let { ERecord(it) }
+                entry.name to localEval(entry.toDataExpression(schema))
+            }.let { RecordValue(it) }
     }
 
     private fun EntryDto.toDataExpression(schema: Map<String, DataExpression<BasicNumber>>): DataExpression<BasicNumber> {
