@@ -19,19 +19,18 @@ java {
 
 repositories {
     mavenCentral()
-    mavenLocal()
-//	maven {
-//		name = "github"
-//		url = uri("https://maven.pkg.github.com/kleis-technology/lcaac")
-//		credentials {
-//			username = System.getenv("GITHUB_ACTOR")
-//			password = System.getenv("GITHUB_TOKEN")
-//		}
-//	}
+	maven {
+		name = "github"
+		url = uri("https://maven.pkg.github.com/kleis-technology/lcaac")
+		credentials {
+			username = System.getenv("GITHUB_ACTOR")
+			password = System.getenv("GITHUB_TOKEN")
+		}
+	}
 }
 
 dependencies {
-    val lcaacVersion = "1.6.8"
+    val lcaacVersion = "1.6.9"
     implementation("ch.kleis.lcaac:core:$lcaacVersion")
     implementation("ch.kleis.lcaac:grammar:$lcaacVersion")
 
