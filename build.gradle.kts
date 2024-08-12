@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "org.cloud_assess"
-version = "1.6.6"
+version = "1.6.7"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
@@ -30,7 +30,7 @@ repositories {
 }
 
 dependencies {
-    val lcaacVersion = "1.6.7"
+    val lcaacVersion = "1.6.9"
     implementation("ch.kleis.lcaac:core:$lcaacVersion")
     implementation("ch.kleis.lcaac:grammar:$lcaacVersion")
 
@@ -62,7 +62,9 @@ tasks.withType<KotlinCompile> {
 }
 
 tasks.withType<Test> {
-    useJUnitPlatform()
+    useJUnitPlatform() {
+        excludeTags("Performance")
+    }
 }
 
 sourceSets {

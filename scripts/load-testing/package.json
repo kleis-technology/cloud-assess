@@ -1,0 +1,23 @@
+{
+  "name": "load-testing",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "compile": "tsc",
+    "generate:dtos": "openapi-generator-cli generate -i ../../openapi/api.yaml -g typescript-fetch -o . --global-property=models",
+    "test": "jest"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@openapitools/openapi-generator-cli": "^2.13.4",
+    "@types/jest": "^29.5.12",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.4",
+    "typescript": "^5.5.4"
+  },
+  "dependencies": {
+    "axios": "^1.7.3"
+  }
+}

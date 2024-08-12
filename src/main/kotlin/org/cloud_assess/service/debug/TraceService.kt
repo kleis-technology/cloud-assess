@@ -2,17 +2,25 @@ package org.cloud_assess.service.debug
 
 import ch.kleis.lcaac.core.assessment.ContributionAnalysisProgram
 import ch.kleis.lcaac.core.datasource.DefaultDataSourceOperations
-import ch.kleis.lcaac.core.datasource.OverriddenDataSourceOperations
+import ch.kleis.lcaac.core.datasource.in_memory.InMemoryConnector
+import ch.kleis.lcaac.core.datasource.in_memory.InMemoryConnectorKeys
+import ch.kleis.lcaac.core.datasource.in_memory.InMemoryDatasource
 import ch.kleis.lcaac.core.lang.SymbolTable
 import ch.kleis.lcaac.core.lang.evaluator.Evaluator
+import ch.kleis.lcaac.core.lang.evaluator.ToValue
+import ch.kleis.lcaac.core.lang.evaluator.reducer.DataExpressionReducer
 import ch.kleis.lcaac.core.lang.expression.*
 import ch.kleis.lcaac.core.lang.register.DataKey
 import ch.kleis.lcaac.core.lang.register.DataRegister
+import ch.kleis.lcaac.core.lang.register.DataSourceRegister
+import ch.kleis.lcaac.core.lang.value.DataValue
+import ch.kleis.lcaac.core.lang.value.RecordValue
 import ch.kleis.lcaac.core.math.basic.BasicNumber
 import ch.kleis.lcaac.core.math.basic.BasicOperations
 import org.cloud_assess.dto.*
 import org.cloud_assess.model.ResourceTrace
 import org.cloud_assess.service.ParsingService
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 
 @Service
@@ -20,10 +28,32 @@ class TraceService(
     private val parsingService: ParsingService,
     private val defaultDataSourceOperations: DefaultDataSourceOperations<BasicNumber>,
     private val symbolTable: SymbolTable<BasicNumber>,
+    @Value("\${COMPUTE_JOB_SIZE:100}")
+    private val jobSize: Int = 100,
 ) {
+    private val dataReducer = DataExpressionReducer(
+        dataRegister = symbolTable.data,
+        dataSourceRegister = DataSourceRegister.empty(),
+        ops = BasicOperations,
+        sourceOps = defaultDataSourceOperations,
+    )
+    private fun localEval(expression: DataExpression<BasicNumber>): DataValue<BasicNumber> {
+        val data = dataReducer.reduce(expression)
+        return with(ToValue(BasicOperations)) {
+            data.toValue()
+        }
+    }
+
     fun analyze(request: TraceRequestListDto): Map<String, ResourceTrace> {
         return request.elements
-            .associate { it.requestId to analyze(it) }
+            .chunked(jobSize)
+            .parallelStream()
+            .map { job ->
+                job.map {
+                    mapOf(it.requestId to analyze(it))
+                }.fold(emptyMap<String, ResourceTrace>()) { acc, element -> acc.plus(element) }
+            }.reduce { acc, element -> acc.plus(element) }
+            .orElse(emptyMap())
     }
 
     fun analyze(request: TraceRequestDto): ResourceTrace {
@@ -31,11 +61,13 @@ class TraceService(
         val symbolTablesWithGlobals = symbolTable.copy(
             data = globals(symbolTable.data, request),
         )
-        val sourceOps = OverriddenDataSourceOperations(
-            overriddenDatasources(request),
-            BasicOperations,
-            defaultDataSourceOperations,
+        val content = overriddenDatasources(request)
+        val inMemoryConnector = InMemoryConnector(
+            config = InMemoryConnectorKeys.defaultConfig(cacheEnabled = true, cacheSize = 1024),
+            content = content,
         )
+        val sourceOps = defaultDataSourceOperations
+            .overrideWith(inMemoryConnector)
         val evaluator = Evaluator(symbolTablesWithGlobals, BasicOperations, sourceOps)
         val trace = evaluator
             .with(processApplication.template)
@@ -52,45 +84,44 @@ class TraceService(
         )
     }
 
-    private fun overriddenDatasources(request: TraceRequestDto): Map<String, List<ERecord<BasicNumber>>> {
+    private fun getSchemaOf(name: String): Map<String, DataExpression<BasicNumber>> {
+        return symbolTable.getDataSource(name)
+            ?.schema
+            ?: throw IllegalArgumentException("unknown datasource '$name'")
+    }
+
+    private fun overriddenDatasources(request: TraceRequestDto): Map<String, InMemoryDatasource<BasicNumber>> {
         val datasources = request.datasources ?: emptyList()
         return datasources
             .associate {
-                val schema = this.symbolTable.getDataSource(it.name)?.schema
-                    ?: throw IllegalArgumentException("unknown datasource '${it.name}'")
-                it.name to it.records.map { r -> record(schema, r) }
-            }
-    }
-
-    private fun record(schema: Map<String, DataExpression<BasicNumber>>, record: RecordDto): ERecord<BasicNumber> {
-        return ERecord(
-            record.elements
-                .filter {
-                    schema.containsKey(it.name)
-                }
-                .associate {
-                    val defaultValue = schema[it.name]
-                        ?: throw IllegalArgumentException("unknown column '${it.name}'")
-                    it.name to entry(defaultValue, it.value)
-                }
-        )
-    }
-
-    private fun entry(defaultValue: DataExpression<BasicNumber>, entry: EntryValueDto): DataExpression<BasicNumber> {
-        return when (entry) {
-            is VNum -> when (defaultValue) {
-                is QuantityExpression<*> -> EQuantityScale(
-                    BasicNumber(entry.value),
-                    EUnitOf(defaultValue),
+                val schema = getSchemaOf(it.name)
+                it.name to InMemoryDatasource(
+                    records = it.records.map { r -> record(schema, r) }
                 )
-
-                else -> throw IllegalArgumentException("expecting type 'number', found 'string'")
             }
+    }
 
-            is VStr -> when (defaultValue) {
-                is StringExpression -> EStringLiteral(entry.value)
-                else -> throw IllegalArgumentException("expecting type 'string', found 'number'")
+    private fun record(schema: Map<String, DataExpression<BasicNumber>>, record: RecordDto): RecordValue<BasicNumber> {
+        return record.elements
+            .filter {
+                schema.containsKey(it.name)
             }
+            .associate { entry ->
+                entry.name to localEval(entry.toDataExpression(schema))
+            }.let { RecordValue(it) }
+    }
+
+    private fun EntryDto.toDataExpression(schema: Map<String, DataExpression<BasicNumber>>): DataExpression<BasicNumber> {
+        return when (val defaultValue = schema[this.name]) {
+            is QuantityExpression<*> -> when (val v = this.value) {
+                is VNum -> EQuantityScale(BasicNumber(v.value), EUnitOf(defaultValue))
+                is VStr -> throw IllegalArgumentException("invalid value for entry '${this.name}': expected 'number', found 'string'")
+            }
+            is EStringLiteral -> when (val v = this.value) {
+                is VNum -> throw IllegalArgumentException("invalid value for entry '${this.name}': expected 'string', found 'number'")
+                is VStr -> EStringLiteral(v.value)
+            }
+            else -> throw IllegalArgumentException("invalid datasource column '${this.name}'")
         }
     }
 

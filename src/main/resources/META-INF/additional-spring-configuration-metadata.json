@@ -13,7 +13,14 @@
     {
       "name": "cors.enabled",
       "type": "java.lang.Boolean",
-      "description": "Enable CORS."
+      "description": "Enable CORS.",
+      "defaultValue": false
+    },
+    {
+      "name": "compute.job-size",
+      "type": "java.lang.Integer",
+      "description": "Job size.",
+      "defaultValue": 100
     }
   ]
 }
