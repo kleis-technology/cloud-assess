@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service
 class MapperService {
     fun map(
         analysis: Map<String, ResourceTrace>,
-        dto: TraceRequestListDto,
     ): TraceResponseListDto {
         return TraceResponseListDto(
             analysis.entries.toList()
@@ -26,6 +25,7 @@ class MapperService {
         val resourceTrace = entry.value
         return TraceResponseDto(
             requestId = requestId,
+            meta = resourceTrace.getMeta(),
             trace = resourceTrace.getElements()
                 .map { traceResponseRowDto(it) }
         )

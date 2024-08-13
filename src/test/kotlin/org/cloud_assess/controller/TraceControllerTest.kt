@@ -67,7 +67,7 @@ class TraceControllerTest {
             elements = emptyList(),
         )
         every { traceService.analyze(any<TraceRequestListDto>()) } returns mockk()
-        every { mapperService.map(any(), any<TraceRequestListDto>()) } returns outputDto
+        every { mapperService.map(any()) } returns outputDto
 
         // when
         mockMvc.perform(

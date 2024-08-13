@@ -15,6 +15,7 @@ class TraceController(
 ) : DebugApi {
     override fun trace(traceRequestListDto: TraceRequestListDto): ResponseEntity<TraceResponseListDto> {
         val analysis = traceService.analyze(traceRequestListDto)
-        return ResponseEntity.ok(mapperService.map(analysis, traceRequestListDto))
+        val outputDto = mapperService.map(analysis)
+        return ResponseEntity.ok(outputDto)
     }
 }

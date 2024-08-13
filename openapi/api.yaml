@@ -345,7 +345,7 @@ components:
             type: string
         maxDepth:
           type: integer
-          default: 1
+          default: -1
         demand:
           $ref: '#/components/schemas/DemandDto'
         globals:

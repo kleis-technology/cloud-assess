@@ -5,6 +5,10 @@ Content-Type: application/json
   "elements": [
     {
       "requestId": "r01",
+      "maxDepth": -1,
+      "meta": {
+        "group": "G0"
+      },
       "demand": {
         "productName": "server",
         "processName": "server",

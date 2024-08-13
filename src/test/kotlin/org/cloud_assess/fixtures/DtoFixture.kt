@@ -17,14 +17,14 @@ class DtoFixture {
                     processName = "vm",
                     quantity = QuantityDto(1.0, "hour"),
                 ),
-                options = OptionsDto(
-                    useDefaultDatasourceIfNotProvided = false,
-                ),
                 globals = listOf(
                     ParameterDto(
                         "x",
                         PVNum(1.0, "kg"),
                     )
+                ),
+                meta = mapOf(
+                    "group" to "foo"
                 ),
                 datasources = listOf(
                     DatasourceDto(

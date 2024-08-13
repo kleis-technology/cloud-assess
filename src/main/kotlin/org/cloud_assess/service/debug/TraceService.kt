@@ -37,6 +37,7 @@ class TraceService(
         ops = BasicOperations,
         sourceOps = defaultDataSourceOperations,
     )
+
     private fun localEval(expression: DataExpression<BasicNumber>): DataValue<BasicNumber> {
         val data = dataReducer.reduce(expression)
         return with(ToValue(BasicOperations)) {
@@ -79,7 +80,9 @@ class TraceService(
 
         return ResourceTrace(
             id = request.requestId,
+            meta = request.meta ?: emptyMap(),
             rawTrace = trace,
+            defaultMaxDepth = request.maxDepth ?: -1,
             contributionAnalysis = analysis,
         )
     }
@@ -117,10 +120,12 @@ class TraceService(
                 is VNum -> EQuantityScale(BasicNumber(v.value), EUnitOf(defaultValue))
                 is VStr -> throw IllegalArgumentException("invalid value for entry '${this.name}': expected 'number', found 'string'")
             }
+
             is EStringLiteral -> when (val v = this.value) {
                 is VNum -> throw IllegalArgumentException("invalid value for entry '${this.name}': expected 'string', found 'number'")
                 is VStr -> EStringLiteral(v.value)
             }
+
             else -> throw IllegalArgumentException("invalid datasource column '${this.name}'")
         }
     }
