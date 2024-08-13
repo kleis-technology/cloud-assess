@@ -1,6 +1,5 @@
 package org.cloud_assess.config
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategy
 import org.cloud_assess.dto.EntryValueDtoDeserializer
 import org.cloud_assess.dto.EntryValueDtoSerializer
 import org.cloud_assess.dto.ParameterValueDtoDeserializer
@@ -20,10 +19,10 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 @Configuration
 @EnableWebMvc
 class WebConfig : WebMvcConfigurer {
-    @Value("\${CORS_ENABLED:false}")
+    @Value("\${cors.enabled:false}")
     private var corsEnabled: Boolean = false
 
-    @Value("\${CORS_ALLOWED_ORIGIN:n/a}")
+    @Value("\${cors.allowed-origin:na}")
     private lateinit var allowedOrigin: String
 
     companion object {

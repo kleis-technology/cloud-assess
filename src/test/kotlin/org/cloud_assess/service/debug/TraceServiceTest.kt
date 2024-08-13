@@ -90,6 +90,9 @@ class TraceServiceTest {
         )
         val request = TraceRequestDto(
             requestId = "r01",
+            meta = mapOf(
+                "group" to "foo",
+            ),
             demand = DemandDto(
                 productName = "p",
                 quantity = QuantityDto(1.0, "kg"),
@@ -103,6 +106,126 @@ class TraceServiceTest {
         // then
         assertThat(actual.isEmpty()).isFalse()
         assertThat(actual.isNotEmpty()).isTrue()
+    }
+
+    @Test
+    fun analyze_singleRequest_simpleCase_shouldMapMeta() {
+        // given
+        val symbolTable = prepare("""
+            process p {
+                products {
+                    1 kg p
+                }
+                impacts {
+                    1 kg GWP
+                }
+            }
+        """.trimIndent())
+        val sourceOps = mockk<DefaultDataSourceOperations<BasicNumber>>()
+        every { sourceOps.overrideWith(any()) } returns sourceOps
+        val service = TraceService(
+            parsingService,
+            sourceOps,
+            symbolTable,
+        )
+        val request = TraceRequestDto(
+            requestId = "r01",
+            meta = mapOf(
+                "group" to "foo",
+            ),
+            demand = DemandDto(
+                productName = "p",
+                quantity = QuantityDto(1.0, "kg"),
+                processName = "p",
+            ),
+        )
+
+        // when
+        val actual = service.analyze(request)
+
+        // then
+        assertThat(actual.getMeta()).isEqualTo(mapOf(
+            "group" to "foo"
+        ))
+    }
+
+    @Test
+    fun analyze_singleRequest_simpleCase_noMaxDepth_thenMinusOne() {
+        // given
+        val symbolTable = prepare("""
+            process p {
+                products {
+                    1 kg p
+                }
+                impacts {
+                    1 kg GWP
+                }
+            }
+        """.trimIndent())
+        val sourceOps = mockk<DefaultDataSourceOperations<BasicNumber>>()
+        every { sourceOps.overrideWith(any()) } returns sourceOps
+        val service = TraceService(
+            parsingService,
+            sourceOps,
+            symbolTable,
+        )
+        val request = TraceRequestDto(
+            requestId = "r01",
+            meta = mapOf(
+                "group" to "foo",
+            ),
+            demand = DemandDto(
+                productName = "p",
+                quantity = QuantityDto(1.0, "kg"),
+                processName = "p",
+            ),
+        )
+
+        // when
+        val actual = service.analyze(request)
+
+        // then
+        assertThat(actual.getDefaultMaxDepth()).isEqualTo(-1)
+    }
+
+    @Test
+    fun analyze_singleRequest_simpleCase_withMaxDepth_thenSetMaxDepth() {
+        // given
+        val symbolTable = prepare("""
+            process p {
+                products {
+                    1 kg p
+                }
+                impacts {
+                    1 kg GWP
+                }
+            }
+        """.trimIndent())
+        val sourceOps = mockk<DefaultDataSourceOperations<BasicNumber>>()
+        every { sourceOps.overrideWith(any()) } returns sourceOps
+        val service = TraceService(
+            parsingService,
+            sourceOps,
+            symbolTable,
+        )
+        val request = TraceRequestDto(
+            requestId = "r01",
+            meta = mapOf(
+                "group" to "foo",
+            ),
+            maxDepth = 6,
+            demand = DemandDto(
+                productName = "p",
+                quantity = QuantityDto(1.0, "kg"),
+                processName = "p",
+            ),
+        )
+
+        // when
+        val actual = service.analyze(request)
+
+        // then
+        assertThat(actual.getDefaultMaxDepth()).isEqualTo(6)
     }
 
     @Test
@@ -127,6 +250,9 @@ class TraceServiceTest {
         )
         val request = TraceRequestDto(
             requestId = "r01",
+            meta = mapOf(
+                "group" to "foo",
+            ),
             demand = DemandDto(
                 productName = "p",
                 quantity = QuantityDto(1.0, "kg"),
@@ -163,6 +289,9 @@ class TraceServiceTest {
         )
         val request = TraceRequestDto(
             requestId = "r01",
+            meta = mapOf(
+                "group" to "foo",
+            ),
             demand = DemandDto(
                 productName = "p",
                 quantity = QuantityDto(1.0, "kg"),
@@ -204,6 +333,9 @@ class TraceServiceTest {
         )
         val request = TraceRequestDto(
             requestId = "r01",
+            meta = mapOf(
+                "group" to "foo",
+            ),
             demand = DemandDto(
                 productName = "p",
                 quantity = QuantityDto(1.0, "kg"),
@@ -249,6 +381,9 @@ class TraceServiceTest {
         )
         val request = TraceRequestDto(
             requestId = "r01",
+            meta = mapOf(
+                "group" to "foo",
+            ),
             demand = DemandDto(
                 productName = "p",
                 quantity = QuantityDto(1.0, "kg"),
@@ -294,6 +429,9 @@ class TraceServiceTest {
                 quantity = QuantityDto(1.0, "kg"),
                 processName = "p",
             ),
+            meta = mapOf(
+                "group" to "foo",
+            ),
             globals = listOf(
                 ParameterDto("x", PVNum(1.0, "kg")),
             )
@@ -338,6 +476,9 @@ class TraceServiceTest {
                 productName = "p",
                 quantity = QuantityDto(1.0, "kg"),
                 processName = "p",
+            ),
+            meta = mapOf(
+                "group" to "foo",
             ),
             globals = listOf(
                 ParameterDto("x", PVStr("foo")),
@@ -391,6 +532,9 @@ class TraceServiceTest {
                 productName = "p",
                 quantity = QuantityDto(1.0, "kg"),
                 processName = "p",
+            ),
+            meta = mapOf(
+                "group" to "foo",
             ),
             datasources = listOf(
                 DatasourceDto(

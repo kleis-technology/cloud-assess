@@ -17,7 +17,7 @@ datasource hw_inventory {
 datasource hw_impacts {
     location = "data/01-hardware/hw_impacts.csv"
     schema {
-        hw_id = "srv-01"
+        id = "srv-01"
         lc_step = "manufacturing"
         /*
         Impacts for the whole equipment lifespan
@@ -52,14 +52,18 @@ ENTRYPOINT
 */
 
 process hardware {
+    params {
+        id = "srv-01"
+        kind = "server"
+    }
     products {
         1 hour hardware
     }
     inputs {
-        1 hour hardware from hardware match ( lc_step = "manufacturing" )
-        1 hour hardware from hardware match ( lc_step = "transport" )
-        1 hour hardware from hardware match ( lc_step = "use" )
-        1 hour hardware from hardware match ( lc_step = "end-of-life" )
+        1 hour hardware from hardware( id = id, kind = kind ) match ( lc_step = "manufacturing" )
+        1 hour hardware from hardware( id = id, kind = kind ) match ( lc_step = "transport" )
+        1 hour hardware from hardware( id = id, kind = kind ) match ( lc_step = "use" )
+        1 hour hardware from hardware( id = id, kind = kind ) match ( lc_step = "end-of-life" )
     }
 }
 
@@ -87,7 +91,7 @@ process hardware {
     }
     // proper hardware impacts
     impacts {
-        for_each impact from hw_impacts match ( lc_step = lc_step, hw_id = id ) {
+        for_each impact from hw_impacts match ( lc_step = lc_step, id = id ) {
             impact.ADPe ADPe
             impact.ADPf ADPf
             impact.AP AP
@@ -131,7 +135,7 @@ process hardware {
     }
     // proper hardware impacts
     impacts {
-        for_each impact from hw_impacts match ( lc_step = lc_step, hw_id = id ) {
+        for_each impact from hw_impacts match ( lc_step = lc_step, id = id ) {
             impact.ADPe ADPe
             impact.ADPf ADPf
             impact.AP AP
@@ -175,7 +179,7 @@ process hardware {
     }
     // proper hardware impacts
     impacts {
-        for_each impact from hw_impacts match ( lc_step = lc_step, hw_id = id ) {
+        for_each impact from hw_impacts match ( lc_step = lc_step, id = id ) {
             impact.ADPe ADPe
             impact.ADPf ADPf
             impact.AP AP
@@ -219,7 +223,7 @@ process hardware {
     }
     // proper hardware impacts
     impacts {
-        for_each impact from hw_impacts match ( lc_step = lc_step, hw_id = id ) {
+        for_each impact from hw_impacts match ( lc_step = lc_step, id = id ) {
             impact.ADPe ADPe
             impact.ADPf ADPf
             impact.AP AP

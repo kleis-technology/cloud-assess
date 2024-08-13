@@ -5,6 +5,7 @@ import ch.kleis.lcaac.core.datasource.ConnectorFactory
 import ch.kleis.lcaac.core.datasource.DataSourceConnector
 import ch.kleis.lcaac.core.datasource.DefaultDataSourceOperations
 import ch.kleis.lcaac.core.datasource.cache.SourceOpsCache
+import ch.kleis.lcaac.core.datasource.resilio_db.ResilioDbConnectorKeys
 import ch.kleis.lcaac.core.lang.SymbolTable
 import ch.kleis.lcaac.core.math.basic.BasicNumber
 import ch.kleis.lcaac.core.math.basic.BasicOperations
@@ -22,16 +23,16 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import java.io.File
 import java.nio.file.Files
-import java.nio.file.Paths
+import java.nio.file.Path
 import kotlin.io.path.isRegularFile
 
 @Configuration
 class LcaConfig {
     @Bean
     fun symbolTable(
-        @Value("\${LCA_LIBRARY:trusted_library}") modelDirectory: File,
+        @Value("\${lca.config}") modelDirectory: Path,
     ): SymbolTable<BasicNumber> {
-        val files = Files.walk(Paths.get(modelDirectory.path))
+        val files = Files.walk(modelDirectory)
             .filter {
                 it.isRegularFile() && it.fileName.toString().endsWith(".lca")
             }
@@ -50,26 +51,49 @@ class LcaConfig {
 
     @Bean
     fun lcaacConfig(
-        @Value("\${LCA_LIBRARY:trusted_library/lcaac.yaml}") configFile: File,
+        @Value("\${lca.config}") modelDirectory: Path,
+        @Value("\${lca.manifest}") manifest: String,
+        @Value("\${resilio-db.url}") rdbUrl: String,
+        @Value("\${resilio-db.access-token}") rdbAccessToken: String,
     ): LcaacConfig {
+        val configFile = Files.walk(modelDirectory, 1)
+            .filter {
+                it.isRegularFile() &&
+                    (it.fileName.toString() == manifest.trim())
+            }
+            .findFirst()
+            .orElseThrow { throw IllegalStateException("cannot find 'lcaac.yaml' nor 'lcaac.yml' in $modelDirectory") }
+            .toFile()
         val yaml = Yaml(
             configuration = YamlConfiguration(
                 strictMode = false
             )
         )
-        val config = if (configFile.exists()) configFile.inputStream().use {
+        val yamlConfig = if (configFile.exists()) configFile.inputStream().use {
             yaml.decodeFromStream(LcaacConfig.serializer(), it)
         }
         else LcaacConfig()
+        val config = yamlConfig
+            .modifyConnector(ResilioDbConnectorKeys.RDB_CONNECTOR_NAME) { connector ->
+                connector
+                    .modifyOption(ResilioDbConnectorKeys.RDB_URL) { rdbUrl }
+                    .modifyOption(ResilioDbConnectorKeys.RDB_ACCESS_TOKEN) { rdbAccessToken }
+            }
         return config
     }
 
     @Bean
     fun connectorFactory(
         lcaacConfig: LcaacConfig,
-        @Value("\${LCA_CONFIG:trusted_library}") modelDirectory: File,
+        @Value("\${lca.config}") modelDirectory: File,
+        symbolTable: SymbolTable<BasicNumber>,
     ): ConnectorFactory<BasicNumber> {
-        return ConnectorFactory(modelDirectory.path, lcaacConfig, BasicOperations)
+        return ConnectorFactory(
+            workingDirectory = modelDirectory.path,
+            lcaacConfig = lcaacConfig,
+            ops = BasicOperations,
+            symbolTable = symbolTable,
+        )
     }
 
     @Bean

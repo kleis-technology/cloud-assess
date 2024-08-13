@@ -41,7 +41,7 @@ process server {
 
     // proper server impacts
     impacts {
-        for_each impact from hw_impacts match ( lc_step = lc_step, hw_id = id ) {
+        for_each impact from hw_impacts match ( lc_step = lc_step, id = id ) {
             impact.ADPe ADPe
             impact.ADPf ADPf
             impact.AP AP
@@ -85,7 +85,7 @@ process server {
 
     // proper server impacts
     impacts {
-        for_each impact from hw_impacts match ( lc_step = lc_step, hw_id = id ) {
+        for_each impact from hw_impacts match ( lc_step = lc_step, id = id ) {
             impact.ADPe ADPe
             impact.ADPf ADPf
             impact.AP AP
@@ -128,7 +128,7 @@ process server {
 
     // proper server impacts
     impacts {
-        for_each impact from hw_impacts match ( lc_step = lc_step, hw_id = id ) {
+        for_each impact from hw_impacts match ( lc_step = lc_step, id = id ) {
             impact.ADPe ADPe
             impact.ADPf ADPf
             impact.AP AP
@@ -172,7 +172,7 @@ process server {
 
     // proper server impacts
     impacts {
-        for_each impact from hw_impacts match ( lc_step = lc_step, hw_id = id ) {
+        for_each impact from hw_impacts match ( lc_step = lc_step, id = id ) {
             impact.ADPe ADPe
             impact.ADPf ADPf
             impact.AP AP
