@@ -10,3 +10,6 @@ local
 .clients
 
 **/node_modules
+
+**/lcaac-tmp.yaml
+**/application-tmp.yaml
