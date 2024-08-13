@@ -1,14 +1,16 @@
 {
   "properties": [
     {
-      "name": "lca.path",
+      "name": "lca.config",
       "type": "java.lang.String",
-      "description": "Path to LCA as CODE model directory."
+      "description": "Path to LCA as CODE config directory.",
+      "defaultValue": "trusted_library"
     },
     {
       "name": "cors.allowed-origin",
       "type": "java.lang.String",
-      "description": "CORS allowed origin."
+      "description": "CORS allowed origin.",
+      "defaultValue": null
     },
     {
       "name": "cors.enabled",

@@ -22,16 +22,16 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import java.io.File
 import java.nio.file.Files
-import java.nio.file.Paths
+import java.nio.file.Path
 import kotlin.io.path.isRegularFile
 
 @Configuration
 class LcaConfig {
     @Bean
     fun symbolTable(
-        @Value("\${LCA_LIBRARY:trusted_library}") modelDirectory: File,
+        @Value("\${lca.config}") modelDirectory: Path,
     ): SymbolTable<BasicNumber> {
-        val files = Files.walk(Paths.get(modelDirectory.path))
+        val files = Files.walk(modelDirectory)
             .filter {
                 it.isRegularFile() && it.fileName.toString().endsWith(".lca")
             }
@@ -50,8 +50,17 @@ class LcaConfig {
 
     @Bean
     fun lcaacConfig(
-        @Value("\${LCA_LIBRARY:trusted_library/lcaac.yaml}") configFile: File,
+        @Value("\${lca.config}") modelDirectory: Path,
     ): LcaacConfig {
+        val configFile = Files.walk(modelDirectory, 1)
+            .filter {
+                it.isRegularFile() &&
+                    (it.fileName.toString() == "lcaac.yaml"
+                        || it.fileName.toString() == "lcaac.yml")
+            }
+            .findFirst()
+            .orElseThrow { throw IllegalStateException("cannot find 'lcaac.yaml' nor 'lcaac.yml' in $modelDirectory") }
+            .toFile()
         val yaml = Yaml(
             configuration = YamlConfiguration(
                 strictMode = false
@@ -67,9 +76,15 @@ class LcaConfig {
     @Bean
     fun connectorFactory(
         lcaacConfig: LcaacConfig,
-        @Value("\${LCA_CONFIG:trusted_library}") modelDirectory: File,
+        @Value("\${lca.config}") modelDirectory: File,
+        symbolTable: SymbolTable<BasicNumber>,
     ): ConnectorFactory<BasicNumber> {
-        return ConnectorFactory(modelDirectory.path, lcaacConfig, BasicOperations)
+        return ConnectorFactory(
+            workingDirectory = modelDirectory.path,
+            lcaacConfig = lcaacConfig,
+            ops = BasicOperations,
+            symbolTable = symbolTable,
+        )
     }
 
     @Bean

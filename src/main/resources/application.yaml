@@ -1,0 +1,7 @@
+lca:
+  config: trusted_library
+cors:
+  enabled: false
+  allowed-origin:
+compute:
+  job-size: 100
