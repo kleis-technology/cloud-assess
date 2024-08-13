@@ -7,6 +7,12 @@
       "defaultValue": "trusted_library"
     },
     {
+      "name": "lca.manifest",
+      "type": "java.lang.String",
+      "description": "Name of the manifest in the config directory.",
+      "defaultValue": "lcaac.yaml"
+    },
+    {
       "name": "cors.allowed-origin",
       "type": "java.lang.String",
       "description": "CORS allowed origin.",
@@ -23,6 +29,18 @@
       "type": "java.lang.Integer",
       "description": "Job size.",
       "defaultValue": 100
+    },
+    {
+      "name": "resilio-db.url",
+      "type": "java.lang.String",
+      "description": "Resilio DB URL.",
+      "defaultValue": "https://db.resilio.tech"
+    },
+    {
+      "name": "resilio-db.access-token",
+      "type": "java.lang.String",
+      "description": "Resilio DB access token.",
+      "defaultValue": null
     }
   ]
 }

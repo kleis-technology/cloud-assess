@@ -1,7 +1,10 @@
 lca:
   config: trusted_library
+  manifest: lcaac.yaml
 cors:
   enabled: false
   allowed-origin:
 compute:
   job-size: 100
+resilio-db:
+  url: https://db.resilio.tech
