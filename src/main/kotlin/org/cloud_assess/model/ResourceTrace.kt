@@ -28,7 +28,7 @@ class ResourceTrace(
         return products.flatMap { demandedProduct ->
             val allocation = (demandedProduct.allocation?.amount?.toDouble()
                 ?: 1.0) * (demandedProduct.allocation?.unit?.scale ?: 1.0)
-            observablePorts.mapIndexed { depth, row ->
+            observablePorts.map { row ->
                 val supply = contributionAnalysis.supplyOf(row)
                 val impacts = Indicator.entries.associateWith { indicator ->
                     controllablePorts.firstOrNull { it.getShortName() == indicator.name }
@@ -36,6 +36,8 @@ class ResourceTrace(
                             contributionAnalysis.getPortContribution(row, col)
                         }
                 }
+                val depth = rawTrace.getDepthOf(row)
+                    ?: throw IllegalStateException("resource trace: missing depth for observable port $row")
                 ResourceTraceElement(
                     depth = depth,
                     allocation = allocation,
