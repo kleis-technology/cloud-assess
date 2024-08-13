@@ -338,8 +338,14 @@ components:
       properties:
         requestId:
           type: string
-        options:
-          $ref: '#/components/schemas/OptionsDto'
+        meta:
+          type: object
+          default: { }
+          additionalProperties:
+            type: string
+        maxDepth:
+          type: integer
+          default: 1
         demand:
           $ref: '#/components/schemas/DemandDto'
         globals:
@@ -366,6 +372,11 @@ components:
       properties:
         requestId:
           type: string
+        meta:
+          type: object
+          default: { }
+          additionalProperties:
+            type: string
         trace:
           type: array
           items:
@@ -451,12 +462,6 @@ components:
           type: string
         value:
           type: EntryValueDto # string or number
-    OptionsDto:
-      type: object
-      properties:
-        useDefaultDatasourceIfNotProvided:
-          type: boolean
-          default: false
     DemandDto:
       required:
         - quantity
