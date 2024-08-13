@@ -8,6 +8,10 @@ On GitHub
 
 ## Procedure
 
+```bash
+./gradlew clean build
+```
+
 Environment variables
 - `GITHUB_ACTOR` contains your GitHub username.
 - `GITHUB_TOKEN` contains your personal access token with the relevant permissions.

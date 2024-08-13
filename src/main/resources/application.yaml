@@ -8,3 +8,4 @@ compute:
   job-size: 100
 resilio-db:
   url: https://db.resilio.tech
+  access-token: dummy-token

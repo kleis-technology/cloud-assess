@@ -5,7 +5,7 @@ Content-Type: application/json
   "elements": [
     {
       "requestId": "r01",
-      "maxDepth": -1,
+      "maxDepth": 1,
       "meta": {
         "group": "G0"
       },
