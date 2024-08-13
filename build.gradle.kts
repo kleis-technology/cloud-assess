@@ -19,15 +19,14 @@ java {
 
 repositories {
     mavenCentral()
-    mavenLocal()
-//	maven {
-//		name = "github"
-//		url = uri("https://maven.pkg.github.com/kleis-technology/lcaac")
-//		credentials {
-//			username = System.getenv("GITHUB_ACTOR")
-//			password = System.getenv("GITHUB_TOKEN")
-//		}
-//	}
+	maven {
+		name = "github"
+		url = uri("https://maven.pkg.github.com/kleis-technology/lcaac")
+		credentials {
+			username = System.getenv("GITHUB_ACTOR")
+			password = System.getenv("GITHUB_TOKEN")
+		}
+	}
 }
 
 dependencies {
