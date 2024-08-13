@@ -52,7 +52,7 @@ process wrapper_dc_fn {
     impacts {
         // impacts from internal equipments
         for_each hw_data from hw_inventory match ( dc_id = id, pool_id = "internal" ) {
-            for_each impact from hw_impacts match ( hw_id = hw_data.id, lc_step = lc_step ) {
+            for_each impact from hw_impacts match ( id = hw_data.id, lc_step = lc_step ) {
                 impact.GWP GWP
             }
         }
