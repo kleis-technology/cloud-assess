@@ -326,6 +326,21 @@ components:
       required:
         - elements
       properties:
+        meta:
+          type: object
+          default: { }
+          additionalProperties:
+            type: string
+        globals:
+          type: array
+          default: [ ]
+          items:
+            $ref: '#/components/schemas/ParameterDto'
+        datasources:
+          type: array
+          default: [ ]
+          items:
+            $ref: '#/components/schemas/DatasourceDto'
         elements:
           type: array
           items:
@@ -362,6 +377,11 @@ components:
     TraceResponseListDto:
       type: object
       properties:
+        meta:
+          type: object
+          default: { }
+          additionalProperties:
+            type: string
         elements:
           type: array
           items:

@@ -3,19 +3,18 @@ package org.cloud_assess.service
 import ch.kleis.lcaac.core.lang.value.*
 import ch.kleis.lcaac.core.math.basic.BasicNumber
 import org.cloud_assess.dto.*
-import org.cloud_assess.model.Indicator
-import org.cloud_assess.model.ResourceAnalysis
-import org.cloud_assess.model.ResourceTrace
-import org.cloud_assess.model.ResourceTraceElement
+import org.cloud_assess.model.*
 import org.springframework.stereotype.Service
 
 @Service
 class MapperService {
     fun map(
-        analysis: Map<String, ResourceTrace>,
+        analysis: ResourceTraceAnalysis,
     ): TraceResponseListDto {
+        val entries = analysis.elements.entries
         return TraceResponseListDto(
-            analysis.entries.toList()
+            meta = analysis.meta,
+            elements = entries.toList()
                 .map { traceResponseDto(it) }
         )
     }
@@ -116,7 +115,7 @@ class MapperService {
             IR = impactDto(impacts, Indicator.IR),
         )
     }
-    
+
     private fun impactDto(impacts: Map<Indicator, QuantityValue<BasicNumber>?>, indicator: Indicator): ImpactDto {
         return impacts[indicator]?.let { ImpactDto(total = it.toQuantityDto()) }
             ?: ImpactDto(total = QuantityDto(amount = 0.0, unit = ""))

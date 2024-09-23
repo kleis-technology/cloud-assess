@@ -5,11 +5,58 @@ import org.cloud_assess.dto.*
 @Suppress("SameParameterValue")
 class DtoFixture {
     companion object {
+        fun traceRequestListWithSpecificGlobalsAndDatasources(size: Int = 3): TraceRequestListDto {
+            return TraceRequestListDto((1..size).map { traceRequestDtoWithGlobalAndDatasource("r$it") })
+        }
+
+        fun traceRequestListWithCommonGlobalAndDatasource(size: Int = 3): TraceRequestListDto {
+            return TraceRequestListDto(
+                elements = (1..size).map { traceRequestDto("r$it") },
+                globals = listOf(
+                    ParameterDto(
+                        "x",
+                        PVNum(1.0, "kg"),
+                    )
+                ),
+                datasources = listOf(
+                    DatasourceDto(
+                        name = "inventory",
+                        records = listOf(
+                            RecordDto(
+                                listOf(
+                                    EntryDto("x", VNum(1.0))
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+        }
+
         fun traceRequestList(size: Int = 3): TraceRequestListDto {
-            return TraceRequestListDto((1..size).map { traceRequestDto("r$it") })
+            return TraceRequestListDto(
+                elements = (1..size).map { traceRequestDto("r$it") },
+            )
         }
 
         private fun traceRequestDto(id: String = "r00"): TraceRequestDto {
+            return TraceRequestDto(
+                requestId = id,
+                demand = DemandDto(
+                    productName = "vm",
+                    processName = "vm",
+                    quantity = QuantityDto(1.0, "hour"),
+                ),
+                globals = emptyList(),
+                meta = mapOf(
+                    "group" to "foo"
+                ),
+                datasources = emptyList()
+            )
+        }
+
+
+        private fun traceRequestDtoWithGlobalAndDatasource(id: String = "r00"): TraceRequestDto {
             return TraceRequestDto(
                 requestId = id,
                 demand = DemandDto(
