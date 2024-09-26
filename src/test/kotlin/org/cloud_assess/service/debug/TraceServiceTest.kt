@@ -11,6 +11,8 @@ import ch.kleis.lcaac.grammar.parser.LcaLangLexer
 import ch.kleis.lcaac.grammar.parser.LcaLangParser
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.spyk
+import io.mockk.verify
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.assertj.core.api.Assertions.assertThat
@@ -36,9 +38,10 @@ class TraceServiceTest {
     }
 
     @Test
-    fun analyze_requestList_mapShouldHaveSameKeys() {
+    fun analyze_requestList_shouldMapCommonMeta() {
         // given
-        val symbolTable = prepare("""
+        val symbolTable = prepare(
+            """
             // nothing
             datasource inventory {
                 schema {
@@ -52,14 +55,211 @@ class TraceServiceTest {
                     1 kg GWP
                 }
             }
-        """.trimIndent())
-        val requestList = DtoFixture.traceRequestList(3)
+        """.trimIndent()
+        )
+        val requestList = DtoFixture.traceRequestList(1).copy(
+            meta = mapOf(
+                "group" to "foo"
+            ),
+        )
+        val sourceOps = mockk<DefaultDataSourceOperations<BasicNumber>>()
+        every { sourceOps.overrideWith(any()) } returns sourceOps
+        val service = spyk(TraceService(parsingService, sourceOps, symbolTable))
+
+        // when
+        val actual = service.analyze(requestList).meta
+
+        // then
+        assertThat(actual).isEqualTo(mapOf("group" to "foo"))
+    }
+
+    @Test
+    fun analyze_requestList_whenCommon() {
+        // given
+        val symbolTable = prepare(
+            """
+            // nothing
+            datasource inventory {
+                schema {
+                }
+            }
+            process vm {
+                products {
+                    1 hour vm
+                }
+                impacts {
+                    1 kg GWP
+                }
+            }
+        """.trimIndent()
+        )
+        val requestList = DtoFixture.traceRequestListWithCommonGlobalAndDatasource(1)
+        val sourceOps = mockk<DefaultDataSourceOperations<BasicNumber>>()
+        every { sourceOps.overrideWith(any()) } returns sourceOps
+        val service = spyk(TraceService(parsingService, sourceOps, symbolTable))
+
+        // when
+        service.analyze(requestList)
+
+        // then
+        val expected = TraceRequestDto(
+            requestId = "r1",
+            demand = DemandDto(
+                productName = "vm",
+                processName = "vm",
+                quantity = QuantityDto(1.0, "hour"),
+            ),
+            globals = listOf(
+                ParameterDto(
+                    "x",
+                    PVNum(1.0, "kg"),
+                )
+            ),
+            meta = mapOf(
+                "group" to "foo"
+            ),
+            datasources = listOf(
+                DatasourceDto(
+                    name = "inventory",
+                    records = listOf(
+                        RecordDto(
+                            listOf(
+                                EntryDto("x", VNum(1.0))
+                            )
+                        )
+                    )
+                )
+            )
+        )
+        verify { service.analyze(expected) }
+    }
+
+    @Test
+    fun analyze_requestList_whenCommonAndSpecific_shouldMerge() {
+        // given
+        val symbolTable = prepare(
+            """
+            // nothing
+            datasource inventory {
+                schema {
+                }
+            }
+            datasource foo {
+                schema {
+                }
+            }
+            process vm {
+                products {
+                    1 hour vm
+                }
+                impacts {
+                    1 kg GWP
+                }
+            }
+        """.trimIndent()
+        )
+        val requestList = DtoFixture.traceRequestListWithSpecificGlobalsAndDatasources(1)
+            .copy(
+                globals = listOf(
+                    ParameterDto(
+                        "y",
+                        PVNum(1.0, "l"),
+                    )
+                ),
+                datasources = listOf(
+                    DatasourceDto(
+                        name = "foo",
+                        records = listOf(
+                            RecordDto(
+                                listOf(
+                                    EntryDto("z", VNum(2.0))
+                                )
+                            )
+                        )
+                    )
+                ),
+            )
+        val sourceOps = mockk<DefaultDataSourceOperations<BasicNumber>>()
+        every { sourceOps.overrideWith(any()) } returns sourceOps
+        val service = spyk(TraceService(parsingService, sourceOps, symbolTable))
+
+        // when
+        service.analyze(requestList)
+
+        // then
+        val expected = TraceRequestDto(
+            requestId = "r1",
+            demand = DemandDto(
+                productName = "vm",
+                processName = "vm",
+                quantity = QuantityDto(1.0, "hour"),
+            ),
+            globals = listOf(
+                ParameterDto(
+                    "y",
+                    PVNum(1.0, "l"),
+                ),
+                ParameterDto(
+                    "x",
+                    PVNum(1.0, "kg"),
+                )
+            ),
+            meta = mapOf(
+                "group" to "foo"
+            ),
+            datasources = listOf(
+                DatasourceDto(
+                    name = "foo",
+                    records = listOf(
+                        RecordDto(
+                            listOf(
+                                EntryDto("z", VNum(2.0))
+                            )
+                        )
+                    )
+                ),
+                DatasourceDto(
+                    name = "inventory",
+                    records = listOf(
+                        RecordDto(
+                            listOf(
+                                EntryDto("x", VNum(1.0))
+                            )
+                        )
+                    )
+                )
+            )
+        )
+        verify { service.analyze(expected) }
+    }
+
+    @Test
+    fun analyze_requestList_mapShouldHaveSameKeys() {
+        // given
+        val symbolTable = prepare(
+            """
+            // nothing
+            datasource inventory {
+                schema {
+                }
+            }
+            process vm {
+                products {
+                    1 hour vm
+                }
+                impacts {
+                    1 kg GWP
+                }
+            }
+        """.trimIndent()
+        )
+        val requestList = DtoFixture.traceRequestListWithSpecificGlobalsAndDatasources(3)
         val sourceOps = mockk<DefaultDataSourceOperations<BasicNumber>>()
         every { sourceOps.overrideWith(any()) } returns sourceOps
         val service = TraceService(parsingService, sourceOps, symbolTable)
 
         // when
-        val actual = service.analyze(requestList).keys
+        val actual = service.analyze(requestList).elements.keys
 
         // then
         val expected = requestList
@@ -71,7 +271,8 @@ class TraceServiceTest {
     @Test
     fun analyze_singleRequest_simpleCase_isNotEmpty() {
         // given
-        val symbolTable = prepare("""
+        val symbolTable = prepare(
+            """
             process p {
                 products {
                     1 kg p
@@ -80,7 +281,8 @@ class TraceServiceTest {
                     1 kg GWP
                 }
             }
-        """.trimIndent())
+        """.trimIndent()
+        )
         val sourceOps = mockk<DefaultDataSourceOperations<BasicNumber>>()
         every { sourceOps.overrideWith(any()) } returns sourceOps
         val service = TraceService(
@@ -111,7 +313,8 @@ class TraceServiceTest {
     @Test
     fun analyze_singleRequest_simpleCase_shouldMapMeta() {
         // given
-        val symbolTable = prepare("""
+        val symbolTable = prepare(
+            """
             process p {
                 products {
                     1 kg p
@@ -120,7 +323,8 @@ class TraceServiceTest {
                     1 kg GWP
                 }
             }
-        """.trimIndent())
+        """.trimIndent()
+        )
         val sourceOps = mockk<DefaultDataSourceOperations<BasicNumber>>()
         every { sourceOps.overrideWith(any()) } returns sourceOps
         val service = TraceService(
@@ -144,15 +348,18 @@ class TraceServiceTest {
         val actual = service.analyze(request)
 
         // then
-        assertThat(actual.getMeta()).isEqualTo(mapOf(
-            "group" to "foo"
-        ))
+        assertThat(actual.getMeta()).isEqualTo(
+            mapOf(
+                "group" to "foo"
+            )
+        )
     }
 
     @Test
     fun analyze_singleRequest_simpleCase_noMaxDepth_thenMinusOne() {
         // given
-        val symbolTable = prepare("""
+        val symbolTable = prepare(
+            """
             process p {
                 products {
                     1 kg p
@@ -161,7 +368,8 @@ class TraceServiceTest {
                     1 kg GWP
                 }
             }
-        """.trimIndent())
+        """.trimIndent()
+        )
         val sourceOps = mockk<DefaultDataSourceOperations<BasicNumber>>()
         every { sourceOps.overrideWith(any()) } returns sourceOps
         val service = TraceService(
@@ -191,7 +399,8 @@ class TraceServiceTest {
     @Test
     fun analyze_singleRequest_simpleCase_withMaxDepth_thenSetMaxDepth() {
         // given
-        val symbolTable = prepare("""
+        val symbolTable = prepare(
+            """
             process p {
                 products {
                     1 kg p
@@ -200,7 +409,8 @@ class TraceServiceTest {
                     1 kg GWP
                 }
             }
-        """.trimIndent())
+        """.trimIndent()
+        )
         val sourceOps = mockk<DefaultDataSourceOperations<BasicNumber>>()
         every { sourceOps.overrideWith(any()) } returns sourceOps
         val service = TraceService(
@@ -231,7 +441,8 @@ class TraceServiceTest {
     @Test
     fun analyze_singleRequest_simpleCase_hasCorrectRequestId() {
         // given
-        val symbolTable = prepare("""
+        val symbolTable = prepare(
+            """
             process p {
                 products {
                     1 kg p
@@ -240,7 +451,8 @@ class TraceServiceTest {
                     1 kg GWP
                 }
             }
-        """.trimIndent())
+        """.trimIndent()
+        )
         val sourceOps = mockk<DefaultDataSourceOperations<BasicNumber>>()
         every { sourceOps.overrideWith(any()) } returns sourceOps
         val service = TraceService(
@@ -270,7 +482,8 @@ class TraceServiceTest {
     @Test
     fun analyze_singleRequest_simpleCase_hasCorrectImpact() {
         // given
-        val symbolTable = prepare("""
+        val symbolTable = prepare(
+            """
             process p {
                 products {
                     1 kg p
@@ -279,7 +492,8 @@ class TraceServiceTest {
                     1 kg GWP
                 }
             }
-        """.trimIndent())
+        """.trimIndent()
+        )
         val sourceOps = mockk<DefaultDataSourceOperations<BasicNumber>>()
         every { sourceOps.overrideWith(any()) } returns sourceOps
         val service = TraceService(
@@ -311,7 +525,8 @@ class TraceServiceTest {
     @Test
     fun analyze_singleRequest_withParams_Num_isNotEmpty() {
         // given
-        val symbolTable = prepare("""
+        val symbolTable = prepare(
+            """
             process p {
                 params {
                     x = 0 kg
@@ -323,7 +538,8 @@ class TraceServiceTest {
                     x GWP
                 }
             }
-        """.trimIndent())
+        """.trimIndent()
+        )
         val sourceOps = mockk<DefaultDataSourceOperations<BasicNumber>>()
         every { sourceOps.overrideWith(any()) } returns sourceOps
         val service = TraceService(
@@ -359,7 +575,8 @@ class TraceServiceTest {
     @Test
     fun analyze_singleRequest_withParams_Str_isNotEmpty() {
         // given
-        val symbolTable = prepare("""
+        val symbolTable = prepare(
+            """
             process p {
                 params {
                     my_name = "bar"
@@ -371,7 +588,8 @@ class TraceServiceTest {
                     1 kg GWP
                 }
             }
-        """.trimIndent())
+        """.trimIndent()
+        )
         val sourceOps = mockk<DefaultDataSourceOperations<BasicNumber>>()
         every { sourceOps.overrideWith(any()) } returns sourceOps
         val service = TraceService(
@@ -405,7 +623,8 @@ class TraceServiceTest {
     @Test
     fun analyze_singleRequest_withGlobals_Num_isNotEmpty() {
         // given
-        val symbolTable = prepare("""
+        val symbolTable = prepare(
+            """
             process p {
                 products {
                     1 kg p
@@ -414,7 +633,8 @@ class TraceServiceTest {
                     x GWP
                 }
             }
-        """.trimIndent())
+        """.trimIndent()
+        )
         val sourceOps = mockk<DefaultDataSourceOperations<BasicNumber>>()
         every { sourceOps.overrideWith(any()) } returns sourceOps
         val service = TraceService(
@@ -450,7 +670,8 @@ class TraceServiceTest {
     @Test
     fun analyze_singleRequest_withGlobals_Str_isNotEmpty() {
         // given
-        val symbolTable = prepare("""
+        val symbolTable = prepare(
+            """
             process p {
                 params {
                     my_name = x
@@ -462,7 +683,8 @@ class TraceServiceTest {
                     1 kg GWP
                 }
             }
-        """.trimIndent())
+        """.trimIndent()
+        )
         val sourceOps = mockk<DefaultDataSourceOperations<BasicNumber>>()
         every { sourceOps.overrideWith(any()) } returns sourceOps
         val service = TraceService(
@@ -496,7 +718,8 @@ class TraceServiceTest {
     @Test
     fun analyze_singleRequest_withOnlineDataSources_isNotEmpty() {
         // given
-        val symbolTable = prepare("""
+        val symbolTable = prepare(
+            """
             datasource inventory {
                 schema {
                     id = "s00"
@@ -515,7 +738,8 @@ class TraceServiceTest {
                     data.GWP GWP
                 }
             }
-        """.trimIndent())
+        """.trimIndent()
+        )
         val sourceOps = DefaultDataSourceOperations(
             ops = BasicOperations,
             config = LcaacConfig(),
@@ -539,11 +763,13 @@ class TraceServiceTest {
             datasources = listOf(
                 DatasourceDto(
                     name = "inventory",
-                    records = records("""
+                    records = records(
+                        """
                         id,WU,GWP,other
                         s00,4.0,2.0,pool-01
                         s01,3.0,1.0,pool-01
-                    """.trimIndent())
+                    """.trimIndent()
+                    )
                 )
             )
         )

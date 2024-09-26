@@ -19,6 +19,7 @@ import ch.kleis.lcaac.core.math.basic.BasicNumber
 import ch.kleis.lcaac.core.math.basic.BasicOperations
 import org.cloud_assess.dto.*
 import org.cloud_assess.model.ResourceTrace
+import org.cloud_assess.model.ResourceTraceAnalysis
 import org.cloud_assess.service.ParsingService
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
@@ -45,16 +46,24 @@ class TraceService(
         }
     }
 
-    fun analyze(request: TraceRequestListDto): Map<String, ResourceTrace> {
-        return request.elements
+    fun analyze(request: TraceRequestListDto): ResourceTraceAnalysis {
+        val meta = request.meta ?: emptyMap()
+        val commonGlobals = request.globals ?: emptyList()
+        val commonDatasources = request.datasources ?: emptyList()
+        val elements = request.elements
             .chunked(jobSize)
             .parallelStream()
             .map { job ->
                 job.map {
-                    mapOf(it.requestId to analyze(it))
+                    val merged = it.copy(
+                        globals = commonGlobals.plus(it.globals ?: emptyList()),
+                        datasources = commonDatasources.plus(it.datasources ?: emptyList()),
+                    )
+                    mapOf(it.requestId to analyze(merged))
                 }.fold(emptyMap<String, ResourceTrace>()) { acc, element -> acc.plus(element) }
             }.reduce { acc, element -> acc.plus(element) }
             .orElse(emptyMap())
+        return ResourceTraceAnalysis(meta, elements)
     }
 
     fun analyze(request: TraceRequestDto): ResourceTrace {
