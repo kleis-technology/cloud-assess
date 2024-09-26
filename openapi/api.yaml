@@ -374,6 +374,14 @@ components:
           items:
             $ref: '#/components/schemas/DatasourceDto'
 
+    ErrorDto:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+
     TraceResponseListDto:
       type: object
       properties:
