@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "org.cloud_assess"
-version = "1.7.1"
+version = "1.7.2"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
@@ -19,15 +19,14 @@ java {
 
 repositories {
     mavenCentral()
-    mavenLocal()
-//	maven {
-//		name = "github"
-//		url = uri("https://maven.pkg.github.com/kleis-technology/lcaac")
-//		credentials {
-//			username = System.getenv("GITHUB_ACTOR")
-//			password = System.getenv("GITHUB_TOKEN")
-//		}
-//	}
+	maven {
+		name = "github"
+		url = uri("https://maven.pkg.github.com/kleis-technology/lcaac")
+		credentials {
+			username = System.getenv("GITHUB_ACTOR")
+			password = System.getenv("GITHUB_TOKEN")
+		}
+	}
 }
 
 dependencies {
