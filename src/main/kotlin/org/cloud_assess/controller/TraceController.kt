@@ -22,7 +22,7 @@ class TraceController(
         return ResponseEntity.ok(outputDto)
     }
 
-    @ExceptionHandler(value = [IllegalArgumentException::class, EvaluatorException::class])
+    @ExceptionHandler(value = [IllegalStateException::class, IllegalArgumentException::class, EvaluatorException::class])
     fun handleException(exception: Exception): ResponseEntity<ErrorDto> {
         val errorDto = ErrorDto(
             message = exception.message ?: "unknown"
