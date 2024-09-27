@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "org.cloud_assess"
-version = "1.7.2"
+version = "1.7.3"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
@@ -30,7 +30,7 @@ repositories {
 }
 
 dependencies {
-    val lcaacVersion = "1.7.2"
+    val lcaacVersion = "1.7.3"
     implementation("ch.kleis.lcaac:core:$lcaacVersion")
     implementation("ch.kleis.lcaac:grammar:$lcaacVersion")
 
