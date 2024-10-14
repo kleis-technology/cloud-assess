@@ -188,6 +188,13 @@ components:
         total:
           $ref: '#/components/schemas/QuantityDto'
         # TODO: per lc step
+    RawImpactDto:
+      type: object
+      properties:
+        label:
+          type: string
+        value:
+          $ref: '#/components/schemas/QuantityDto'
     PoolDto:
       type: object
       required:
@@ -437,7 +444,9 @@ components:
         supply:
           $ref: '#/components/schemas/QuantityDto'
         impacts:
-          $ref: '#/components/schemas/ImpactsDto'
+          type: array
+          items:
+            $ref: '#/components/schemas/RawImpactDto'
     ParameterDto:
       type: object
       required:
