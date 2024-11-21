@@ -192,13 +192,10 @@ components:
       type: object
       required:
         - id
-        - service_level
         - meta
       properties:
         id:
           type: string
-        service_level:
-          $ref: '#/components/schemas/QuantityDimensionlessDto'
         meta:
           type: object
           default: { }
@@ -233,6 +230,7 @@ components:
       required:
         - id
         - pool_id
+        - quantity
         - ram
         - storage
         - vcpu
@@ -242,6 +240,8 @@ components:
           type: string
         pool_id:
           type: string
+        quantity:
+          $ref: '#/components/schemas/QuantityDimensionlessDto'
         ram:
           $ref: '#/components/schemas/QuantityMemoryDto'
         storage:
