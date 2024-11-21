@@ -1,5 +1,5 @@
 /*
-ENTRYPOINT
+Servers
 */
 
 process pool_server {
@@ -10,48 +10,17 @@ process pool_server {
         1 hour pool_server
     }
     inputs {
-        1 hour pool_server from pool_server_fn( id = id, lc_step = "manufacturing" )
-        1 hour pool_server from pool_server_fn( id = id, lc_step = "transport" )
-        1 hour pool_server from pool_server_fn( id = id, lc_step = "use" )
-        1 hour pool_server from pool_server_fn( id = id, lc_step = "end-of-life" )
+        1 hour pool_server from pool_server_fn( id = id, lc_step = "manufacturing" ) match ( phase = "embodied" )
+        1 hour pool_server from pool_server_fn( id = id, lc_step = "transport" ) match ( phase = "embodied" )
+        1 hour pool_server from pool_server_fn ( id = id ) match ( phase = "use" )
+        1 hour pool_server from pool_server_fn( id = id, lc_step = "end-of-life" ) match ( phase = "embodied" )
     }
 }
-
-process pool_network {
-    params {
-        id = "client_network"
-    }
-    products {
-        1 hour pool_network
-    }
-    inputs {
-        1 hour pool_network from pool_network_fn( id = id, lc_step = "manufacturing" )
-        1 hour pool_network from pool_network_fn( id = id, lc_step = "transport" )
-        1 hour pool_network from pool_network_fn( id = id, lc_step = "use" )
-        1 hour pool_network from pool_network_fn( id = id, lc_step = "end-of-life" )
-    }
-}
-
-process pool_hardware {
-    params {
-        id = "client_vm"
-    }
-    products {
-        1 hour pool_hardware
-    }
-    inputs {
-        1 hour pool_hardware from pool_hardware_fn( id = id, lc_step = "manufacturing" )
-        1 hour pool_hardware from pool_hardware_fn( id = id, lc_step = "transport" )
-        1 hour pool_hardware from pool_hardware_fn( id = id, lc_step = "use" )
-        1 hour pool_hardware from pool_hardware_fn( id = id, lc_step = "end-of-life" )
-    }
-}
-
-/*
-PER LC STEP
-*/
 
 process pool_server_fn {
+    labels {
+        phase = "embodied"
+    }
     params {
         id = "client_vm"
         lc_step = "manufacturing"
@@ -60,13 +29,52 @@ process pool_server_fn {
         1 hour pool_server
     }
     inputs {
-        for_each server from hw_inventory match ( pool_id = id, kind = "server" ) {
-            1 hour server from server( id = server.id ) match ( lc_step = lc_step )
+        for_each server from server_inventory match ( pool_id = id ) {
+            server.quantity * 1 hour server from server_fn( id = server.id, lc_step = lc_step ) match ( phase = phase )
         }
     }
 }
 
+process pool_server_fn {
+    labels {
+        phase = "use"
+    }
+    params {
+        id = "client_vm"
+    }
+    products {
+        1 hour pool_server
+    }
+    inputs {
+        for_each server from server_inventory match ( pool_id = id ) {
+            server.quantity * 1 hour server from server_fn( id = server.id ) match ( phase = phase )
+        }
+    }
+}
+
+/*
+Network
+*/
+
+process pool_network {
+    params {
+        id = "client_vm"
+    }
+    products {
+        1 hour pool_network
+    }
+    inputs {
+        1 hour pool_network from pool_network_fn( id = id, lc_step = "manufacturing" ) match ( phase = "embodied" )
+        1 hour pool_network from pool_network_fn( id = id, lc_step = "transport" ) match ( phase = "embodied" )
+        1 hour pool_network from pool_network_fn ( id = id ) match ( phase = "use" )
+        1 hour pool_network from pool_network_fn( id = id, lc_step = "end-of-life" ) match ( phase = "embodied" )
+    }
+}
+
 process pool_network_fn {
+    labels {
+        phase = "embodied"
+    }
     params {
         id = "client_vm"
         lc_step = "manufacturing"
@@ -75,23 +83,80 @@ process pool_network_fn {
         1 hour pool_network
     }
     inputs {
-        for_each network from hw_inventory match ( pool_id = id, kind = "network" ) {
-            1 hour network from network( id = network.id ) match ( lc_step = lc_step )
+        for_each network from network_inventory match ( pool_id = id ) {
+            network.quantity * 1 hour network from network_fn( id = network.id, lc_step = lc_step ) match ( phase = phase )
         }
     }
 }
 
-process pool_hardware_fn {
+process pool_network_fn {
+    labels {
+        phase = "use"
+    }
+    params {
+        id = "client_vm"
+    }
+    products {
+        1 hour pool_network
+    }
+    inputs {
+        for_each network from network_inventory match ( pool_id = id ) {
+            network.quantity * 1 hour network from network_fn( id = network.id ) match ( phase = phase )
+        }
+    }
+}
+
+/*
+Storage
+*/
+
+process pool_storage {
+    params {
+        id = "client_vm"
+    }
+    products {
+        1 hour pool_storage
+    }
+    inputs {
+        1 hour pool_storage from pool_storage_fn( id = id, lc_step = "manufacturing" ) match ( phase = "embodied" )
+        1 hour pool_storage from pool_storage_fn( id = id, lc_step = "transport" ) match ( phase = "embodied" )
+        1 hour pool_storage from pool_storage_fn ( id = id ) match ( phase = "use" )
+        1 hour pool_storage from pool_storage_fn( id = id, lc_step = "end-of-life" ) match ( phase = "embodied" )
+    }
+}
+
+process pool_storage_fn {
+    labels {
+        phase = "embodied"
+    }
     params {
         id = "client_vm"
         lc_step = "manufacturing"
     }
     products {
-        1 hour pool_hardware
+        1 hour pool_storage
     }
     inputs {
-        for_each hw from hw_inventory match ( pool_id = id ) {
-            1 hour hardware from hardware( id = hw.id, kind = hw.kind ) match ( lc_step = lc_step )
+        for_each storage from storage_inventory match ( pool_id = id ) {
+            storage.quantity * 1 hour storage from storage_fn( id = storage.id, lc_step = lc_step ) match ( phase = phase )
         }
     }
 }
+
+process pool_storage_fn {
+    labels {
+        phase = "use"
+    }
+    params {
+        id = "client_vm"
+    }
+    products {
+        1 hour pool_storage
+    }
+    inputs {
+        for_each storage from storage_inventory match ( pool_id = id ) {
+            storage.quantity * 1 hour storage from storage_fn( id = storage.id ) match ( phase = phase )
+        }
+    }
+}
+

@@ -10,10 +10,10 @@ process server {
         1 hour server
     }
     inputs {
-        1 hour server from server( id = id ) match ( lc_step = "manufacturing" )
-        1 hour server from server( id = id ) match ( lc_step = "transport" )
-        1 hour server from server( id = id ) match ( lc_step = "use" )
-        1 hour server from server( id = id ) match ( lc_step = "end-of-life" )
+        1 hour server from server_fn( id = id, lc_step = "manufacturing" ) match ( phase = "embodied" )
+        1 hour server from server_fn( id = id, lc_step = "transport" ) match ( phase = "embodied" )
+        1 hour server from server_fn( id = id ) match ( phase = "use" )
+        1 hour server from server_fn( id = id, lc_step = "end-of-life" ) match ( phase = "embodied" )
     }
 }
 
@@ -21,27 +21,33 @@ process server {
 PER LC STEP
 */
 
-process server {
+process server_fn {
     labels {
+        phase = "embodied"
+    }
+    params {
+        id = "srv-01"
         lc_step = "manufacturing"
     }
-    params {
-        id = "srv-01"
-    }
     variables {
-        data = lookup hw_inventory match ( id = id, kind = "server" )
+        data = lookup server_inventory match ( id = id )
+        dt = data.lifespan
     }
     products {
-        data.lifespan server
+        dt server
     }
     inputs {
         // share of impact from datacenter
-        data.lifespan * data.power datacenter from wrapper_dc_fn( id = data.dc_id, lc_step = lc_step )
+        dt * data.power datacenter from datacenter_fn( id = data.dc_id, lc_step = lc_step ) match ( phase = "embodied" )
+
+        // share of impact from mutualized equipments
+        dt * data.power mutualized_pool from mutualized_pool_fn( dc_id = data.dc_id, lc_step = lc_step ) match ( phase = "embodied" )
     }
 
     // proper server impacts
     impacts {
-        for_each impact from hw_impacts match ( lc_step = lc_step, id = id ) {
+        // assumption: impacts reported for the time period dt
+        for_each impact from server_impacts match ( lc_step = lc_step, hw_id = id ) {
             impact.ADPe ADPe
             impact.ADPf ADPf
             impact.AP AP
@@ -52,6 +58,7 @@ process server {
             impact.Epm Epm
             impact.Ept Ept
             impact.GWP GWP
+            impact.GWPb GWPb
             impact.GWPf GWPf
             impact.GWPlu GWPlu
             impact.IR IR
@@ -61,31 +68,65 @@ process server {
             impact.POCP POCP
             impact.WU WU
             impact.TPE TPE
+
+            // markers
+            impact.ADPe ADPe_pool_server
+            impact.ADPf ADPf_pool_server
+            impact.AP AP_pool_server
+            impact.CTUe CTUe_pool_server
+            impact.CTUh_c CTUh_c_pool_server
+            impact.CTUh_nc CTUh_nc_pool_server
+            impact.Epf Epf_pool_server
+            impact.Epm Epm_pool_server
+            impact.Ept Ept_pool_server
+            impact.GWP GWP_pool_server
+            impact.GWPb GWPb_pool_server
+            impact.GWPf GWPf_pool_server
+            impact.GWPlu GWPlu_pool_server
+            impact.IR IR_pool_server
+            impact.LU LU_pool_server
+            impact.ODP ODP_pool_server
+            impact.PM PM_pool_server
+            impact.POCP POCP_pool_server
+            impact.WU WU_pool_server
+            impact.TPE TPE_pool_server
         }
     }
 }
 
-process server {
+process server_fn {
     labels {
-        lc_step = "transport"
+        phase = "use"
     }
     params {
         id = "srv-01"
     }
     variables {
-        data = lookup hw_inventory match ( id = id, kind = "server" )
+        data = lookup server_inventory match ( id = id )
+        dt = 1 year
+        dc = lookup dc_inventory match ( id = data.dc_id )
     }
     products {
-        data.lifespan server
+        dt server
     }
     inputs {
+        // share of impact from electricity consumption
+        dt * data.power electricity from electricity_production( geo = dc.geo, target = "server" )
+
         // share of impact from datacenter
-        data.lifespan * data.power datacenter from wrapper_dc_fn( id = data.dc_id, lc_step = lc_step )
+        dt * data.power datacenter from datacenter_fn( id = data.dc_id ) match ( phase = phase )
+
+        // share of impact from mutualized equipments
+        dt * data.power mutualized_pool from mutualized_pool_fn( dc_id = data.dc_id ) match ( phase = phase )
+
+        // share of impact from maintenance
+        dt * maintenance_intensity maintenance from maintenance
     }
 
     // proper server impacts
     impacts {
-        for_each impact from hw_impacts match ( lc_step = lc_step, id = id ) {
+        // assumption: impacts reported for the time period dt
+        for_each impact from server_impacts match ( lc_step = phase, hw_id = id ) {
             impact.ADPe ADPe
             impact.ADPf ADPf
             impact.AP AP
@@ -96,6 +137,7 @@ process server {
             impact.Epm Epm
             impact.Ept Ept
             impact.GWP GWP
+            impact.GWPb GWPb
             impact.GWPf GWPf
             impact.GWPlu GWPlu
             impact.IR IR
@@ -105,93 +147,28 @@ process server {
             impact.POCP POCP
             impact.WU WU
             impact.TPE TPE
-        }
-    }
-}
 
-process server {
-    labels {
-        lc_step = "use"
-    }
-    params {
-        id = "srv-01"
-    }
-    variables {
-        data = lookup hw_inventory match ( id = id, kind = "server" )
-    }
-    products {
-        1 hour server
-    }
-    inputs {
-        1 hour * data.power datacenter from wrapper_dc_fn( id = data.dc_id, lc_step = lc_step )
-    }
-
-    // proper server impacts
-    impacts {
-        for_each impact from hw_impacts match ( lc_step = lc_step, id = id ) {
-            impact.ADPe ADPe
-            impact.ADPf ADPf
-            impact.AP AP
-            impact.CTUe CTUe
-            impact.CTUh_c CTUh_c
-            impact.CTUh_nc CTUh_nc
-            impact.Epf Epf
-            impact.Epm Epm
-            impact.Ept Ept
-            impact.GWP GWP
-            impact.GWPf GWPf
-            impact.GWPlu GWPlu
-            impact.IR IR
-            impact.LU LU
-            impact.ODP ODP
-            impact.PM PM
-            impact.POCP POCP
-            impact.WU WU
-            impact.TPE TPE
-        }
-    }
-}
-
-process server {
-    labels {
-        lc_step = "end-of-life"
-    }
-    params {
-        id = "srv-01"
-    }
-    variables {
-        data = lookup hw_inventory match ( id = id, kind = "server" )
-    }
-    products {
-        data.lifespan server
-    }
-    inputs {
-        // share of impact from datacenter
-        data.lifespan * data.power datacenter from wrapper_dc_fn( id = data.dc_id, lc_step = lc_step )
-    }
-
-    // proper server impacts
-    impacts {
-        for_each impact from hw_impacts match ( lc_step = lc_step, id = id ) {
-            impact.ADPe ADPe
-            impact.ADPf ADPf
-            impact.AP AP
-            impact.CTUe CTUe
-            impact.CTUh_c CTUh_c
-            impact.CTUh_nc CTUh_nc
-            impact.Epf Epf
-            impact.Epm Epm
-            impact.Ept Ept
-            impact.GWP GWP
-            impact.GWPf GWPf
-            impact.GWPlu GWPlu
-            impact.IR IR
-            impact.LU LU
-            impact.ODP ODP
-            impact.PM PM
-            impact.POCP POCP
-            impact.WU WU
-            impact.TPE TPE
+            // markers
+            impact.ADPe ADPe_pool_server
+            impact.ADPf ADPf_pool_server
+            impact.AP AP_pool_server
+            impact.CTUe CTUe_pool_server
+            impact.CTUh_c CTUh_c_pool_server
+            impact.CTUh_nc CTUh_nc_pool_server
+            impact.Epf Epf_pool_server
+            impact.Epm Epm_pool_server
+            impact.Ept Ept_pool_server
+            impact.GWP GWP_pool_server
+            impact.GWPb GWPb_pool_server
+            impact.GWPf GWPf_pool_server
+            impact.GWPlu GWPlu_pool_server
+            impact.IR IR_pool_server
+            impact.LU LU_pool_server
+            impact.ODP ODP_pool_server
+            impact.PM PM_pool_server
+            impact.POCP POCP_pool_server
+            impact.WU WU_pool_server
+            impact.TPE TPE_pool_server
         }
     }
 }

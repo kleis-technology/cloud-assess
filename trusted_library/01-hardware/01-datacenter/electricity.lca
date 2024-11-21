@@ -1,5 +1,5 @@
 datasource electricity_mix {
-    location = "data/01-hardware/electricity_mix.csv"
+    location = "01-hardware/electricity_mix.csv"
     schema {
         geo = "GLO"
 
@@ -13,6 +13,7 @@ datasource electricity_mix {
         Epm = 0 kg_N_Eq
         Ept = 0 mol_N_Eq
         GWP = 0 kg_CO2_Eq
+        GWPb = 0 kg_CO2_Eq
         GWPf = 0 kg_CO2_Eq
         GWPlu = 0 kg_CO2_Eq
         IR = 0 kBq_U235_Eq
@@ -28,6 +29,7 @@ datasource electricity_mix {
 process electricity_production {
     params {
         geo = "GLO"
+        target = "anyother"
     }
     variables {
         data = lookup electricity_mix match geo = geo
@@ -46,6 +48,7 @@ process electricity_production {
         data.Epm Epm
         data.Ept Ept
         data.GWP GWP
+        data.GWPb GWPb
         data.GWPf GWPf
         data.GWPlu GWPlu
         data.IR IR
@@ -55,5 +58,27 @@ process electricity_production {
         data.POCP POCP
         data.WU WU
         data.TPE TPE
+
+        // markers
+        data.ADPe ADPe_electricity
+        data.ADPf ADPf_electricity
+        data.AP AP_electricity
+        data.CTUe CTUe_electricity
+        data.CTUh_c CTUh_c_electricity
+        data.CTUh_nc CTUh_nc_electricity
+        data.Epf Epf_electricity
+        data.Epm Epm_electricity
+        data.Ept Ept_electricity
+        data.GWP GWP_electricity
+        data.GWPb GWPb_electricity
+        data.GWPf GWPf_electricity
+        data.GWPlu GWPlu_electricity
+        data.IR IR_electricity
+        data.LU LU_electricity
+        data.ODP ODP_electricity
+        data.PM PM_electricity
+        data.POCP POCP_electricity
+        data.WU WU_electricity
+        data.TPE TPE_electricity
     }
 }

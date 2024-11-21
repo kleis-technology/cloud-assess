@@ -1,0 +1,187 @@
+process mutualized_network_pool {
+    labels {
+        phase = "embodied"
+    }
+    params {
+        dc_id = "dc-01"
+        lc_step = "manufacturing"
+    }
+    variables {
+        dt = 1 hour
+        mutualized_pool_id = "mutualized"
+        dc = lookup dc_inventory match ( id = dc_id )
+    }
+    products {
+        dt mutualized_network_pool
+    }
+    inputs {
+        for_each network from network_inventory match ( pool_id = mutualized_pool_id, dc_id = dc_id ) {
+            network.quantity * dt mutualized_network from mutualized_network_fn( id = network.id, lc_step = lc_step ) match ( phase = "embodied" )
+        }
+    }
+}
+
+process mutualized_network_pool {
+    labels {
+        phase = "use"
+    }
+    params {
+        dc_id = "dc-01"
+    }
+    variables {
+        dt = 1 hour
+        mutualized_pool_id = "mutualized"
+        dc = lookup dc_inventory match ( id = dc_id )
+    }
+    products {
+        dt mutualized_network_pool
+    }
+    inputs {
+        for_each network from network_inventory match ( pool_id = mutualized_pool_id, dc_id = dc_id ) {
+            network.quantity * dt mutualized_network from mutualized_network_fn( id = network.id ) match ( phase = "use" )
+        }
+    }
+}
+
+
+/*
+The models in this file represent an equipment that is internal to the cloud provider.
+I.e., this equipment is not directly serviced to its customers, but is mutualized.
+*/
+
+process mutualized_network_fn {
+    labels {
+        phase = "embodied"
+    }
+    params {
+        id = "mutualized-net-01"
+        lc_step = "manufacturing"
+    }
+    variables {
+        data = lookup network_inventory match ( id = id )
+        dt = data.lifespan
+    }
+    products {
+        dt mutualized_network
+    }
+    inputs {
+        data.power * dt datacenter from datacenter_fn( id = data.dc_id, lc_step = lc_step ) match ( phase = phase )
+    }
+    impacts {
+        // assumption: impacts reported for the time period dt
+        for_each impact from network_impacts match ( hw_id = id, lc_step = lc_step ) {
+            impact.ADPe ADPe
+            impact.ADPf ADPf
+            impact.AP AP
+            impact.CTUe CTUe
+            impact.CTUh_c CTUh_c
+            impact.CTUh_nc CTUh_nc
+            impact.Epf Epf
+            impact.Epm Epm
+            impact.Ept Ept
+            impact.GWP GWP
+            impact.GWPb GWPb
+            impact.GWPf GWPf
+            impact.GWPlu GWPlu
+            impact.IR IR
+            impact.LU LU
+            impact.ODP ODP
+            impact.PM PM
+            impact.POCP POCP
+            impact.WU WU
+            impact.TPE TPE
+
+            // markers
+            impact.ADPe ADPe_mutualized_network
+            impact.ADPf ADPf_mutualized_network
+            impact.AP AP_mutualized_network
+            impact.CTUe CTUe_mutualized_network
+            impact.CTUh_c CTUh_c_mutualized_network
+            impact.CTUh_nc CTUh_nc_mutualized_network
+            impact.Epf Epf_mutualized_network
+            impact.Epm Epm_mutualized_network
+            impact.Ept Ept_mutualized_network
+            impact.GWP GWP_mutualized_network
+            impact.GWPb GWPb_mutualized_network
+            impact.GWPf GWPf_mutualized_network
+            impact.GWPlu GWPlu_mutualized_network
+            impact.IR IR_mutualized_network
+            impact.LU LU_mutualized_network
+            impact.ODP ODP_mutualized_network
+            impact.PM PM_mutualized_network
+            impact.POCP POCP_mutualized_network
+            impact.WU WU_mutualized_network
+            impact.TPE TPE_mutualized_network
+        }
+    }
+}
+
+process mutualized_network_fn {
+    labels {
+        phase = "use"
+    }
+    params {
+        id = "mutualized-net-01"
+    }
+    variables {
+        data = lookup network_inventory match ( id = id )
+        lc_step = "use"
+        dt = 1 year
+        dc = lookup dc_inventory match ( id = data.dc_id )
+    }
+    products {
+        dt mutualized_network
+    }
+    inputs {
+        data.power * dt electricity from electricity_production( geo = dc.geo, target = "mutualized_network" )
+        data.power * dt datacenter from datacenter_fn( id = data.dc_id ) match ( phase = "use" )
+        dt * maintenance_intensity maintenance from maintenance
+    }
+    impacts {
+        // assumption: impacts reported for the time period dt
+        for_each impact from network_impacts match ( hw_id = id, lc_step = lc_step ) {
+            impact.ADPe ADPe
+            impact.ADPf ADPf
+            impact.AP AP
+            impact.CTUe CTUe
+            impact.CTUh_c CTUh_c
+            impact.CTUh_nc CTUh_nc
+            impact.Epf Epf
+            impact.Epm Epm
+            impact.Ept Ept
+            impact.GWP GWP
+            impact.GWPb GWPb
+            impact.GWPf GWPf
+            impact.GWPlu GWPlu
+            impact.IR IR
+            impact.LU LU
+            impact.ODP ODP
+            impact.PM PM
+            impact.POCP POCP
+            impact.WU WU
+            impact.TPE TPE
+
+            // markers
+            impact.ADPe ADPe_mutualized_network
+            impact.ADPf ADPf_mutualized_network
+            impact.AP AP_mutualized_network
+            impact.CTUe CTUe_mutualized_network
+            impact.CTUh_c CTUh_c_mutualized_network
+            impact.CTUh_nc CTUh_nc_mutualized_network
+            impact.Epf Epf_mutualized_network
+            impact.Epm Epm_mutualized_network
+            impact.Ept Ept_mutualized_network
+            impact.GWP GWP_mutualized_network
+            impact.GWPb GWPb_mutualized_network
+            impact.GWPf GWPf_mutualized_network
+            impact.GWPlu GWPlu_mutualized_network
+            impact.IR IR_mutualized_network
+            impact.LU LU_mutualized_network
+            impact.ODP ODP_mutualized_network
+            impact.PM PM_mutualized_network
+            impact.POCP POCP_mutualized_network
+            impact.WU WU_mutualized_network
+            impact.TPE TPE_mutualized_network
+        }
+    }
+}

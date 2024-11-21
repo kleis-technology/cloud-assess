@@ -1,4 +1,4 @@
-id,pool_id,nb_cores
-comp-01,client_compute,16
-comp-02,client_compute,8
-comp-03,client_compute,32
+id,pool_id,vcpu_size,quantity
+comp-01,client_compute,16,1
+comp-02,client_compute,8,1
+comp-03,client_compute,32,1

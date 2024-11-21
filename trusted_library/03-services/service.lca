@@ -4,13 +4,50 @@ We model here a generic a service over a dedicated pool of equipments.
 
 process service {
     params {
-        pool_id = "client_vm"
-        service_level = 1 u
+        id = "client_vm"
     }
     products {
-        service_level * 1 hour service
+        timewindow service
     }
     inputs {
-        1 hour pool_hardware from pool_hardware( id = pool_id )
+        timewindow service from service_fn( id = id, lc_step = "manufacturing" ) match ( phase = "embodied" )
+        timewindow service from service_fn( id = id, lc_step = "transport" ) match ( phase = "embodied" )
+        timewindow service from service_fn( id = id ) match ( phase = "use" )
+        timewindow service from service_fn( id = id, lc_step = "end-of-life" ) match ( phase = "embodied" )
+    }
+}
+
+process service_fn {
+    labels {
+        phase = "embodied"
+    }
+    params {
+        id = "client_vm"
+        lc_step = "manufacturing"
+    }
+    products {
+        1 hour service
+    }
+    inputs {
+        1 hour pool_server from pool_server_fn( id = id, lc_step = lc_step ) match ( phase = phase )
+        1 hour pool_network from pool_network_fn( id = id, lc_step = lc_step ) match ( phase = phase )
+        1 hour pool_storage from pool_storage_fn( id = id, lc_step = lc_step ) match ( phase = phase )
+    }
+}
+
+process service_fn {
+    labels {
+        phase = "use"
+    }
+    params {
+        id = "client_vm"
+    }
+    products {
+        1 hour service
+    }
+    inputs {
+        1 hour pool_server from pool_server_fn( id = id ) match ( phase = phase )
+        1 hour pool_network from pool_network_fn( id = id ) match ( phase = phase )
+        1 hour pool_storage from pool_storage_fn( id = id ) match ( phase = phase )
     }
 }

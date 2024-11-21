@@ -1,0 +1,186 @@
+process mutualized_server_pool {
+    labels {
+        phase = "embodied"
+    }
+    params {
+        dc_id = "dc-01"
+        lc_step = "manufacturing"
+    }
+    variables {
+        dt = 1 hour
+        mutualized_pool_id = "mutualized"
+        dc = lookup dc_inventory match ( id = dc_id )
+    }
+    products {
+        dt mutualized_server_pool
+    }
+    inputs {
+        for_each server from server_inventory match ( pool_id = mutualized_pool_id, dc_id = dc_id ) {
+            server.quantity * dt mutualized_server from mutualized_server_fn( id = server.id, lc_step = lc_step ) match ( phase = "embodied" )
+        }
+    }
+}
+
+process mutualized_server_pool {
+    labels {
+        phase = "use"
+    }
+    params {
+        dc_id = "dc-01"
+    }
+    variables {
+        dt = 1 hour
+        mutualized_pool_id = "mutualized"
+        dc = lookup dc_inventory match ( id = dc_id )
+    }
+    products {
+        dt mutualized_server_pool
+    }
+    inputs {
+        for_each server from server_inventory match ( pool_id = mutualized_pool_id, dc_id = dc_id ) {
+            server.quantity * dt mutualized_server from mutualized_server_fn( id = server.id ) match ( phase = "use" )
+        }
+    }
+}
+
+/*
+The models in this file represent an equipment that is internal to the cloud provider.
+I.e., this equipment is not directly serviced to its customers, but is mutualized.
+*/
+
+process mutualized_server_fn {
+    labels {
+        phase = "embodied"
+    }
+    params {
+        id = "mutualized-srv-01"
+        lc_step = "manufacturing"
+    }
+    variables {
+        data = lookup server_inventory match ( id = id )
+        dt = data.lifespan
+    }
+    products {
+        dt mutualized_server
+    }
+    inputs {
+        data.power * dt datacenter from datacenter_fn( id = data.dc_id, lc_step = lc_step ) match ( phase = "embodied" )
+    }
+    impacts {
+        // assumption: impacts reported for the time period dt
+        for_each impact from server_impacts match ( hw_id = id, lc_step = lc_step ) {
+            impact.ADPe ADPe
+            impact.ADPf ADPf
+            impact.AP AP
+            impact.CTUe CTUe
+            impact.CTUh_c CTUh_c
+            impact.CTUh_nc CTUh_nc
+            impact.Epf Epf
+            impact.Epm Epm
+            impact.Ept Ept
+            impact.GWP GWP
+            impact.GWPb GWPb
+            impact.GWPf GWPf
+            impact.GWPlu GWPlu
+            impact.IR IR
+            impact.LU LU
+            impact.ODP ODP
+            impact.PM PM
+            impact.POCP POCP
+            impact.WU WU
+            impact.TPE TPE
+
+            // markers
+            impact.ADPe ADPe_mutualized_server
+            impact.ADPf ADPf_mutualized_server
+            impact.AP AP_mutualized_server
+            impact.CTUe CTUe_mutualized_server
+            impact.CTUh_c CTUh_c_mutualized_server
+            impact.CTUh_nc CTUh_nc_mutualized_server
+            impact.Epf Epf_mutualized_server
+            impact.Epm Epm_mutualized_server
+            impact.Ept Ept_mutualized_server
+            impact.GWP GWP_mutualized_server
+            impact.GWPb GWPb_mutualized_server
+            impact.GWPf GWPf_mutualized_server
+            impact.GWPlu GWPlu_mutualized_server
+            impact.IR IR_mutualized_server
+            impact.LU LU_mutualized_server
+            impact.ODP ODP_mutualized_server
+            impact.PM PM_mutualized_server
+            impact.POCP POCP_mutualized_server
+            impact.WU WU_mutualized_server
+            impact.TPE TPE_mutualized_server
+        }
+    }
+}
+
+process mutualized_server_fn {
+    labels {
+        phase = "use"
+    }
+    params {
+        id = "mutualized-srv-01"
+    }
+    variables {
+        data = lookup server_inventory match ( id = id )
+        lc_step = phase
+        dt = 1 year
+        dc = lookup dc_inventory match ( id = data.dc_id )
+    }
+    products {
+        dt mutualized_server
+    }
+    inputs {
+        data.power * dt electricity from electricity_production( geo = dc.geo, target = "mutualized_server" )
+        data.power * dt datacenter from datacenter_fn( id = data.dc_id ) match ( phase = phase )
+        dt * maintenance_intensity maintenance from maintenance
+    }
+    impacts {
+        // assumption: impacts reported for the time period dt
+        for_each impact from server_impacts match ( hw_id = id, lc_step = lc_step ) {
+            impact.ADPe ADPe
+            impact.ADPf ADPf
+            impact.AP AP
+            impact.CTUe CTUe
+            impact.CTUh_c CTUh_c
+            impact.CTUh_nc CTUh_nc
+            impact.Epf Epf
+            impact.Epm Epm
+            impact.Ept Ept
+            impact.GWP GWP
+            impact.GWPb GWPb
+            impact.GWPf GWPf
+            impact.GWPlu GWPlu
+            impact.IR IR
+            impact.LU LU
+            impact.ODP ODP
+            impact.PM PM
+            impact.POCP POCP
+            impact.WU WU
+            impact.TPE TPE
+
+            // markers
+            impact.ADPe ADPe_mutualized_server
+            impact.ADPf ADPf_mutualized_server
+            impact.AP AP_mutualized_server
+            impact.CTUe CTUe_mutualized_server
+            impact.CTUh_c CTUh_c_mutualized_server
+            impact.CTUh_nc CTUh_nc_mutualized_server
+            impact.Epf Epf_mutualized_server
+            impact.Epm Epm_mutualized_server
+            impact.Ept Ept_mutualized_server
+            impact.GWP GWP_mutualized_server
+            impact.GWPb GWPb_mutualized_server
+            impact.GWPf GWPf_mutualized_server
+            impact.GWPlu GWPlu_mutualized_server
+            impact.IR IR_mutualized_server
+            impact.LU LU_mutualized_server
+            impact.ODP ODP_mutualized_server
+            impact.PM PM_mutualized_server
+            impact.POCP POCP_mutualized_server
+            impact.WU WU_mutualized_server
+            impact.TPE TPE_mutualized_server
+        }
+    }
+}

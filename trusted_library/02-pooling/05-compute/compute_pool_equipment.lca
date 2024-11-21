@@ -1,0 +1,42 @@
+// Difference wrt PCR: allocation based on reserved cores during the time window.
+
+process compute_pool_equipment {
+    labels {
+        phase = "embodied"
+    }
+    params {
+        id = "client_compute"
+        lc_step = "manufacturing"
+    }
+    variables {
+        reserved_cpu = sum( compute_inventory match pool_id = id, quantity * vcpu_size )
+    }
+    products {
+        reserved_cpu cpu
+    }
+    inputs {
+        timewindow pool_server from pool_server_fn( id = id, lc_step = lc_step ) match ( phase = "embodied" )
+        timewindow pool_storage from pool_storage_fn( id = id, lc_step = lc_step ) match ( phase = "embodied" )
+        timewindow pool_network from pool_network_fn( id = id, lc_step = lc_step ) match ( phase = "embodied" )
+    }
+}
+
+process compute_pool_equipment {
+    labels {
+        phase = "use"
+    }
+    params {
+        id = "client_compute"
+    }
+    variables {
+        reserved_cpu = sum( compute_inventory match pool_id = id, quantity * vcpu_size )
+    }
+    products {
+        reserved_cpu cpu
+    }
+    inputs {
+        timewindow pool_server from pool_server_fn( id = id ) match ( phase = phase )
+        timewindow pool_storage from pool_storage_fn( id = id ) match ( phase = "embodied" )
+        timewindow pool_network from pool_network_fn( id = id ) match ( phase = "embodied" )
+    }
+}

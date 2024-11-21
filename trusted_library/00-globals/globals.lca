@@ -1,0 +1,4 @@
+variables {
+    timewindow = 1 hour
+    maintenance_intensity = 0 man * working_day / month
+}
