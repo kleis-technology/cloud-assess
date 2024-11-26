@@ -2,7 +2,7 @@
 ENTRYPOINT
 */
 
-process network {
+process network_fn {
     params {
         id = "net-01"
     }

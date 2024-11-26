@@ -2,7 +2,7 @@
 ENTRYPOINT
 */
 
-process server {
+process server_fn {
     params {
         id = "srv-01"
     }

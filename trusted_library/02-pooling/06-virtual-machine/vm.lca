@@ -17,7 +17,7 @@ datasource vm_inventory {
 ENTRYPOINT
 */
 
-process vm {
+process vm_fn {
     params {
         id = "vm-01"
     }

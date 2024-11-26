@@ -2,7 +2,7 @@
 Servers
 */
 
-process pool_server {
+process pool_server_fn {
     params {
         id = "client_vm"
     }
@@ -56,7 +56,7 @@ process pool_server_fn {
 Network
 */
 
-process pool_network {
+process pool_network_fn {
     params {
         id = "client_vm"
     }
@@ -110,7 +110,7 @@ process pool_network_fn {
 Storage
 */
 
-process pool_storage {
+process pool_storage_fn {
     params {
         id = "client_vm"
     }
