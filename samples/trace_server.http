@@ -11,7 +11,7 @@ Content-Type: application/json
       },
       "demand": {
         "productName": "server",
-        "processName": "server",
+        "processName": "server_fn",
         "quantity": {
           "amount": 10.0,
           "unit": "hour"
