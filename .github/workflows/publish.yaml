@@ -44,8 +44,8 @@ jobs:
           context: .
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/${{ github.repository }}:${{ github.ref_name }}
-            ghcr.io/${{ github.repository_owner }}/${{ github.repository }}:latest
+            ghcr.io/${{ github.repository_owner }}/${{ github.repository }}/cloud-assess-app:${{ github.ref_name }}
+            ghcr.io/${{ github.repository_owner }}/${{ github.repository }}/cloud-assess-app:latest
 
       - name: Create a GitHub release
         id: create_release
