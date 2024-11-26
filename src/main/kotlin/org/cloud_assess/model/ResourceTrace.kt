@@ -46,6 +46,9 @@ class ResourceTrace(
                 ?: 1.0) * (demandedProduct.allocation?.unit?.scale ?: 1.0)
             observablePorts.map { row ->
                 val supply = contributionAnalysis.supplyOf(row)
+                val rawImpacts = controllablePorts.associateWith { col ->
+                    contributionAnalysis.getPortContribution(row, col)
+                }
                 val impacts = Indicator.entries.associateWith { indicator ->
                     controllablePorts.firstOrNull { it.getShortName() == indicator.name }
                         ?.let { col ->
@@ -61,6 +64,7 @@ class ResourceTrace(
                     target = row,
                     supply = supply,
                     impacts = impacts,
+                    rawImpacts = rawImpacts,
                 )
             }
         }
@@ -74,4 +78,5 @@ class ResourceTraceElement(
     val target: MatrixColumnIndex<BasicNumber>,
     val supply: QuantityValue<BasicNumber>,
     val impacts: Map<Indicator, QuantityValue<BasicNumber>?>,
+    val rawImpacts: Map<MatrixColumnIndex<BasicNumber>, QuantityValue<BasicNumber>?>,
 )

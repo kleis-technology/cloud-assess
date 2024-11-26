@@ -7,7 +7,7 @@ Content-Type: application/json
       "requestId": "r01",
       "demand": {
         "productName": "vm",
-        "processName": "vm",
+        "processName": "vm_fn",
         "quantity": {
           "amount": 1.0,
           "unit": "hour"

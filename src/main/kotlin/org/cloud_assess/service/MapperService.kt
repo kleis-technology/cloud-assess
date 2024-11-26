@@ -36,7 +36,7 @@ class MapperService {
                 depth = element.depth,
                 name = target.name,
                 supply = element.supply.toQuantityDto(),
-                impacts = impactsDto(element.impacts)
+                impacts = rawImpactsDto(element.rawImpacts)
             )
 
             is ProductValue -> TraceResponseRowDto(
@@ -50,7 +50,7 @@ class MapperService {
                     processLabelDto(it)
                 },
                 supply = element.supply.toQuantityDto(),
-                impacts = impactsDto(element.impacts)
+                impacts = rawImpactsDto(element.rawImpacts)
             )
 
             is FullyQualifiedSubstanceValue -> TraceResponseRowDto(
@@ -59,14 +59,14 @@ class MapperService {
                 compartment = target.compartment,
                 subCompartment = target.subcompartment,
                 supply = element.supply.toQuantityDto(),
-                impacts = impactsDto(element.impacts)
+                impacts = rawImpactsDto(element.rawImpacts)
             )
 
             is PartiallyQualifiedSubstanceValue -> TraceResponseRowDto(
                 depth = element.depth,
                 name = target.name,
                 supply = element.supply.toQuantityDto(),
-                impacts = impactsDto(element.impacts)
+                impacts = rawImpactsDto(element.rawImpacts)
             )
         }
     }
@@ -94,31 +94,15 @@ class MapperService {
             is RecordValue -> null
         }
 
-    @Suppress("DuplicatedCode")
-    private fun impactsDto(impacts: Map<Indicator, QuantityValue<BasicNumber>?>): ImpactsDto {
-        return ImpactsDto(
-            adPe = impactDto(impacts, Indicator.ADPe),
-            adPf = impactDto(impacts, Indicator.ADPf),
-            AP = impactDto(impacts, Indicator.AP),
-            GWP = impactDto(impacts, Indicator.GWP),
-            LU = impactDto(impacts, Indicator.LU),
-            ODP = impactDto(impacts, Indicator.ODP),
-            PM = impactDto(impacts, Indicator.PM),
-            POCP = impactDto(impacts, Indicator.POCP),
-            WU = impactDto(impacts, Indicator.WU),
-            ctUe = impactDto(impacts, Indicator.CTUe),
-            ctUhC = impactDto(impacts, Indicator.CTUh_c),
-            ctUhNc = impactDto(impacts, Indicator.CTUh_nc),
-            epf = impactDto(impacts, Indicator.Epf),
-            epm = impactDto(impacts, Indicator.Epm),
-            ept = impactDto(impacts, Indicator.Ept),
-            IR = impactDto(impacts, Indicator.IR),
-        )
-    }
-
-    private fun impactDto(impacts: Map<Indicator, QuantityValue<BasicNumber>?>, indicator: Indicator): ImpactDto {
-        return impacts[indicator]?.let { ImpactDto(total = it.toQuantityDto()) }
-            ?: ImpactDto(total = QuantityDto(amount = 0.0, unit = ""))
+    private fun rawImpactsDto(impacts: Map<MatrixColumnIndex<BasicNumber>, QuantityValue<BasicNumber>?>): List<RawImpactDto> {
+        return impacts.entries.map { entry ->
+            RawImpactDto(
+                indicator = entry.key.getShortName(),
+                value = entry.value?.let {
+                    it.toQuantityDto()
+                } ?: QuantityDto( amount = 0.0, unit = "")
+            )
+        }.toList()
     }
 
     fun map(
@@ -154,9 +138,19 @@ class MapperService {
     }
 
     private fun impactDto(analysis: ResourceAnalysis, target: Indicator): ImpactDto {
-        val quantity = analysis.contribution(target)
+        val total = analysis.total(target)
+        val manufacturing =  analysis.manufacturing(target)
+        val transport = analysis.transport(target)
+        val use = analysis.use(target)
+        val endOfLife = analysis.endOfLife(target)
         return ImpactDto(
-            total = quantity.toQuantityDto()
+            total = total.toQuantityDto(),
+            perLcStep = ImpactPerLcStepDto(
+                manufacturing = manufacturing.toQuantityDto(),
+                transport = transport.toQuantityDto(),
+                use = use.toQuantityDto(),
+                endOfLife = endOfLife.toQuantityDto(),
+            )
         )
     }
 

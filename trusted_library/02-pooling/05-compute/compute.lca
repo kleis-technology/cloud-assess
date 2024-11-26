@@ -12,7 +12,7 @@ datasource compute_inventory {
 ENTRYPOINT
 */
 
-process compute {
+process compute_fn {
     params {
         id = "comp-01"
     }

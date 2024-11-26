@@ -46,7 +46,7 @@ datasource dc_impacts {
 ENTRYPOINT
 */
 
-process datacenter {
+process datacenter_fn {
     params {
         id = "dc-01"
     }

@@ -2,7 +2,7 @@
 ENTRYPOINT
 */
 
-process storage {
+process storage_fn {
     params {
         id = "sto-01"
     }

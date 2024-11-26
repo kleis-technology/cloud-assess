@@ -14,7 +14,7 @@ datasource storage_space_inventory {
 ENTRYPOINT
 */
 
-process storage_space {
+process storage_space_fn {
     params {
         id = "sto-sp-01"
     }

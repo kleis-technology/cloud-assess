@@ -2,7 +2,7 @@
 We model here a generic a service over a dedicated pool of equipments.
 */
 
-process service {
+process service_fn {
     params {
         id = "client_vm"
     }

@@ -184,10 +184,12 @@ components:
       type: object
       required:
         - total
+        - per_lc_step
       properties:
         total:
           $ref: '#/components/schemas/QuantityDto'
-        # TODO: per lc step
+        per_lc_step:
+          $ref: '#/components/schemas/ImpactPerLcStepDto'
     PoolDto:
       type: object
       required:
@@ -437,7 +439,9 @@ components:
         supply:
           $ref: '#/components/schemas/QuantityDto'
         impacts:
-          $ref: '#/components/schemas/ImpactsDto'
+          type: array
+          items:
+            $ref: '#/components/schemas/RawImpactDto'
     ParameterDto:
       type: object
       required:
@@ -512,4 +516,27 @@ components:
           default: [ ]
           items:
             $ref: '#/components/schemas/ProcessLabelDto'
+    ImpactPerLcStepDto:
+      type: object
+      required:
+        - manufacturing
+        - transport
+        - use
+        - end_of_life
+      properties:
+        manufacturing:
+          $ref: '#/components/schemas/QuantityDto'
+        transport:
+          $ref: '#/components/schemas/QuantityDto'
+        use:
+          $ref: '#/components/schemas/QuantityDto'
+        end_of_life:
+          $ref: '#/components/schemas/QuantityDto'
+    RawImpactDto:
+      type: object
+      properties:
+        indicator:
+          type: string
+        value:
+          $ref: '#/components/schemas/QuantityDto'
 
