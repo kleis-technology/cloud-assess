@@ -1,5 +1,6 @@
 package org.cloud_assess.fixtures
 
+import io.mockk.mockk
 import org.cloud_assess.dto.*
 
 @Suppress("SameParameterValue")
@@ -198,6 +199,12 @@ class DtoFixture {
         private fun impactDto(): ImpactDto {
             return ImpactDto(
                 total = oneKgCO2eqDto(),
+                perLcStep = ImpactPerLcStepDto(
+                    manufacturing = oneKgCO2eqDto(),
+                    transport = oneKgCO2eqDto(),
+                    use = oneKgCO2eqDto(),
+                    endOfLife = oneKgCO2eqDto(),
+                ),
             )
         }
 

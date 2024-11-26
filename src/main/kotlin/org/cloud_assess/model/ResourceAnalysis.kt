@@ -9,18 +9,60 @@ import ch.kleis.lcaac.core.math.basic.BasicNumber
 import org.cloud_assess.dto.QuantityTimeDto
 
 class ResourceAnalysis(
-    id: String,
+    private val target: ProductMatcher,
     val period: QuantityTimeDto,
     private val rawAnalysis: ContributionAnalysis<BasicNumber, BasicMatrix>,
-    private val entryPointRef: String = "__main__",
+    private val targetManufacturing: ProductMatcher = target
+        .addLabel("phase", "embodied")
+        .addArgument("lc_step", "manufacturing"),
+    private val targetTransport: ProductMatcher = target
+        .addLabel("phase", "embodied")
+        .addArgument("lc_step", "transport"),
+    private val targetUse: ProductMatcher = target
+        .addLabel("phase", "use"),
+    private val targetEndOfLife: ProductMatcher = target
+        .addLabel("phase", "embodied")
+        .addArgument("lc_step", "end-of-life"),
 ) {
-    private val main = rawAnalysis.getObservablePorts().getElements()
+    private val mainPort = rawAnalysis.getObservablePorts().getElements()
         .filterIsInstance<ProductValue<BasicNumber>>()
-        .firstOrNull { it.name == entryPointRef }
-        ?: throw IllegalStateException("no impacts found for id=$id")
+        .firstOrNull { target.matches(it) }
+        ?: throw IllegalStateException("no impacts found for '$target'")
+    private val manufacturingPort = rawAnalysis.getObservablePorts().getElements()
+        .filterIsInstance<ProductValue<BasicNumber>>()
+        .firstOrNull { targetManufacturing.matches(it) }
+        ?: throw IllegalStateException("no impacts found for '$targetManufacturing'")
+    private val transportPort = rawAnalysis.getObservablePorts().getElements()
+        .filterIsInstance<ProductValue<BasicNumber>>()
+        .firstOrNull { targetTransport.matches(it) }
+        ?: throw IllegalStateException("no impacts found for '$targetTransport'")
+    private val usePort = rawAnalysis.getObservablePorts().getElements()
+        .filterIsInstance<ProductValue<BasicNumber>>()
+        .firstOrNull { targetUse.matches(it) }
+        ?: throw IllegalStateException("no impacts found for '$targetUse'")
+    private val endOfLifePort = rawAnalysis.getObservablePorts().getElements()
+        .filterIsInstance<ProductValue<BasicNumber>>()
+        .firstOrNull { targetEndOfLife.matches(it) }
+        ?: throw IllegalStateException("no impacts found for '$targetEndOfLife'")
 
-    fun contribution(target: Indicator): QuantityValue<BasicNumber> {
-        return rawAnalysis.getPortContribution(main, indicator(target))
+    fun total(target: Indicator): QuantityValue<BasicNumber> {
+        return rawAnalysis.getPortContribution(mainPort, indicator(target))
+    }
+
+    fun manufacturing(target: Indicator): QuantityValue<BasicNumber> {
+        return rawAnalysis.getPortContribution(manufacturingPort, indicator(target))
+    }
+
+    fun transport(target: Indicator): QuantityValue<BasicNumber> {
+        return rawAnalysis.getPortContribution(transportPort, indicator(target))
+    }
+
+    fun use(target: Indicator): QuantityValue<BasicNumber> {
+        return rawAnalysis.getPortContribution(usePort, indicator(target))
+    }
+
+    fun endOfLife(target: Indicator): QuantityValue<BasicNumber> {
+        return rawAnalysis.getPortContribution(endOfLifePort, indicator(target))
     }
 
     private fun indicator(indicator: Indicator): IndicatorValue<BasicNumber> {

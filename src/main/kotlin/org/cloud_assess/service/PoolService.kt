@@ -7,9 +7,9 @@ import ch.kleis.lcaac.core.lang.evaluator.Evaluator
 import ch.kleis.lcaac.core.lang.expression.EProcessTemplateApplication
 import ch.kleis.lcaac.core.math.basic.BasicNumber
 import ch.kleis.lcaac.core.math.basic.BasicOperations
-import org.cloud_assess.dto.DimensionlessUnitsDto
 import org.cloud_assess.dto.PoolListDto
 import org.cloud_assess.dto.TimeUnitsDto
+import org.cloud_assess.model.ProductMatcher
 import org.cloud_assess.model.ResourceAnalysis
 import org.springframework.stereotype.Service
 
@@ -33,7 +33,15 @@ class PoolService(
                 val entryPoint = trace.getEntryPoint()
                 val program = ContributionAnalysisProgram(systemValue, entryPoint)
                 val rawAnalysis = program.run()
-                mapOf(it.key to ResourceAnalysis(it.key, period, rawAnalysis))
+                mapOf(
+                    it.key to ResourceAnalysis(
+                        ProductMatcher(
+                            name = "service",
+                            process = "service_fn",
+                            arguments = mapOf("id" to it.key)
+                        ), period, rawAnalysis
+                    )
+                )
             }.reduce { acc, element -> acc.plus(element) }
             .orElse(emptyMap())
         return analysis
@@ -46,14 +54,13 @@ class PoolService(
             TimeUnitsDto.hour -> "${pools.period.amount} hour"
         }
         val cases = pools.pools.associate {
-            // TODO: swagger: remove service level
             val content = """
                 process __main__ {
                     products {
                         1 u __main__
                     }
                     inputs {
-                        $period service from service(id = "${it.id}")
+                        $period service from service_fn(id = "${it.id}")
                     }
                 }
             """.trimIndent()

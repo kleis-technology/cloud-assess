@@ -13,13 +13,11 @@ import ch.kleis.lcaac.core.lang.expression.*
 import ch.kleis.lcaac.core.lang.register.DataKey
 import ch.kleis.lcaac.core.lang.register.DataSourceRegister
 import ch.kleis.lcaac.core.lang.value.DataValue
-import ch.kleis.lcaac.core.lang.value.QuantityValue
 import ch.kleis.lcaac.core.lang.value.RecordValue
-import ch.kleis.lcaac.core.lang.value.UnitValue
 import ch.kleis.lcaac.core.math.basic.BasicNumber
 import ch.kleis.lcaac.core.math.basic.BasicOperations
-import ch.kleis.lcaac.core.prelude.Prelude
 import org.cloud_assess.dto.*
+import org.cloud_assess.model.ProductMatcher
 import org.cloud_assess.model.ResourceAnalysis
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
@@ -74,7 +72,15 @@ class VirtualMachineService(
                     val entryPoint = trace.getEntryPoint()
                     val program = ContributionAnalysisProgram(systemValue, entryPoint)
                     val rawAnalysis = program.run()
-                    mapOf(it.key to ResourceAnalysis(it.key, period, rawAnalysis))
+                    mapOf(
+                        it.key to ResourceAnalysis(
+                            ProductMatcher(
+                                name = "vm",
+                                process = "vm_fn",
+                                arguments = mapOf("id" to it.key)
+                            ), period, rawAnalysis
+                        )
+                    )
                 }.fold(emptyMap<String, ResourceAnalysis>()) { acc, element -> acc.plus(element) }
             }.reduce { acc, element -> acc.plus(element) }
             .orElse(emptyMap())
@@ -94,7 +100,7 @@ class VirtualMachineService(
                         1 u __main__
                     }
                     inputs {
-                        $period vm from vm(id = "${it.id}")
+                        $period vm from vm_fn(id = "${it.id}")
                     }
                 }
             """.trimIndent()
@@ -150,7 +156,7 @@ class VirtualMachineService(
     }
 
     private fun QuantityDimensionlessDto.toDataExpression(): DataExpression<BasicNumber> {
-        return when(this.unit) {
+        return when (this.unit) {
             DimensionlessUnitsDto.u -> EQuantityScale(BasicNumber(this.amount), EDataRef("u"))
         }
     }
