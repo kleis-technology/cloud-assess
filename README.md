@@ -55,10 +55,7 @@ Visit this [page](http://localhost) to explore the endpoints, DTOs and run examp
 To build the server, you will need
 
 * Java 17 (temurin) environment
-*
-
-A [GitHub personal access token (classic)](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic)
-with the permission `read:packages` to download packages from GitHub Package Registry.
+* A [GitHub personal access token (classic)](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic) with the permission `read:packages` to download packages from GitHub Package Registry.
 
 Then, set up the following environment variables.
 
@@ -93,32 +90,36 @@ The request takes the following form:
 
 ```json
 {
-  "period": {
-    "amount": 1.0,
-    "unit": "hour"
-  },
-  "virtual_machines": [
-    {
-      "id": "c1",
-      "pool_id": "client_vm",
-      "vcpu": {
-        "amount": 1.0,
-        "unit": "vCPU"
-      },
-      "ram": {
-        "amount": 32.0,
-        "unit": "GB"
-      },
-      "storage": {
-        "amount": 1024.0,
-        "unit": "GB"
-      },
-      "meta": {
-        "region": "sofia",
-        "env": "production"
+   "period": {
+      "amount": 1.0,
+      "unit": "hour"
+   },
+   "virtual_machines": [
+      {
+         "id": "vm-01",
+         "pool_id": "client_vm",
+         "quantity": {
+            "amount": 1.0,
+            "unit": "u"
+         },
+         "ram": {
+            "amount": 4.0,
+            "unit": "GB"
+         },
+         "storage": {
+            "amount": 20.0,
+            "unit": "GB"
+         },
+         "vcpu": {
+            "amount": 1.0,
+            "unit": "vCPU"
+         },
+         "meta": {
+            "region": "sofia",
+            "env": "production"
+         }
       }
-    }
-  ]
+   ]
 }
 ```
 
@@ -135,119 +136,424 @@ but nothing stops you from assessing as many virtual machines as you want.
 
 ```json
 {
-  "virtual_machines": [
-    {
-      "request": {
-        "id": "c1",
-        "quantity": {
-          "amount": 1.0,
-          "unit": "hour"
-        },
-        "meta": {
-          "region": "sofia",
-          "env": "production"
-        }
-      },
-      "impacts": {
-        "ADPe": {
-          "total": {
-            "amount": 1.2442674861138006E-7,
-            "unit": "kg Sb-Eq"
-          }
-        },
-        "ADPf": {
-          "total": {
-            "amount": 0.5856626163896165,
-            "unit": "MJ, net calorific value"
-          }
-        },
-        "AP": {
-          "total": {
-            "amount": 2.4412031648686188E-4,
-            "unit": "mol H+-Eq"
-          }
-        },
-        "GWP": {
-          "total": {
-            "amount": 0.04522166507916957,
-            "unit": "kg CO2-Eq"
-          }
-        },
-        "LU": {
-          "total": {
-            "amount": 0.004520589981659305,
-            "unit": "u"
-          }
-        },
-        "ODP": {
-          "total": {
-            "amount": 0.06362503350653016,
-            "unit": "kg CFC-11-Eq"
-          }
-        },
-        "PM": {
-          "total": {
-            "amount": 6.97494882258087E-9,
-            "unit": "disease incidence"
-          }
-        },
-        "POCP": {
-          "total": {
-            "amount": 1.6048978567682187E-9,
-            "unit": "kg NMVOC-Eq"
-          }
-        },
-        "WU": {
-          "total": {
-            "amount": 1.1112742040640779E-4,
-            "unit": "m3 world eq. deprived"
-          }
-        },
-        "CTUe": {
-          "total": {
-            "amount": 0.789792211082212,
-            "unit": "CTUe"
-          }
-        },
-        "CTUh_c": {
-          "total": {
-            "amount": 9.6110170405875E-12,
-            "unit": "CTUh"
-          }
-        },
-        "CTUh_nc": {
-          "total": {
-            "amount": 3.969223225207655E-10,
-            "unit": "CTUh"
-          }
-        },
-        "Epf": {
-          "total": {
-            "amount": 1.497996507152073E-5,
-            "unit": "kg P-Eq"
-          }
-        },
-        "Epm": {
-          "total": {
-            "amount": 3.918786733484802E-5,
-            "unit": "kg N-Eq"
-          }
-        },
-        "Ept": {
-          "total": {
-            "amount": 3.99503638233262E-4,
-            "unit": "mol N-Eq"
-          }
-        },
-        "IR": {
-          "total": {
-            "amount": 6.123032983267816E-5,
-            "unit": "kBq U235-Eq"
-          }
-        }
+   "virtual_machines": [
+      {
+         "period": {
+            "amount": 1.0,
+            "unit": "hour"
+         },
+         "request": {
+            "id": "vm-01",
+            "pool_id": "client_vm",
+            "quantity": {
+               "amount": 1.0,
+               "unit": "u"
+            },
+            "ram": {
+               "amount": 4.0,
+               "unit": "GB"
+            },
+            "storage": {
+               "amount": 20.0,
+               "unit": "GB"
+            },
+            "vcpu": {
+               "amount": 1.0,
+               "unit": "vCPU"
+            },
+            "meta": {
+               "region": "sofia",
+               "env": "production"
+            }
+         },
+         "impacts": {
+            "ADPe": {
+               "total": {
+                  "amount": 1.1854678736318172E-5,
+                  "unit": "kg Sb-Eq"
+               },
+               "per_lc_step": {
+                  "manufacturing": {
+                     "amount": 2.225849560067201E-6,
+                     "unit": "kg Sb-Eq"
+                  },
+                  "transport": {
+                     "amount": 1.526861504175665E-6,
+                     "unit": "kg Sb-Eq"
+                  },
+                  "use": {
+                     "amount": 6.570462152963352E-6,
+                     "unit": "kg Sb-Eq"
+                  },
+                  "end_of_life": {
+                     "amount": 1.5315055191119535E-6,
+                     "unit": "kg Sb-Eq"
+                  }
+               }
+            },
+            "ADPf": {
+               "total": {
+                  "amount": 62.33162368565782,
+                  "unit": "MJ, net calorific value"
+               },
+               "per_lc_step": {
+                  "manufacturing": {
+                     "amount": 16.68493611195954,
+                     "unit": "MJ, net calorific value"
+                  },
+                  "transport": {
+                     "amount": 16.575951835849164,
+                     "unit": "MJ, net calorific value"
+                  },
+                  "use": {
+                     "amount": 12.48864307614414,
+                     "unit": "MJ, net calorific value"
+                  },
+                  "end_of_life": {
+                     "amount": 16.582092661704973,
+                     "unit": "MJ, net calorific value"
+                  }
+               }
+            },
+            "AP": {
+               "total": {
+                  "amount": 0.027696043162935963,
+                  "unit": "mol H+-Eq"
+               },
+               "per_lc_step": {
+                  "manufacturing": {
+                     "amount": 0.007594263925867406,
+                     "unit": "mol H+-Eq"
+                  },
+                  "transport": {
+                     "amount": 0.007499887185410032,
+                     "unit": "mol H+-Eq"
+                  },
+                  "use": {
+                     "amount": 0.005096811622739166,
+                     "unit": "mol H+-Eq"
+                  },
+                  "end_of_life": {
+                     "amount": 0.007505080428919357,
+                     "unit": "mol H+-Eq"
+                  }
+               }
+            },
+            "GWP": {
+               "total": {
+                  "amount": 4.917652556684529,
+                  "unit": "kg CO2-Eq"
+               },
+               "per_lc_step": {
+                  "manufacturing": {
+                     "amount": 1.2685097680580173,
+                     "unit": "kg CO2-Eq"
+                  },
+                  "transport": {
+                     "amount": 1.2582340374175287,
+                     "unit": "kg CO2-Eq"
+                  },
+                  "use": {
+                     "amount": 1.1324125903631403,
+                     "unit": "kg CO2-Eq"
+                  },
+                  "end_of_life": {
+                     "amount": 1.2584961608458427,
+                     "unit": "kg CO2-Eq"
+                  }
+               }
+            },
+            "LU": {
+               "total": {
+                  "amount": 2.624571812069938,
+                  "unit": "u"
+               },
+               "per_lc_step": {
+                  "manufacturing": {
+                     "amount": 0.04726920471902647,
+                     "unit": "u"
+                  },
+                  "transport": {
+                     "amount": 0.021918300384408593,
+                     "unit": "u"
+                  },
+                  "use": {
+                     "amount": 2.5317431295884796,
+                     "unit": "u"
+                  },
+                  "end_of_life": {
+                     "amount": 0.02364117737802341,
+                     "unit": "u"
+                  }
+               }
+            },
+            "ODP": {
+               "total": {
+                  "amount": 0.013312891435337558,
+                  "unit": "kg CFC-11-Eq"
+               },
+               "per_lc_step": {
+                  "manufacturing": {
+                     "amount": 0.0044376267209147125,
+                     "unit": "kg CFC-11-Eq"
+                  },
+                  "transport": {
+                     "amount": 0.0044376261366686634,
+                     "unit": "kg CFC-11-Eq"
+                  },
+                  "use": {
+                     "amount": 1.2410867486489788E-8,
+                     "unit": "kg CFC-11-Eq"
+                  },
+                  "end_of_life": {
+                     "amount": 0.004437626166886695,
+                     "unit": "kg CFC-11-Eq"
+                  }
+               }
+            },
+            "PM": {
+               "total": {
+                  "amount": 1.443563140628956E-6,
+                  "unit": "disease incidence"
+               },
+               "per_lc_step": {
+                  "manufacturing": {
+                     "amount": 4.659322817923548E-7,
+                     "unit": "disease incidence"
+                  },
+                  "transport": {
+                     "amount": 4.6532709663581914E-7,
+                     "unit": "disease incidence"
+                  },
+                  "use": {
+                     "amount": 4.6936584062332816E-8,
+                     "unit": "disease incidence"
+                  },
+                  "end_of_life": {
+                     "amount": 4.653671781384491E-7,
+                     "unit": "disease incidence"
+                  }
+               }
+            },
+            "POCP": {
+               "total": {
+                  "amount": 0.002505739886538823,
+                  "unit": "kg NMVOC-Eq"
+               },
+               "per_lc_step": {
+                  "manufacturing": {
+                     "amount": 4.015940673344095E-5,
+                     "unit": "kg NMVOC-Eq"
+                  },
+                  "transport": {
+                     "amount": 1.6654121903901202E-6,
+                     "unit": "kg NMVOC-Eq"
+                  },
+                  "use": {
+                     "amount": 0.0024609082726224306,
+                     "unit": "kg NMVOC-Eq"
+                  },
+                  "end_of_life": {
+                     "amount": 3.0067949925616415E-6,
+                     "unit": "kg NMVOC-Eq"
+                  }
+               }
+            },
+            "WU": {
+               "total": {
+                  "amount": 0.2503283010915833,
+                  "unit": "m3 world eq. deprived"
+               },
+               "per_lc_step": {
+                  "manufacturing": {
+                     "amount": 0.012371380794322486,
+                     "unit": "m3 world eq. deprived"
+                  },
+                  "transport": {
+                     "amount": 0.0028470792627199957,
+                     "unit": "m3 world eq. deprived"
+                  },
+                  "use": {
+                     "amount": 0.23226350876206023,
+                     "unit": "m3 world eq. deprived"
+                  },
+                  "end_of_life": {
+                     "amount": 0.002846332272480629,
+                     "unit": "m3 world eq. deprived"
+                  }
+               }
+            },
+            "CTUe": {
+               "total": {
+                  "amount": 58.90191574298565,
+                  "unit": "CTUe"
+               },
+               "per_lc_step": {
+                  "manufacturing": {
+                     "amount": 18.73533240114092,
+                     "unit": "CTUe"
+                  },
+                  "transport": {
+                     "amount": 18.51641380532083,
+                     "unit": "CTUe"
+                  },
+                  "use": {
+                     "amount": 3.064604371185056,
+                     "unit": "CTUe"
+                  },
+                  "end_of_life": {
+                     "amount": 18.58556516533884,
+                     "unit": "CTUe"
+                  }
+               }
+            },
+            "CTUh_c": {
+               "total": {
+                  "amount": 1.9213914310898006E-9,
+                  "unit": "CTUh"
+               },
+               "per_lc_step": {
+                  "manufacturing": {
+                     "amount": 1.8094839178619905E-10,
+                     "unit": "CTUh"
+                  },
+                  "transport": {
+                     "amount": 1.3431110837644963E-10,
+                     "unit": "CTUh"
+                  },
+                  "use": {
+                     "amount": 1.4671232876712334E-9,
+                     "unit": "CTUh"
+                  },
+                  "end_of_life": {
+                     "amount": 1.3900864325591864E-10,
+                     "unit": "CTUh"
+                  }
+               }
+            },
+            "CTUh_nc": {
+               "total": {
+                  "amount": 3.503286449092768E-8,
+                  "unit": "CTUh"
+               },
+               "per_lc_step": {
+                  "manufacturing": {
+                     "amount": 8.23316171853553E-9,
+                     "unit": "CTUh"
+                  },
+                  "transport": {
+                     "amount": 7.746208995686664E-9,
+                     "unit": "CTUh"
+                  },
+                  "use": {
+                     "amount": 1.1281201653961916E-8,
+                     "unit": "CTUh"
+                  },
+                  "end_of_life": {
+                     "amount": 7.772292122743571E-9,
+                     "unit": "CTUh"
+                  }
+               }
+            },
+            "Epf": {
+               "total": {
+                  "amount": 3.763748948066863E-4,
+                  "unit": "kg P-Eq"
+               },
+               "per_lc_step": {
+                  "manufacturing": {
+                     "amount": 6.67944179626921E-6,
+                     "unit": "kg P-Eq"
+                  },
+                  "transport": {
+                     "amount": 3.4798870544897944E-6,
+                     "unit": "kg P-Eq"
+                  },
+                  "use": {
+                     "amount": 3.624785519394673E-4,
+                     "unit": "kg P-Eq"
+                  },
+                  "end_of_life": {
+                     "amount": 3.737014016459945E-6,
+                     "unit": "kg P-Eq"
+                  }
+               }
+            },
+            "Epm": {
+               "total": {
+                  "amount": 0.004107094825533502,
+                  "unit": "kg N-Eq"
+               },
+               "per_lc_step": {
+                  "manufacturing": {
+                     "amount": 9.038519487735136E-4,
+                     "unit": "kg N-Eq"
+                  },
+                  "transport": {
+                     "amount": 8.924280436794234E-4,
+                     "unit": "kg N-Eq"
+                  },
+                  "use": {
+                     "amount": 0.0014164017889792132,
+                     "unit": "kg N-Eq"
+                  },
+                  "end_of_life": {
+                     "amount": 8.944130441013518E-4,
+                     "unit": "kg N-Eq"
+                  }
+               }
+            },
+            "Ept": {
+               "total": {
+                  "amount": 0.04057960045019888,
+                  "unit": "mol N-Eq"
+               },
+               "per_lc_step": {
+                  "manufacturing": {
+                     "amount": 0.00950936272870918,
+                     "unit": "mol N-Eq"
+                  },
+                  "transport": {
+                     "amount": 0.009385327891433154,
+                     "unit": "mol N-Eq"
+                  },
+                  "use": {
+                     "amount": 0.01229587775308712,
+                     "unit": "mol N-Eq"
+                  },
+                  "end_of_life": {
+                     "amount": 0.009389032076969424,
+                     "unit": "mol N-Eq"
+                  }
+               }
+            },
+            "IR": {
+               "total": {
+                  "amount": 0.19346701518814927,
+                  "unit": "kBq U235-Eq"
+               },
+               "per_lc_step": {
+                  "manufacturing": {
+                     "amount": 0.018582459009159547,
+                     "unit": "kBq U235-Eq"
+                  },
+                  "transport": {
+                     "amount": 4.811815316290109E-7,
+                     "unit": "kBq U235-Eq"
+                  },
+                  "use": {
+                     "amount": 0.17482771230063854,
+                     "unit": "kBq U235-Eq"
+                  },
+                  "end_of_life": {
+                     "amount": 5.6362696819523E-5,
+                     "unit": "kBq U235-Eq"
+                  }
+               }
+            }
+         }
       }
-    }
-  ]
+   ]
 }
 ```
 
@@ -277,16 +583,6 @@ Cloud Assess aims at covering all functional units, but also FU that are not exp
 
 These models are specified under the folder `trusted_library`.
 
-The library also contains intermediate/generic models, e.g.,
-
-| Functional unit            | Model |
-|----------------------------|-------|
-| Pool of servers            | ✅     |
-| Pool of storage equipments | ✅     |
-| Pool of network equipments | ✅     |
-
-which can be used for specific purposes, e.g., a mail service running on a dedicated infrastructure.
-
 ### Adapt the models to your taste
 
 #### Structure
@@ -302,8 +598,8 @@ The source repository is available [here](https://github.com/kleis-technology/lc
 The folder `trusted_library` is organized as follows.
 
 * `01-hardware` : this folder contains the PCR models for the functional units 1 to 4.
-* `02-pooling` : this folder contains the PCR models for the functional units 5 to 8.
-* `03-services` : this folder contains the PCR models for functional units 9 and 10.
+* `02-pooling` : this folder contains the PCR models for the functional units 5 to 7.
+* `03-services` : this folder contains higher functional units.
 
 Here is an illustration of this layering structure.
 
@@ -319,12 +615,16 @@ and associated emission factors. To adapt Cloud Assess you must fill in, at leas
 the following inventories
 
 * `data/01-hardware/dc_inventory.csv` : this file lists the available datacenters.
-* `data/01-hardware/hw_inventory.csv` : this file lists the available hardware equipments.
+* `data/01-hardware/server_inventory.csv` : this file lists the available servers.
+* `data/01-hardware/network_inventory.csv` : this file lists the available network equipments.
+* `data/01-hardware/storage_inventory.csv` : this file lists the available storage equipments.
 
 The following files should be filled with the relevant emission factors:
 
 * `data/01-hardware/dc_impacts.csv`
-* `data/01-hardware/hw_impacts.csv`
+* `data/01-hardware/server_impacts.csv`
+* `data/01-hardware/network_impacts.csv`
+* `data/01-hardware/storage_impacts.csv`
 * `data/01-hardware/electricity_mix.csv`
 
 Note that the emission factors presented in this repository are mock values.
