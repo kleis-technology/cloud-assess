@@ -1,7 +1,7 @@
 version: "3"
 services:
   app:
-    image: "ghcr.io/kleis-technology/cloud-assess/cloud-assess-app:1.7.3"
+    image: "ghcr.io/kleis-technology/cloud-assess/cloud-assess-app:1.7.4"
     container_name: cloud-assess-app
     ports:
     - "8080:8080"
