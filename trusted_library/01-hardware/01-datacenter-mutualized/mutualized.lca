@@ -1,0 +1,54 @@
+process mutualized_pool_fn {
+    labels {
+        phase = "embodied"
+    }
+    params {
+        dc_id = "dc-01"
+        lc_step = "manufacturing"
+    }
+
+    variables {
+        dt = 1 hour
+        mutualized_pool_id = "mutualized"
+        dc = lookup dc_inventory match ( id = dc_id )
+        internal_power = sum( server_inventory match ( pool_id = mutualized_pool_id, dc_id = dc_id ), quantity * power )
+                         + sum( network_inventory match ( pool_id = mutualized_pool_id, dc_id = dc_id ), quantity * power )
+                         + sum( storage_inventory match ( pool_id = mutualized_pool_id, dc_id = dc_id ), quantity * power )
+        available_power = ( dc.reserved_power / dc.power_usage_effectiveness ) - internal_power
+    }
+    products {
+        available_power * dt mutualized_pool
+    }
+    inputs {
+        dt mutualized_server_pool from mutualized_server_pool( dc_id = dc_id, lc_step = lc_step ) match ( phase = "embodied" )
+        dt mutualized_network_pool from mutualized_network_pool( dc_id = dc_id, lc_step = lc_step ) match ( phase = "embodied" )
+        dt mutualized_storage_pool from mutualized_storage_pool( dc_id = dc_id, lc_step = lc_step ) match ( phase = "embodied" )
+    }
+}
+
+process mutualized_pool_fn {
+    labels {
+        phase = "use"
+    }
+    params {
+        dc_id = "dc-01"
+    }
+
+    variables {
+        dt = 1 hour
+        internal_pool_id = "mutualized"
+        dc = lookup dc_inventory match ( id = dc_id )
+        internal_power = sum( server_inventory match ( pool_id = internal_pool_id, dc_id = dc_id ), quantity * power )
+                         + sum( network_inventory match ( pool_id = internal_pool_id, dc_id = dc_id ), quantity * power )
+                         + sum( storage_inventory match ( pool_id = internal_pool_id, dc_id = dc_id ), quantity * power )
+        available_power = ( dc.reserved_power / dc.power_usage_effectiveness ) - internal_power
+    }
+    products {
+        available_power * dt mutualized_pool
+    }
+    inputs {
+        dt mutualized_server_pool from mutualized_server_pool( dc_id = dc_id ) match ( phase = "use" )
+        dt mutualized_network_pool from mutualized_network_pool( dc_id = dc_id ) match ( phase = "use" )
+        dt mutualized_storage_pool from mutualized_storage_pool( dc_id = dc_id ) match ( phase = "use" )
+    }
+}

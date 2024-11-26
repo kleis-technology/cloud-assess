@@ -260,35 +260,30 @@ but nothing stops you from assessing as many virtual machines as you want.
 The ambition of Cloud Assess is to offer a library of *transparent*,
 *PCR-compliant* and *executable* LCA models in the sector of digital services.
 More precisely, this work builds on the
-existing [PCR](https://codde.fr/wp-content/uploads/2023/01/referentiel_rcp_datacenter_services_cloud.pdf)
-for data center and cloud services.
-The PCR defines 11 functional units, covering the hosting infrastructure (physical datacenter) up to
-more abstract FUs, e.g., Software Services.
-Cloud Assess aims at covering all functional units, but also FU that are not explicitly
-covered by the PCR
+new PCR (to be published soon) for data center and cloud services.
+The PCR defines 7 functional units, covering the hosting infrastructure (physical datacenter) up to
+more abstract ones, e.g., virtual machines. 
+Cloud Assess aims at covering all functional units, but also FU that are not explicitly covered by the PCR
 
-| PCR No. | Functional Unit       | Status      |
-|---------|-----------------------|-------------|
-| 1       | Datacenter            | in progress |
-| 2       | Physical server       | in progress |
-| 3       | Storage               | in progress |
-| 4       | Network equipment     | in progress |
-| 5       | Computing resource    | in progress |
-| 6       | Virtual machine       | ✅           |
-| 7       | Database              | in progress |
-| 8       | Block storage         | in progress |
-| 9       | Platform as a Service | planned     |
-| 10      | Function as a Service | planned     |
-| 11      | Software as a Service | planned     |
+| PCR No. | Functional Unit    | Model | API endpoint |
+|---------|--------------------|-------|--------------|
+| 1       | Datacenter         | n/a   | n/a          |
+| 2       | Physical server    | ✅     | planned      |
+| 3       | Storage            | ✅     | planned      |
+| 4       | Network equipment  | ✅     | planned      |
+| 5       | Computing resource | ✅     | planned      |
+| 6       | Virtual machine    | ✅     | ✅            |
+| 7       | Block storage      | ✅     | planned      |
 
 These models are specified under the folder `trusted_library`.
 
 The library also contains intermediate/generic models, e.g.,
 
-| Functional unit            | Status |
-|----------------------------|--------|
-| Pool of servers            | ✅      |
-| Pool of network equipments | ✅      |
+| Functional unit            | Model |
+|----------------------------|-------|
+| Pool of servers            | ✅     |
+| Pool of storage equipments | ✅     |
+| Pool of network equipments | ✅     |
 
 which can be used for specific purposes, e.g., a mail service running on a dedicated infrastructure.
 

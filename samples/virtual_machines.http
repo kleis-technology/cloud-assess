@@ -10,6 +10,10 @@ Content-Type: application/json
     {
       "id": "vm-01",
       "pool_id": "client_vm",
+      "quantity": {
+        "amount": 1.0,
+        "unit": "u"
+      },
       "ram": {
         "amount": 4.0,
         "unit": "GB"
@@ -30,6 +34,10 @@ Content-Type: application/json
     {
       "id": "vm-02",
       "pool_id": "client_vm",
+      "quantity": {
+        "amount": 1.0,
+        "unit": "u"
+      },
       "ram": {
         "amount": 16.0,
         "unit": "GB"
@@ -50,6 +58,10 @@ Content-Type: application/json
     {
       "id": "vm-03",
       "pool_id": "client_vm",
+      "quantity": {
+        "amount": 1.0,
+        "unit": "u"
+      },
       "ram": {
         "amount": 8.0,
         "unit": "GB"

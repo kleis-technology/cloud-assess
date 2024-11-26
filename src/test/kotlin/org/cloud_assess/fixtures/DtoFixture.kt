@@ -93,21 +93,16 @@ class DtoFixture {
             return PoolListDto(
                 period = quantityHour(1.0),
                 pools = listOf(
-                    poolDto("client_vm", 1.0),
+                    poolDto("client_vm"),
                 )
             )
         }
 
         fun poolDto(
             id: String = "client_vm",
-            serviceLevel: Double = 1.0,
         ): PoolDto {
             return PoolDto(
                 id = id,
-                serviceLevel = QuantityDimensionlessDto(
-                    amount = serviceLevel,
-                    unit = DimensionlessUnitsDto.u,
-                ),
                 meta = mapOf(
                     "region" to "FR",
                 ),
@@ -133,6 +128,7 @@ class DtoFixture {
             return VirtualMachineDto(
                 id = id,
                 poolId = poolId,
+                quantity = quantityDimensionless(1.0),
                 ram = quantityMemory(ram),
                 storage = quantityMemory(storage),
                 vcpu = quantityVCPU(vcpu),
@@ -144,6 +140,13 @@ class DtoFixture {
 
         private fun quantityVCPU(amount: Double = 1.0): QuantityVCPUDto {
             return QuantityVCPUDto(amount, VCPUUnitsDto.vCPU)
+        }
+
+        private fun quantityDimensionless(amount: Double = 1.0): QuantityDimensionlessDto {
+            return QuantityDimensionlessDto(
+                amount,
+                DimensionlessUnitsDto.u,
+            )
         }
 
         private fun quantityMemory(amount: Double = 10.0): QuantityMemoryDto {

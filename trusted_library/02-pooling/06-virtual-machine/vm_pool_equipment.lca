@@ -1,0 +1,112 @@
+process vm_pool_equipment {
+    labels {
+        lc_step = "manufacturing"
+    }
+    variables {
+        ratio_ram = 85 percent
+        ratio_cpu = 2 percent
+        ratio_storage = 13 percent
+    }
+    params {
+        id = "client_vm"
+    }
+    variables {
+        reserved_vcpu = sum( vm_inventory match pool_id = id, quantity * vcpu_size )
+        reserved_ram = sum( vm_inventory match pool_id = id, quantity * ram_size )
+        reserved_storage = sum( vm_inventory match pool_id = id, quantity * storage_size )
+    }
+    products {
+        reserved_ram ram allocate ratio_ram
+        reserved_vcpu vcpu allocate ratio_cpu
+        reserved_storage storage allocate ratio_storage
+    }
+    inputs {
+        timewindow pool_server from pool_server_fn( id = id, lc_step = lc_step ) match ( phase = "embodied" )
+        timewindow pool_network from pool_network_fn( id = id, lc_step = lc_step ) match ( phase = "embodied" )
+    }
+}
+
+process vm_pool_equipment {
+    labels {
+        lc_step = "transport"
+    }
+    variables {
+        ratio_ram = 33 percent
+        ratio_cpu = 34 percent
+        ratio_storage = 33 percent
+    }
+    params {
+        id = "client_vm"
+    }
+    variables {
+        reserved_vcpu = sum( vm_inventory match pool_id = id, quantity * vcpu_size )
+        reserved_ram = sum( vm_inventory match pool_id = id, quantity * ram_size )
+        reserved_storage = sum( vm_inventory match pool_id = id, quantity * storage_size )
+    }
+    products {
+        reserved_ram ram allocate ratio_ram
+        reserved_vcpu vcpu allocate ratio_cpu
+        reserved_storage storage allocate ratio_storage
+    }
+    inputs {
+        timewindow pool_server from pool_server_fn( id = id, lc_step = lc_step ) match ( phase = "embodied" )
+        timewindow pool_network from pool_network_fn( id = id, lc_step = lc_step ) match ( phase = "embodied" )
+    }
+}
+
+process vm_pool_equipment {
+    labels {
+        lc_step = "use"
+    }
+    variables {
+        ratio_ram = 30 percent
+        ratio_cpu = 60 percent
+        ratio_storage = 10 percent
+    }
+    params {
+        id = "client_vm"
+    }
+    variables {
+        reserved_vcpu = sum( vm_inventory match pool_id = id, quantity * vcpu_size )
+        reserved_ram = sum( vm_inventory match pool_id = id, quantity * ram_size )
+        reserved_storage = sum( vm_inventory match pool_id = id, quantity * storage_size )
+    }
+    products {
+        reserved_ram ram allocate ratio_ram
+        reserved_vcpu vcpu allocate ratio_cpu
+        reserved_storage storage allocate ratio_storage
+    }
+    inputs {
+        timewindow pool_server from pool_server_fn( id = id ) match ( phase = "use" )
+        timewindow pool_network from pool_network_fn( id = id ) match ( phase = "use" )
+    }
+}
+
+process vm_pool_equipment {
+    labels {
+        lc_step = "end-of-life"
+    }
+    variables {
+        ratio_ram = 85 percent
+        ratio_cpu = 2 percent
+        ratio_storage = 13 percent
+    }
+    params {
+        id = "client_vm"
+    }
+    variables {
+        // According to PCR, allocation built with with respect to total "reserved" resources.
+        reserved_vcpu = sum( vm_inventory match pool_id = id, quantity * vcpu_size )
+        reserved_ram = sum( vm_inventory match pool_id = id, quantity * ram_size )
+        reserved_storage = sum( vm_inventory match pool_id = id, quantity * storage_size )
+    }
+    products {
+        reserved_ram ram allocate ratio_ram
+        reserved_vcpu vcpu allocate ratio_cpu
+        reserved_storage storage allocate ratio_storage
+    }
+    inputs {
+        timewindow pool_server from pool_server_fn( id = id, lc_step = lc_step ) match ( phase = "embodied" )
+        timewindow pool_network from pool_network_fn( id = id, lc_step = lc_step ) match ( phase = "embodied" )
+    }
+}

@@ -1,4 +1,4 @@
-id,pool_id,vcpu_size,volume,duration
-sto-sp-01,client_storage_space,4,1024,4
-sto-sp-02,client_storage_space,8,2048,8
-sto-sp-03,client_storage_space,2,512,2
+id,pool_id,vcpu_size,volume,quantity
+sto-sp-01,client_storage_space,4,1024,1
+sto-sp-02,client_storage_space,8,2048,1
+sto-sp-03,client_storage_space,2,512,1

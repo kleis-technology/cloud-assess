@@ -12,5 +12,9 @@ class QuantityFixture {
             BasicNumber(1.0),
             UnitValue(UnitSymbol.of("kg"), 1.0, Dimension.of("mass"))
         )
+        val oneUnit = QuantityValue(
+            BasicNumber(1.0),
+            UnitValue(UnitSymbol.of("u"), 1.0, Dimension.None)
+        )
     }
 }

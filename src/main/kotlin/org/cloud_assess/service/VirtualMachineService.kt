@@ -13,9 +13,12 @@ import ch.kleis.lcaac.core.lang.expression.*
 import ch.kleis.lcaac.core.lang.register.DataKey
 import ch.kleis.lcaac.core.lang.register.DataSourceRegister
 import ch.kleis.lcaac.core.lang.value.DataValue
+import ch.kleis.lcaac.core.lang.value.QuantityValue
 import ch.kleis.lcaac.core.lang.value.RecordValue
+import ch.kleis.lcaac.core.lang.value.UnitValue
 import ch.kleis.lcaac.core.math.basic.BasicNumber
 import ch.kleis.lcaac.core.math.basic.BasicOperations
+import ch.kleis.lcaac.core.prelude.Prelude
 import org.cloud_assess.dto.*
 import org.cloud_assess.model.ResourceAnalysis
 import org.springframework.beans.factory.annotation.Value
@@ -112,6 +115,7 @@ class VirtualMachineService(
                         "ram_size" to localEval(vm.ram.toDataExpression()),
                         "storage_size" to localEval(vm.storage.toDataExpression()),
                         "vcpu_size" to localEval(vm.vcpu.toDataExpression()),
+                        "quantity" to localEval(vm.quantity.toDataExpression()),
                     )
                 )
             }
@@ -142,6 +146,12 @@ class VirtualMachineService(
     private fun QuantityVCPUDto.toDataExpression(): DataExpression<BasicNumber> {
         return when (this.unit) {
             VCPUUnitsDto.vCPU -> EQuantityScale(BasicNumber(this.amount), EDataRef("vCPU"))
+        }
+    }
+
+    private fun QuantityDimensionlessDto.toDataExpression(): DataExpression<BasicNumber> {
+        return when(this.unit) {
+            DimensionlessUnitsDto.u -> EQuantityScale(BasicNumber(this.amount), EDataRef("u"))
         }
     }
 }

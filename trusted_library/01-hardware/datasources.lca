@@ -1,0 +1,167 @@
+datasource maintenance_impacts {
+    location = "01-hardware/maintenance_impacts.csv"
+    schema {
+        id = "maintenance"
+        lc_step = "use"
+        // Assumption: impacts for 1 man*working_day.
+        ADPe = 0 kg_Sb_Eq
+        ADPf = 0 MJ_net_calorific_value
+        AP = 0 mol_H_p_Eq
+        CTUe = 0 CTUe
+        CTUh_c = 0 CTUh
+        CTUh_nc = 0 CTUh
+        Epf = 0 kg_P_Eq
+        Epm = 0 kg_N_Eq
+        Ept = 0 mol_N_Eq
+        GWP = 0 kg_CO2_Eq
+        GWPb = 0 kg_CO2_Eq
+        GWPf = 0 kg_CO2_Eq
+        GWPlu = 0 kg_CO2_Eq
+        IR = 0 kBq_U235_Eq
+        LU = 0 u
+        ODP = 0 kg_CFC_11_Eq
+        PM = 0 disease_incidence
+        POCP = 0 kg_NMVOC_Eq
+        WU = 0 m3_world_eq_deprived
+        TPE = 0 MJ_net_calorific_value
+    }
+}
+
+datasource server_inventory {
+    location = "01-hardware/server_inventory.csv"
+    schema {
+        id = "srv-01"
+        dc_id = "dc-01"
+        pool_id = "client"
+        quantity = 1 p
+        power = 100 W
+        lifespan = 5 year
+    }
+}
+
+datasource server_impacts {
+    location = "01-hardware/server_impacts.csv"
+    schema {
+        hw_id = "srv-01"
+        lc_step = "manufacturing"
+        /*
+        Impacts for the whole equipment lifespan
+        TODO: what about lc_step = "use" ?
+        do not count electricity consumption (provided by datacenter)
+        could be maintenance impacts over the lifespan
+        */
+        ADPe = 0 kg_Sb_Eq
+        ADPf = 0 MJ_net_calorific_value
+        AP = 0 mol_H_p_Eq
+        CTUe = 0 CTUe
+        CTUh_c = 0 CTUh
+        CTUh_nc = 0 CTUh
+        Epf = 0 kg_P_Eq
+        Epm = 0 kg_N_Eq
+        Ept = 0 mol_N_Eq
+        GWP = 0 kg_CO2_Eq
+        GWPb = 0 kg_CO2_Eq
+        GWPf = 0 kg_CO2_Eq
+        GWPlu = 0 kg_CO2_Eq
+        IR = 0 kBq_U235_Eq
+        LU = 0 u
+        ODP = 0 kg_CFC_11_Eq
+        PM = 0 disease_incidence
+        POCP = 0 kg_NMVOC_Eq
+        WU = 0 m3_world_eq_deprived
+        TPE = 0 MJ_net_calorific_value
+    }
+}
+
+datasource storage_inventory {
+    location = "01-hardware/storage_inventory.csv"
+    schema {
+        id = "srv-01"
+        dc_id = "dc-01"
+        pool_id = "client"
+        quantity = 1 p
+        power = 100 W
+        lifespan = 5 year
+    }
+}
+
+datasource storage_impacts {
+    location = "01-hardware/storage_impacts.csv"
+    schema {
+        hw_id = "srv-01"
+        lc_step = "manufacturing"
+        /*
+        Impacts for the whole equipment lifespan
+        TODO: what about lc_step = "use" ?
+        do not count electricity consumption (provided by datacenter)
+        could be maintenance impacts over the lifespan
+        */
+        ADPe = 0 kg_Sb_Eq
+        ADPf = 0 MJ_net_calorific_value
+        AP = 0 mol_H_p_Eq
+        CTUe = 0 CTUe
+        CTUh_c = 0 CTUh
+        CTUh_nc = 0 CTUh
+        Epf = 0 kg_P_Eq
+        Epm = 0 kg_N_Eq
+        Ept = 0 mol_N_Eq
+        GWP = 0 kg_CO2_Eq
+        GWPb = 0 kg_CO2_Eq
+        GWPf = 0 kg_CO2_Eq
+        GWPlu = 0 kg_CO2_Eq
+        IR = 0 kBq_U235_Eq
+        LU = 0 u
+        ODP = 0 kg_CFC_11_Eq
+        PM = 0 disease_incidence
+        POCP = 0 kg_NMVOC_Eq
+        WU = 0 m3_world_eq_deprived
+        TPE = 0 MJ_net_calorific_value
+    }
+}
+
+datasource network_inventory {
+    location = "01-hardware/network_inventory.csv"
+    schema {
+        id = "srv-01"
+        dc_id = "dc-01"
+        pool_id = "client"
+        quantity = 1 p
+        power = 100 W
+        lifespan = 5 year
+    }
+}
+
+datasource network_impacts {
+    location = "01-hardware/network_impacts.csv"
+    schema {
+        hw_id = "srv-01"
+        lc_step = "manufacturing"
+        /*
+        Impacts for the whole equipment lifespan
+        TODO: what about lc_step = "use" ?
+        do not count electricity consumption (provided by datacenter)
+        could be maintenance impacts over the lifespan
+        */
+        ADPe = 0 kg_Sb_Eq
+        ADPf = 0 MJ_net_calorific_value
+        AP = 0 mol_H_p_Eq
+        CTUe = 0 CTUe
+        CTUh_c = 0 CTUh
+        CTUh_nc = 0 CTUh
+        Epf = 0 kg_P_Eq
+        Epm = 0 kg_N_Eq
+        Ept = 0 mol_N_Eq
+        GWP = 0 kg_CO2_Eq
+        GWPb = 0 kg_CO2_Eq
+        GWPf = 0 kg_CO2_Eq
+        GWPlu = 0 kg_CO2_Eq
+        IR = 0 kBq_U235_Eq
+        LU = 0 u
+        ODP = 0 kg_CFC_11_Eq
+        PM = 0 disease_incidence
+        POCP = 0 kg_NMVOC_Eq
+        WU = 0 m3_world_eq_deprived
+        TPE = 0 MJ_net_calorific_value
+    }
+}
+

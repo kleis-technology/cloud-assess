@@ -1,3 +1,23 @@
+unit week {
+    symbol = "week"
+    alias_for = 7 day
+}
+
+unit working_day {
+    symbol = "working_day"
+    alias_for = 7 hour
+}
+
+unit man {
+    symbol = "man"
+    dimension = "man"
+}
+
+unit month {
+    symbol = "month"
+    alias_for = 30 day
+}
+
 unit kW {
     symbol = "kW"
     alias_for = 1000 W
@@ -27,12 +47,8 @@ unit KB {
     alias_for = 1e-3 GB
 }
 
-unit core {
-    symbol = "core"
-    dimension = "core"
-}
-
 unit vCPU {
     symbol = "vCPU"
     dimension = "vCPU"
 }
+

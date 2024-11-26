@@ -1,23 +1,23 @@
 datasource dc_inventory {
-    location = "data/01-hardware/dc_inventory.csv"
+    location = "01-hardware/dc_inventory.csv"
     schema {
         id = "dc-01"
         geo = "GLO"
-        reserved_power = 100 kW
+        total_power = 5e3 kW // total power provided by the datacenter for all its customers
+        reserved_power = 100 kW // power reserved by the cloud provider under study
         lifespan = 25 year
+        power_usage_effectiveness = 1 u
     }
 }
 
 datasource dc_impacts {
-    location = "data/01-hardware/dc_impacts.csv"
+    location = "01-hardware/dc_impacts.csv"
     schema {
         dc_id = "dc-01"
-        scope = "architecture" // or "technical"
-        lc_step = "manufacturing" // or "transport"
+        lc_step = "manufacturing"
 
         /*
-        Impact for each lc step.
-        Always with respect to the datacenter over its entire lifespan, with the reserved_power.
+        Assumption: the impacts are reported per kW of total dc power
         */
         ADPe = 0 kg_Sb_Eq
         ADPf = 0 MJ_net_calorific_value
@@ -29,6 +29,7 @@ datasource dc_impacts {
         Epm = 0 kg_N_Eq
         Ept = 0 mol_N_Eq
         GWP = 0 kg_CO2_Eq
+        GWPb = 0 kg_CO2_Eq
         GWPf = 0 kg_CO2_Eq
         GWPlu = 0 kg_CO2_Eq
         IR = 0 kBq_U235_Eq
@@ -53,10 +54,10 @@ process datacenter {
         1 kWh datacenter
     }
     inputs {
-        1 kWh datacenter from datacenter match ( lc_step = "manufacturing" )
-        1 kWh datacenter from datacenter match ( lc_step = "transport" )
-        1 kWh datacenter from datacenter match ( lc_step = "use" )
-        1 kWh datacenter from datacenter match ( lc_step = "end-of-life" )
+        1 kWh datacenter from datacenter_fn( id = id, lc_step = "manufacturing" ) match ( phase = "embodied" )
+        1 kWh datacenter from datacenter_fn( id = id, lc_step = "transport" ) match ( phase = "embodied" )
+        1 kWh datacenter from datacenter_fn( id = id ) match ( phase = "use" )
+        1 kWh datacenter from datacenter_fn( id = id, lc_step = "end-of-life" ) match ( phase = "embodied" )
     }
 }
 
@@ -64,21 +65,20 @@ process datacenter {
 PER LC STEP
 */
 
-process datacenter {
+process datacenter_fn {
     labels {
+        phase = "embodied"
+    }
+    params {
+        id = "dc-01"
         lc_step = "manufacturing"
     }
-    params {
-        id = "dc-01"
-    }
-    variables {
-        data = lookup dc_inventory match id = id
-    }
     products {
-        data.reserved_power * data.lifespan datacenter
+        1 kW * year datacenter
     }
+    // assumption: impacts reported for 1 kW * 1 year
     impacts {
-        for_each impact from dc_impacts match ( lc_step = "manufacturing", dc_id = id ) {
+        for_each impact from dc_impacts match ( lc_step = lc_step, dc_id = id ) {
             impact.ADPe ADPe
             impact.ADPf ADPf
             impact.AP AP
@@ -89,6 +89,7 @@ process datacenter {
             impact.Epm Epm
             impact.Ept Ept
             impact.GWP GWP
+            impact.GWPb GWPb
             impact.GWPf GWPf
             impact.GWPlu GWPlu
             impact.IR IR
@@ -98,83 +99,49 @@ process datacenter {
             impact.POCP POCP
             impact.WU WU
             impact.TPE TPE
+
+            // markers
+            impact.ADPe ADPe_datacenter
+            impact.ADPf ADPf_datacenter
+            impact.AP AP_datacenter
+            impact.CTUe CTUe_datacenter
+            impact.CTUh_c CTUh_c_datacenter
+            impact.CTUh_nc CTUh_nc_datacenter
+            impact.Epf Epf_datacenter
+            impact.Epm Epm_datacenter
+            impact.Ept Ept_datacenter
+            impact.GWP GWP_datacenter
+            impact.GWPb GWPb_datacenter
+            impact.GWPf GWPf_datacenter
+            impact.GWPlu GWPlu_datacenter
+            impact.IR IR_datacenter
+            impact.LU LU_datacenter
+            impact.ODP ODP_datacenter
+            impact.PM PM_datacenter
+            impact.POCP POCP_datacenter
+            impact.WU WU_datacenter
+            impact.TPE TPE_datacenter
         }
     }
 }
 
-process datacenter {
+process datacenter_fn {
     labels {
-        lc_step = "transport"
+        phase = "use"
     }
     params {
         id = "dc-01"
     }
     variables {
-        data = lookup dc_inventory match id = id
-    }
-    products {
-        data.reserved_power * data.lifespan datacenter
-    }
-    impacts {
-        for_each impact from dc_impacts match ( lc_step = "transport", dc_id = id ) {
-            impact.ADPe ADPe
-            impact.ADPf ADPf
-            impact.AP AP
-            impact.CTUe CTUe
-            impact.CTUh_c CTUh_c
-            impact.CTUh_nc CTUh_nc
-            impact.Epf Epf
-            impact.Epm Epm
-            impact.Ept Ept
-            impact.GWP GWP
-            impact.GWPf GWPf
-            impact.GWPlu GWPlu
-            impact.IR IR
-            impact.LU LU
-            impact.ODP ODP
-            impact.PM PM
-            impact.POCP POCP
-            impact.WU WU
-            impact.TPE TPE
-        }
-    }
-}
-
-process datacenter {
-    labels {
         lc_step = "use"
-    }
-    params {
-        id = "dc-01"
-    }
-    variables {
-        data = lookup dc_inventory match id = id
+        dt = 1 year
     }
     products {
-        1 kWh datacenter
-    }
-    inputs {
-        1 kWh electricity from electricity_production( geo = data.geo )
-    }
-
-    // TODO: Include maintenance, and other consumables, here if any
-}
-
-process datacenter {
-    labels {
-        lc_step = "end-of-life"
-    }
-    params {
-        id = "dc-01"
-    }
-    variables {
-        data = lookup dc_inventory match id = id
-    }
-    products {
-        data.reserved_power * data.lifespan datacenter
+        1 kW * year datacenter
     }
     impacts {
-        for_each impact from dc_impacts match ( lc_step = "end-of-life", dc_id = id ) {
+        // assumption: impacts reported for 1 kW * year
+        for_each impact from dc_impacts match ( lc_step = lc_step, dc_id = id ) {
             impact.ADPe ADPe
             impact.ADPf ADPf
             impact.AP AP
@@ -185,6 +152,7 @@ process datacenter {
             impact.Epm Epm
             impact.Ept Ept
             impact.GWP GWP
+            impact.GWPb GWPb
             impact.GWPf GWPf
             impact.GWPlu GWPlu
             impact.IR IR
@@ -194,6 +162,28 @@ process datacenter {
             impact.POCP POCP
             impact.WU WU
             impact.TPE TPE
+        
+            // markers
+            impact.ADPe ADPe_datacenter
+            impact.ADPf ADPf_datacenter
+            impact.AP AP_datacenter
+            impact.CTUe CTUe_datacenter
+            impact.CTUh_c CTUh_c_datacenter
+            impact.CTUh_nc CTUh_nc_datacenter
+            impact.Epf Epf_datacenter
+            impact.Epm Epm_datacenter
+            impact.Ept Ept_datacenter
+            impact.GWP GWP_datacenter
+            impact.GWPb GWPb_datacenter
+            impact.GWPf GWPf_datacenter
+            impact.GWPlu GWPlu_datacenter
+            impact.IR IR_datacenter
+            impact.LU LU_datacenter
+            impact.ODP ODP_datacenter
+            impact.PM PM_datacenter
+            impact.POCP POCP_datacenter
+            impact.WU WU_datacenter
+            impact.TPE TPE_datacenter
         }
     }
 }

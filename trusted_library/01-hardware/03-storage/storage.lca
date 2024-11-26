@@ -10,10 +10,10 @@ process storage {
         1 hour storage
     }
     inputs {
-        1 hour storage from storage match ( lc_step = "manufacturing" )
-        1 hour storage from storage match ( lc_step = "transport" )
-        1 hour storage from storage match ( lc_step = "use" )
-        1 hour storage from storage match ( lc_step = "end-of-life" )
+        1 hour storage from storage_fn( id = id, lc_step = "manufacturing" ) match ( phase = "embodied" )
+        1 hour storage from storage_fn( id = id, lc_step = "transport" ) match ( phase = "embodied" )
+        1 hour storage from storage_fn( id = id ) match ( phase = "use" )
+        1 hour storage from storage_fn( id = id, lc_step = "end-of-life" ) match ( phase = "embodied" )
     }
 }
 
@@ -21,86 +21,154 @@ process storage {
 PER LC STEP
 */
 
-process storage {
+process storage_fn {
     labels {
+        phase = "embodied"
+    }
+    params {
+        id = "sto-01"
         lc_step = "manufacturing"
     }
-    params {
-        id = "sto-01"
-    }
     variables {
-        data = lookup hw_inventory match ( id = id, kind = "storage" )
+        data = lookup storage_inventory match ( id = id )
+        dt = data.lifespan
     }
     products {
-        data.lifespan storage
+        dt storage
     }
     inputs {
         // share of impact from datacenter
-        data.lifespan * data.power datacenter from wrapper_dc_fn( id = data.dc_id, lc_step = lc_step )
+        dt * data.power datacenter from datacenter_fn( id = data.dc_id, lc_step = lc_step ) match ( phase = "embodied" )
+
+        // share of impact from mutualized equipments
+        dt * data.power mutualized_pool from mutualized_pool_fn( dc_id = data.dc_id, lc_step = lc_step ) match ( phase = "embodied" )
     }
 
-    // TODO: According to PCR, proper impacts are not included. Why?
+    // proper storage impacts
+    impacts {
+        // assumption: impacts reported for the time period dt
+        for_each impact from storage_impacts match ( lc_step = lc_step, hw_id = id ) {
+            impact.ADPe ADPe
+            impact.ADPf ADPf
+            impact.AP AP
+            impact.CTUe CTUe
+            impact.CTUh_c CTUh_c
+            impact.CTUh_nc CTUh_nc
+            impact.Epf Epf
+            impact.Epm Epm
+            impact.Ept Ept
+            impact.GWP GWP
+            impact.GWPb GWPb
+            impact.GWPf GWPf
+            impact.GWPlu GWPlu
+            impact.IR IR
+            impact.LU LU
+            impact.ODP ODP
+            impact.PM PM
+            impact.POCP POCP
+            impact.WU WU
+            impact.TPE TPE
+
+            // markers
+            impact.ADPe ADPe_pool_storage
+            impact.ADPf ADPf_pool_storage
+            impact.AP AP_pool_storage
+            impact.CTUe CTUe_pool_storage
+            impact.CTUh_c CTUh_c_pool_storage
+            impact.CTUh_nc CTUh_nc_pool_storage
+            impact.Epf Epf_pool_storage
+            impact.Epm Epm_pool_storage
+            impact.Ept Ept_pool_storage
+            impact.GWP GWP_pool_storage
+            impact.GWPb GWPb_pool_storage
+            impact.GWPf GWPf_pool_storage
+            impact.GWPlu GWPlu_pool_storage
+            impact.IR IR_pool_storage
+            impact.LU LU_pool_storage
+            impact.ODP ODP_pool_storage
+            impact.PM PM_pool_storage
+            impact.POCP POCP_pool_storage
+            impact.WU WU_pool_storage
+            impact.TPE TPE_pool_storage
+        }
+    }
 }
 
-process storage {
+process storage_fn {
     labels {
-        lc_step = "transport"
+        phase = "use"
     }
     params {
         id = "sto-01"
     }
     variables {
-        data = lookup hw_inventory match ( id = id, kind = "storage" )
+        data = lookup storage_inventory match ( id = id )
+        dt = 1 year
+        dc = lookup dc_inventory match ( id = data.dc_id )
     }
     products {
-        data.lifespan storage
+        dt storage
     }
     inputs {
+        // share of impact from electricity consumption
+        dt * data.power electricity from electricity_production( geo = dc.geo, target = "storage" )
+
         // share of impact from datacenter
-        data.lifespan * data.power datacenter from wrapper_dc_fn( id = data.dc_id, lc_step = lc_step )
+        dt * data.power datacenter from datacenter_fn( id = data.dc_id ) match ( phase = phase )
+
+        // share of impact from mutualized equipments
+        dt * data.power mutualized_pool from mutualized_pool_fn( dc_id = data.dc_id ) match ( phase = phase )
+
+        // share of impact from maintenance
+        dt * maintenance_intensity maintenance from maintenance
     }
 
-    // TODO: According to PCR, proper impacts are not included. Why?
-}
+    // proper storage impacts
+    impacts {
+        // assumption: impacts reported for the time period dt
+        for_each impact from storage_impacts match ( lc_step = phase, hw_id = id ) {
+            impact.ADPe ADPe
+            impact.ADPf ADPf
+            impact.AP AP
+            impact.CTUe CTUe
+            impact.CTUh_c CTUh_c
+            impact.CTUh_nc CTUh_nc
+            impact.Epf Epf
+            impact.Epm Epm
+            impact.Ept Ept
+            impact.GWP GWP
+            impact.GWPb GWPb
+            impact.GWPf GWPf
+            impact.GWPlu GWPlu
+            impact.IR IR
+            impact.LU LU
+            impact.ODP ODP
+            impact.PM PM
+            impact.POCP POCP
+            impact.WU WU
+            impact.TPE TPE
 
-process storage {
-    labels {
-        lc_step = "use"
+            // markers
+            impact.ADPe ADPe_pool_storage
+            impact.ADPf ADPf_pool_storage
+            impact.AP AP_pool_storage
+            impact.CTUe CTUe_pool_storage
+            impact.CTUh_c CTUh_c_pool_storage
+            impact.CTUh_nc CTUh_nc_pool_storage
+            impact.Epf Epf_pool_storage
+            impact.Epm Epm_pool_storage
+            impact.Ept Ept_pool_storage
+            impact.GWP GWP_pool_storage
+            impact.GWPb GWPb_pool_storage
+            impact.GWPf GWPf_pool_storage
+            impact.GWPlu GWPlu_pool_storage
+            impact.IR IR_pool_storage
+            impact.LU LU_pool_storage
+            impact.ODP ODP_pool_storage
+            impact.PM PM_pool_storage
+            impact.POCP POCP_pool_storage
+            impact.WU WU_pool_storage
+            impact.TPE TPE_pool_storage
+        }
     }
-    params {
-        id = "sto-01"
-    }
-    variables {
-        data = lookup hw_inventory match ( id = id, kind = "storage" )
-    }
-    products {
-        1 hour storage
-    }
-    inputs {
-        // share of impact from datacenter
-        1 hour * data.power datacenter from wrapper_dc_fn( id = data.dc_id, lc_step = lc_step )
-    }
-
-    // TODO: According to PCR, proper impacts are not included. Why?
-}
-
-process storage {
-    labels {
-        lc_step = "end-of-life"
-    }
-    params {
-        id = "sto-01"
-    }
-    variables {
-        data = lookup hw_inventory match ( id = id, kind = "storage" )
-    }
-    products {
-        data.lifespan storage
-    }
-    inputs {
-        // share of impact from datacenter
-        data.lifespan * data.power datacenter from wrapper_dc_fn( id = data.dc_id, lc_step = lc_step )
-    }
-
-    // TODO: According to PCR, proper impacts are not included. Why?
 }

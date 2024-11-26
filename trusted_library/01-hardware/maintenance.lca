@@ -1,0 +1,52 @@
+process maintenance {
+    products {
+        1 man * working_day maintenance
+    }
+    impacts {
+        // sum over all lc steps
+        for_each impact from maintenance_impacts {
+            impact.ADPe ADPe
+            impact.ADPf ADPf
+            impact.AP AP
+            impact.CTUe CTUe
+            impact.CTUh_c CTUh_c
+            impact.CTUh_nc CTUh_nc
+            impact.Epf Epf
+            impact.Epm Epm
+            impact.Ept Ept
+            impact.GWP GWP
+            impact.GWPb GWPb
+            impact.GWPf GWPf
+            impact.GWPlu GWPlu
+            impact.IR IR
+            impact.LU LU
+            impact.ODP ODP
+            impact.PM PM
+            impact.POCP POCP
+            impact.WU WU
+            impact.TPE TPE
+
+            // markers
+            impact.ADPe ADPe_maintenance
+            impact.ADPf ADPf_maintenance
+            impact.AP AP_maintenance
+            impact.CTUe CTUe_maintenance
+            impact.CTUh_c CTUh_c_maintenance
+            impact.CTUh_nc CTUh_nc_maintenance
+            impact.Epf Epf_maintenance
+            impact.Epm Epm_maintenance
+            impact.Ept Ept_maintenance
+            impact.GWP GWP_maintenance
+            impact.GWPb GWPb_maintenance
+            impact.GWPf GWPf_maintenance
+            impact.GWPlu GWPlu_maintenance
+            impact.IR IR_maintenance
+            impact.LU LU_maintenance
+            impact.ODP ODP_maintenance
+            impact.PM PM_maintenance
+            impact.POCP POCP_maintenance
+            impact.WU WU_maintenance
+            impact.TPE TPE_maintenance
+        }
+    }
+}

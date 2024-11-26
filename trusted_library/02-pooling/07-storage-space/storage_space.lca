@@ -1,0 +1,74 @@
+datasource storage_space_inventory {
+    location = "02-pooling/storage_space_inventory.csv"
+    schema {
+        id = "sto-sp-01"
+        pool_id = "client_storage_space"
+        service_id = "svc"
+        quantity = 1 p
+        vcpu_size = 1 vCPU
+        volume = 10 GB
+    }
+}
+
+/*
+ENTRYPOINT
+*/
+
+process storage_space {
+    params {
+        id = "sto-sp-01"
+    }
+    products {
+        1 hour storage
+    }
+    inputs {
+        1 hour storage from storage_space_fn( id = id, lc_step = "manufacturing" ) match ( phase = "embodied" )
+        1 hour storage from storage_space_fn( id = id, lc_step = "transport" ) match ( phase = "embodied" )
+        1 hour storage from storage_space_fn( id = id ) match ( phase = "use" )
+        1 hour storage from storage_space_fn( id = id, lc_step = "end-of-life" ) match ( phase = "embodied" )
+    }
+}
+
+/*
+PER LC STEP
+*/
+
+process storage_space_fn {
+    labels {
+        phase = "embodied"
+    }
+    params {
+        id = "sto-sp-01"
+        lc_step = "manufacturing"
+    }
+    variables {
+        data = lookup storage_space_inventory match id = id
+    }
+    products {
+        timewindow storage
+    }
+
+    inputs {
+        data.vcpu_size vcpu from space_pool_equipment( id = data.pool_id, lc_step = lc_step ) match ( phase = phase )
+        data.volume storage from space_pool_equipment( id = data.pool_id, lc_step = lc_step ) match ( phase = phase )
+    }
+}
+
+process storage_space_fn {
+    labels {
+        phase = "use"
+    }
+    params {
+        id = "sto-sp-01"
+    }
+    variables {
+        data = lookup storage_space_inventory match id = id
+    }
+    products {
+        timewindow storage
+    }
+    inputs {
+        data.vcpu_size vcpu from space_pool_equipment( id = data.pool_id ) match ( phase = phase )
+        data.volume storage from space_pool_equipment( id = data.pool_id ) match ( phase = phase )
+    }
+}

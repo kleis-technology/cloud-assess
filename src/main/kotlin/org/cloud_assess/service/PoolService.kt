@@ -46,16 +46,14 @@ class PoolService(
             TimeUnitsDto.hour -> "${pools.period.amount} hour"
         }
         val cases = pools.pools.associate {
-            val serviceLevel = when (it.serviceLevel.unit) {
-                DimensionlessUnitsDto.u -> "${it.serviceLevel.amount} u"
-            }
+            // TODO: swagger: remove service level
             val content = """
                 process __main__ {
                     products {
                         1 u __main__
                     }
                     inputs {
-                        $period service from service(pool_id = "${it.id}", service_level = $serviceLevel)
+                        $period service from service(id = "${it.id}")
                     }
                 }
             """.trimIndent()

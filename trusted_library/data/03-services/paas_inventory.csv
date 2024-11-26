@@ -1,4 +1,0 @@
-id,pool_id,nb_cores,ram_size
-paas-01,client_paas,8,12
-paas-02,client_paas,16,16
-paas-03,client_paas,3,32
