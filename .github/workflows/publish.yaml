@@ -46,3 +46,14 @@ jobs:
           tags: |
             ghcr.io/${{ github.repository_owner }}/${{ github.repository }}:${{ github.ref_name }}
             ghcr.io/${{ github.repository_owner }}/${{ github.repository }}:latest
+
+      - name: Create a GitHub release
+        id: create_release
+        uses: actions/create-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: Release ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
