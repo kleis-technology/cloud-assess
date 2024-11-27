@@ -3,6 +3,10 @@ name: Run Tests
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - trusted_library/**
+      - openapi/**
+      - src/**
   pull_request:
     branches: [ "main" ]
 
