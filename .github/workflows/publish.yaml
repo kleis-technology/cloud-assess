@@ -26,6 +26,9 @@ jobs:
           cache: gradle
 
       - name: Build gradle
+        env:
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           ./gradlew :build
 
