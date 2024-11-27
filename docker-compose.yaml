@@ -1,6 +1,6 @@
 services:
   app:
-    image: "ghcr.io/kleis-technology/cloud-assess/cloud-assess-app:v1.8.0"
+    image: "ghcr.io/kleis-technology/cloud-assess/cloud-assess-app:v1.8.1"
     container_name: cloud-assess-app
     ports:
     - "8080:8080"
