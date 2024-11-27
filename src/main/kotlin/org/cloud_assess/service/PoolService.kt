@@ -8,7 +8,6 @@ import ch.kleis.lcaac.core.lang.expression.EProcessTemplateApplication
 import ch.kleis.lcaac.core.math.basic.BasicNumber
 import ch.kleis.lcaac.core.math.basic.BasicOperations
 import org.cloud_assess.dto.PoolListDto
-import org.cloud_assess.dto.TimeUnitsDto
 import org.cloud_assess.model.ProductMatcher
 import org.cloud_assess.model.ResourceAnalysis
 import org.springframework.stereotype.Service
@@ -19,6 +18,10 @@ class PoolService(
     private val defaultDataSourceOperations: DefaultDataSourceOperations<BasicNumber>,
     private val symbolTable: SymbolTable<BasicNumber>,
 ) {
+    private val helper = Helper(
+        defaultDataSourceOperations,
+        symbolTable,
+    )
 
     @Suppress("DuplicatedCode")
     fun analyze(pools: PoolListDto): Map<String, ResourceAnalysis> {
@@ -50,9 +53,7 @@ class PoolService(
     private fun cases(
         pools: PoolListDto,
     ): Map<String, EProcessTemplateApplication<BasicNumber>> {
-        val period = when (pools.period.unit) {
-            TimeUnitsDto.hour -> "${pools.period.amount} hour"
-        }
+        val period = with(helper) { pools.period.toLcaac() }
         val cases = pools.pools.associate {
             val content = """
                 process __main__ {

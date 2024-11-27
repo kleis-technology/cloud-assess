@@ -577,9 +577,9 @@ Cloud Assess aims at covering all functional units, but also FU that are not exp
 | 2       | Physical server    | ✅     | planned      |
 | 3       | Storage            | ✅     | planned      |
 | 4       | Network equipment  | ✅     | planned      |
-| 5       | Computing resource | ✅     | planned      |
+| 5       | Computing resource | ✅     | ✅            |
 | 6       | Virtual machine    | ✅     | ✅            |
-| 7       | Block storage      | ✅     | planned      |
+| 7       | Block storage      | ✅     | ✅            |
 
 These models are specified under the folder `trusted_library`.
 

@@ -41,7 +41,6 @@ process compute_fn {
     }
     variables {
         data = lookup compute_inventory match id = id
-        total_nb_vCPUs = sum( compute_inventory match pool_id = data.pool_id, vcpu_size )
     }
     products {
         timewindow compute
@@ -60,7 +59,6 @@ process compute_fn {
     }
     variables {
         data = lookup compute_inventory match id = id
-        total_nb_vCPUs = sum( compute_inventory match pool_id = data.pool_id, vcpu_size )
     }
     products {
         timewindow compute

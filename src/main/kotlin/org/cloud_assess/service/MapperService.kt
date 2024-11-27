@@ -107,6 +107,22 @@ class MapperService {
 
     fun map(
         analysis: Map<String, ResourceAnalysis>,
+        dto: ComputeResourceListDto,
+    ): ComputeResourceListAssessmentDto {
+        return ComputeResourceListAssessmentDto(
+            dto.computeResources.map {
+                val computeResourceAnalysis = analysis[it.id] ?: throw IllegalStateException("Unknown compute_resource '${it.id}'")
+                ComputeResourceAssessmentDto(
+                    period = dto.period,
+                    request = it,
+                    impacts = impactsDto(computeResourceAnalysis)
+                )
+            }
+        )
+    }
+
+    fun map(
+        analysis: Map<String, ResourceAnalysis>,
         dto: PoolListDto
     ): PoolListAssessmentDto {
         return PoolListAssessmentDto(
@@ -180,6 +196,19 @@ class MapperService {
             epm = impactDto(analysis, Indicator.Epm),
             ept = impactDto(analysis, Indicator.Ept),
             IR = impactDto(analysis, Indicator.IR),
+        )
+    }
+
+    fun map(analysis: Map<String, ResourceAnalysis>, dto: StorageResourceListDto): StorageResourceListAssessmentDto {
+        return StorageResourceListAssessmentDto(
+            dto.storageResources.map {
+                val storageResourceAnalysis = analysis[it.id] ?: throw IllegalStateException("Unknown storage_resource '${it.id}'")
+                StorageResourceAssessmentDto(
+                    period = dto.period,
+                    request = it,
+                    impacts = impactsDto(storageResourceAnalysis),
+                )
+            }
         )
     }
 }

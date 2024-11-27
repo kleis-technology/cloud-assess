@@ -7,13 +7,12 @@ import ch.kleis.lcaac.core.lang.value.UnitValue
 import ch.kleis.lcaac.core.math.basic.BasicNumber
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.data.Percentage
-import org.cloud_assess.dto.PoolListDto
-import org.cloud_assess.dto.QuantityTimeDto
-import org.cloud_assess.dto.TimeUnitsDto
-import org.cloud_assess.dto.VirtualMachineListDto
+import org.cloud_assess.dto.*
 import org.cloud_assess.fixtures.DtoFixture
 import org.cloud_assess.model.Indicator
+import org.cloud_assess.service.ComputeResourceService
 import org.cloud_assess.service.PoolService
+import org.cloud_assess.service.StorageResourceService
 import org.cloud_assess.service.VirtualMachineService
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -21,6 +20,10 @@ import org.springframework.boot.test.context.SpringBootTest
 
 @SpringBootTest
 class CloudAssessApplicationTest(
+    @Autowired
+    private val computeResourceService: ComputeResourceService,
+    @Autowired
+    private val storageResourceService: StorageResourceService,
     @Autowired
     private val virtualMachineService: VirtualMachineService,
     @Autowired
@@ -113,6 +116,90 @@ class CloudAssessApplicationTest(
             assertGWPKgCO2Eq(transport, 0.62911701870)
             assertGWPKgCO2Eq(use, 0.5662062951815)
             assertGWPKgCO2Eq(endOfLife, 0.62924808042)
+            assertThat(
+                total.amount.value
+            ).isCloseTo(
+                manufacturing.amount.value
+                    + transport.amount.value
+                    + use.amount.value
+                    + endOfLife.amount.value,
+                Percentage.withPercentage(1e-3)
+            )
+        }
+    }
+
+    @Test
+    fun computeResourceService() {
+        // given
+        val computeResources = ComputeResourceListDto(
+            period = QuantityTimeDto(1.0, TimeUnitsDto.hour),
+            computeResources = listOf(
+                DtoFixture.computeResourceDto("comp-01", "client_compute"),
+                DtoFixture.computeResourceDto("comp-02", "client_compute"),
+            ),
+        )
+
+        // when
+        val actual = computeResourceService.analyze(computeResources)
+
+        // then
+        listOf("comp-01", "comp-02").forEach { id ->
+            val computeResource = actual[id]!!
+            assertThat(computeResource.period).isEqualTo(QuantityTimeDto(1.0, TimeUnitsDto.hour))
+
+            val total = computeResource.total(Indicator.GWP)
+            val manufacturing = computeResource.manufacturing(Indicator.GWP)
+            val transport = computeResource.transport(Indicator.GWP)
+            val use = computeResource.use(Indicator.GWP)
+            val endOfLife = computeResource.endOfLife(Indicator.GWP)
+
+            assertGWPKgCO2Eq(total, 3.72540688945756)
+            assertGWPKgCO2Eq(manufacturing, 0.953923318828)
+            assertGWPKgCO2Eq(transport, 0.945360209961)
+            assertGWPKgCO2Eq(use, 0.8805447145145)
+            assertGWPKgCO2Eq(endOfLife, 0.945578646152)
+            assertThat(
+                total.amount.value
+            ).isCloseTo(
+                manufacturing.amount.value
+                    + transport.amount.value
+                    + use.amount.value
+                    + endOfLife.amount.value,
+                Percentage.withPercentage(1e-3)
+            )
+        }
+    }
+    
+    @Test
+    fun storageResourceService() {
+        // given
+        val storageResources = StorageResourceListDto(
+            period = QuantityTimeDto(1.0, TimeUnitsDto.hour),
+            storageResources = listOf(
+                DtoFixture.storageResourceDto("sto-sp-01", "client_storage_space"),
+                DtoFixture.storageResourceDto("sto-sp-02", "client_storage_space"),
+            ),
+        )
+
+        // when
+        val actual = storageResourceService.analyze(storageResources)
+
+        // then
+        listOf("sto-sp-01", "sto-sp-02").forEach { id ->
+            val storageResource = actual[id]!!
+            assertThat(storageResource.period).isEqualTo(QuantityTimeDto(1.0, TimeUnitsDto.hour))
+
+            val total = storageResource.total(Indicator.GWP)
+            val manufacturing = storageResource.manufacturing(Indicator.GWP)
+            val transport = storageResource.transport(Indicator.GWP)
+            val use = storageResource.use(Indicator.GWP)
+            val endOfLife = storageResource.endOfLife(Indicator.GWP)
+
+            assertGWPKgCO2Eq(total, 3.7885393335789)
+            assertGWPKgCO2Eq(manufacturing, 0.953923318828)
+            assertGWPKgCO2Eq(transport, 0.945360209961)
+            assertGWPKgCO2Eq(use, 0.9436771586359)
+            assertGWPKgCO2Eq(endOfLife, 0.945578646152)
             assertThat(
                 total.amount.value
             ).isCloseTo(

@@ -42,8 +42,8 @@ unit TB {
     alias_for = 1000 GB
 }
 
-unit KB {
-    symbol = "KB"
+unit MB {
+    symbol = "MB"
     alias_for = 1e-3 GB
 }
 
