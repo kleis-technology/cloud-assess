@@ -42,9 +42,27 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PoolListAssessmentDto'
+  /compute_resources/assess:
+    post:
+      summary: Assess a collection of compute resources (FU5)
+      operationId: assessComputeResources
+      requestBody:
+        description: Collection of compute resources to assess
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ComputeResourceListDto'
+      responses:
+        '200':
+          description: Assessment of compute resources
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComputeResourceListAssessmentDto'
   /virtual_machines/assess:
     post:
-      summary: Assess a collection of virtual machines
+      summary: Assess a collection of virtual machines (FU6)
       operationId: assessVirtualMachines
       requestBody:
         description: Collection of virtual machines to assess
@@ -60,6 +78,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/VirtualMachineListAssessmentDto'
+  /storage_resources/assess:
+    post:
+      summary: Assess a collection of storage resources (FU7)
+      operationId: assessStorageResources
+      requestBody:
+        description: Collection of storage resources to assess
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StorageResourceListDto'
+      responses:
+        '200':
+          description: Assessment of storage resources
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StorageResourceListAssessmentDto'
+
   /health:
     get:
       summary: Health endpoint
@@ -539,4 +576,116 @@ components:
           type: string
         value:
           $ref: '#/components/schemas/QuantityDto'
-
+    ComputeResourceListDto:
+      type: object
+      required:
+        - period
+        - compute_resources
+      properties:
+        period:
+          $ref: '#/components/schemas/QuantityTimeDto'
+        compute_resources:
+          type: array
+          items:
+            $ref: '#/components/schemas/ComputeResourceDto'
+    ComputeResourceDto:
+      type: object
+      required:
+        - id
+        - pool_id
+        - quantity
+        - vcpu
+        - meta
+      properties:
+        id:
+          type: string
+        pool_id:
+          type: string
+        quantity:
+          $ref: '#/components/schemas/QuantityDimensionlessDto'
+        vcpu:
+          $ref: '#/components/schemas/QuantityVCPUDto'
+        meta:
+          type: object
+          default: { }
+          additionalProperties:
+            type: string
+    ComputeResourceListAssessmentDto:
+      type: object
+      required:
+        - compute_resources
+      properties:
+        compute_resources:
+          type: array
+          items:
+            $ref: '#/components/schemas/ComputeResourceAssessmentDto'
+    ComputeResourceAssessmentDto:
+      type: object
+      required:
+        - period
+        - request
+        - impacts
+      properties:
+        period:
+          $ref: '#/components/schemas/QuantityTimeDto'
+        request:
+          $ref: '#/components/schemas/ComputeResourceDto'
+        impacts:
+          $ref: '#/components/schemas/ImpactsDto'
+    StorageResourceListDto:
+      type: object
+      required:
+        - period
+        - storage_resources
+      properties:
+        period:
+          $ref: '#/components/schemas/QuantityTimeDto'
+        storage_resources:
+          type: array
+          items:
+            $ref: '#/components/schemas/StorageResourceDto'
+    StorageResourceDto:
+      type: object
+      required:
+        - id
+        - pool_id
+        - quantity
+        - storage
+        - vcpu
+        - meta
+      properties:
+        id:
+          type: string
+        pool_id:
+          type: string
+        quantity:
+          $ref: '#/components/schemas/QuantityDimensionlessDto'
+        storage:
+          $ref: '#/components/schemas/QuantityMemoryDto'
+        vcpu:
+          $ref: '#/components/schemas/QuantityVCPUDto'
+        meta:
+          type: object
+          default: { }
+          additionalProperties:
+            type: string
+    StorageResourceListAssessmentDto:
+      type: object
+      properties:
+        storage_resources:
+          type: array
+          items:
+            $ref: '#/components/schemas/StorageResourceAssessmentDto'
+    StorageResourceAssessmentDto:
+      type: object
+      required:
+        - period
+        - request
+        - impacts
+      properties:
+        period:
+          $ref: '#/components/schemas/QuantityTimeDto'
+        request:
+          $ref: '#/components/schemas/StorageResourceDto'
+        impacts:
+          $ref: '#/components/schemas/ImpactsDto'
