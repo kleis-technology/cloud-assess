@@ -231,7 +231,6 @@ components:
       type: object
       required:
         - id
-        - meta
       properties:
         id:
           type: string
@@ -273,7 +272,6 @@ components:
         - ram
         - storage
         - vcpu
-        - meta
       properties:
         id:
           type: string
@@ -595,7 +593,6 @@ components:
         - pool_id
         - quantity
         - vcpu
-        - meta
       properties:
         id:
           type: string
@@ -652,7 +649,6 @@ components:
         - quantity
         - storage
         - vcpu
-        - meta
       properties:
         id:
           type: string
