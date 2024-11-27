@@ -139,6 +139,80 @@ class DtoFixture {
             )
         }
 
+        fun computeResourceListDto(): ComputeResourceListDto {
+            return ComputeResourceListDto(
+                period = quantityHour(1.0),
+                computeResources = listOf(
+                    computeResourceDto("comp-01"),
+                ),
+            )
+        }
+
+        fun computeResourceDto(
+            id: String = "comp-01",
+            poolId: String = "client_vm",
+            vcpu: Double = 1.0,
+        ): ComputeResourceDto {
+            return ComputeResourceDto(
+                id = id,
+                poolId = poolId,
+                quantity = quantityDimensionless(1.0),
+                vcpu = quantityVCPU(vcpu),
+                meta = mapOf(
+                    "region" to "FR"
+                )
+            )
+        }
+
+        fun computeResourceAssessmentDto(
+            id: String = "comp-01",
+        ): ComputeResourceAssessmentDto {
+            return ComputeResourceAssessmentDto(
+                period = quantityHour(1.0),
+                request = computeResourceDto(id),
+                impacts = impactsDto(),
+            )
+        }
+
+
+        fun storageResourceListDto(): StorageResourceListDto {
+            return StorageResourceListDto(
+                period = quantityHour(1.0),
+                storageResources = listOf(
+                    storageResourceDto("sto-sp-01")
+                )
+            )
+        }
+
+        fun storageResourceDto(
+            id: String = "sto-sp-01",
+            poolId: String = "client_vm",
+            storage: Double = 10.0,
+            vcpu: Double = 1.0,
+        ): StorageResourceDto {
+            return StorageResourceDto(
+                id = id,
+                poolId = poolId,
+                storage = quantityMemory(storage),
+                vcpu = quantityVCPU(vcpu),
+                quantity = quantityDimensionless(1.0),
+                meta = mapOf(
+                    "region" to "FR"
+                )
+            )
+        }
+
+        fun storageResourceAssessmentDto(
+            id: String = "sto-sp-01",
+        ): StorageResourceAssessmentDto {
+            return StorageResourceAssessmentDto(
+                period = quantityHour(1.0),
+                request = storageResourceDto(id),
+                impacts = impactsDto(),
+            )
+        }
+
+
         private fun quantityVCPU(amount: Double = 1.0): QuantityVCPUDto {
             return QuantityVCPUDto(amount, VCPUUnitsDto.vCPU)
         }
