@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "org.cloud_assess"
-version = "1.8.1"
+version = "1.8.2"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
@@ -30,7 +30,7 @@ repositories {
 }
 
 dependencies {
-    val lcaacVersion = "1.7.10"
+    val lcaacVersion = "1.7.11"
     implementation("ch.kleis.lcaac:core:$lcaacVersion")
     implementation("ch.kleis.lcaac:grammar:$lcaacVersion")
 
@@ -51,6 +51,7 @@ dependencies {
     testImplementation("io.mockk:mockk:1.13.4")
 
     implementation("com.charleskorn.kaml:kaml:0.59.0")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
 }
 
 tasks.withType<KotlinCompile> {
