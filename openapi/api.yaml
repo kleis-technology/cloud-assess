@@ -141,6 +141,15 @@ components:
           $ref: '#/components/schemas/PoolDto'
         impacts:
           $ref: '#/components/schemas/ImpactsDto'
+    TotalVirtualMachineConsumptionDto:
+      type: object
+      properties:
+        ram:
+          $ref: '#/components/schemas/QuantityMemoryDto'
+        storage:
+          $ref: '#/components/schemas/QuantityMemoryDto'
+        vcpu:
+          $ref: '#/components/schemas/QuantityVCPUDto'
     VirtualMachineAssessmentDto:
       type: object
       required:
@@ -150,6 +159,8 @@ components:
       properties:
         period:
           $ref: '#/components/schemas/QuantityTimeDto'
+        total:
+          $ref: '#/components/schemas/TotalVirtualMachineConsumptionDto'
         request:
           $ref: '#/components/schemas/VirtualMachineDto'
         impacts:
