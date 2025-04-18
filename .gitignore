@@ -8,6 +8,7 @@ build
 local
 .local
 .clients
+.direnv
 
 **/node_modules
 
