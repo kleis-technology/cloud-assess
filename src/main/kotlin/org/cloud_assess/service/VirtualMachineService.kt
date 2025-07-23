@@ -79,6 +79,9 @@ class VirtualMachineService(
         vms: VirtualMachineListDto,
     ): Map<String, EProcessTemplateApplication<BasicNumber>> {
         val period = with(helper) { vms.period.toLcaac() }
+        val totalVcpu = with(helper) { vms.totalVcpu.toDataExpression() }
+        val totalRam = with(helper) { vms.totalRam.toDataExpression() }
+        val totalStorage = with(helper) { vms.totalStorage.toDataExpression() }
         val cases = vms.virtualMachines.associate {
             val content = """
                 process __main__ {
@@ -86,7 +89,12 @@ class VirtualMachineService(
                         1 u __main__
                     }
                     inputs {
-                        $period vm from vm_fn(id = "${it.id}")
+                        $period vm from vm_fn(
+                            id = "${it.id}",
+                            total_vcpu = ${totalVcpu},
+                            total_ram = ${totalRam},
+                            total_storage = ${totalStorage},
+                            )
                     }
                 }
             """.trimIndent()

@@ -90,9 +90,9 @@ class CloudAssessApplicationTest(
         // given
         val vms = VirtualMachineListDto(
             period = QuantityTimeDto(1.0, TimeUnitsDto.hour),
-            totalVcpu = QuantityVCPUDto(1.0, VCPUUnitsDto.vCPU),
-            totalRam = QuantityMemoryDto(1.0, MemoryUnitsDto.gB),
-            totalStorage = QuantityMemoryDto(1.0, MemoryUnitsDto.gB),
+            totalVcpu = QuantityVCPUDto(20.0, VCPUUnitsDto.vCPU),
+            totalRam = QuantityMemoryDto(200.0, MemoryUnitsDto.gB),
+            totalStorage = QuantityMemoryDto(200.0, MemoryUnitsDto.gB),
             virtualMachines = listOf(
                 DtoFixture.virtualMachineDto("vm-01", "client_vm"),
                 DtoFixture.virtualMachineDto("vm-02", "client_vm"),
@@ -112,11 +112,11 @@ class CloudAssessApplicationTest(
             val use = vm.use(Indicator.GWP)
             val endOfLife = vm.endOfLife(Indicator.GWP)
 
-            assertGWPKgCO2Eq(total, 2.458826278)
-            assertGWPKgCO2Eq(manufacturing, 0.63425488402)
-            assertGWPKgCO2Eq(transport, 0.62911701870)
-            assertGWPKgCO2Eq(use, 0.5662062951815)
-            assertGWPKgCO2Eq(endOfLife, 0.62924808042)
+            assertGWPKgCO2Eq(total, 0.2458826278)
+            assertGWPKgCO2Eq(manufacturing, 0.063425488402)
+            assertGWPKgCO2Eq(transport, 0.062911701870)
+            assertGWPKgCO2Eq(use, 0.05662062951815)
+            assertGWPKgCO2Eq(endOfLife, 0.062924808042)
             assertThat(
                 total.amount.value
             ).isCloseTo(
