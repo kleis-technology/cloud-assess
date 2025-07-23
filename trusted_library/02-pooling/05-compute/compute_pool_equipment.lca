@@ -5,10 +5,10 @@ process compute_pool_equipment {
     params {
         id = "client_compute"
         lc_step = "manufacturing"
-        reserved_vcpu = sum( compute_inventory match pool_id = id, quantity * vcpu_size )
+        total_vcpu = sum( compute_inventory match pool_id = id, quantity * vcpu_size )
     }
     products {
-        reserved_vcpu cpu
+        total_vcpu cpu
     }
     inputs {
         timewindow pool_server from pool_server_fn( id = id, lc_step = lc_step ) match ( phase = "embodied" )
@@ -23,10 +23,10 @@ process compute_pool_equipment {
     }
     params {
         id = "client_compute"
-        reserved_vcpu = sum( compute_inventory match pool_id = id, quantity * vcpu_size )
+        total_vcpu = sum( compute_inventory match pool_id = id, quantity * vcpu_size )
     }
     products {
-        reserved_vcpu cpu
+        total_vcpu cpu
     }
     inputs {
         timewindow pool_server from pool_server_fn( id = id ) match ( phase = phase )

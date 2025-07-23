@@ -11,16 +11,16 @@ process space_pool_equipment {
     params {
         id = "client_storage_space"
         lc_step = "manufacturing"
-        reserved_vcpu = sum( storage_space_inventory match pool_id = id, quantity * vcpu_size )
-        reserved_storage = sum( storage_space_inventory match pool_id = id, quantity * volume )
+        total_vcpu = sum( storage_space_inventory match pool_id = id, quantity * vcpu_size )
+        total_storage = sum( storage_space_inventory match pool_id = id, quantity * volume )
     }
     variables {
         ratio_cpu = 5 percent
         ratio_storage = 95 percent
     }
     products {
-        reserved_vcpu vcpu allocate ratio_cpu
-        reserved_storage storage allocate ratio_storage
+        total_vcpu vcpu allocate ratio_cpu
+        total_storage storage allocate ratio_storage
     }
     inputs {
         timewindow pool_server from pool_server_fn( id = id, lc_step = lc_step ) match ( phase = phase )
@@ -35,16 +35,16 @@ process space_pool_equipment {
     }
     params {
         id = "client_storage_space"
-        reserved_vcpu = sum( storage_space_inventory match pool_id = id, quantity * vcpu_size )
-        reserved_storage = sum( storage_space_inventory match pool_id = id, quantity * volume )
+        total_vcpu = sum( storage_space_inventory match pool_id = id, quantity * vcpu_size )
+        total_storage = sum( storage_space_inventory match pool_id = id, quantity * volume )
     }
     variables {
         ratio_cpu = 75 percent
         ratio_storage = 25 percent
     }
     products {
-        reserved_vcpu vcpu allocate ratio_cpu
-        reserved_storage storage allocate ratio_storage
+        total_vcpu vcpu allocate ratio_cpu
+        total_storage storage allocate ratio_storage
     }
     inputs {
         timewindow pool_server from pool_server_fn( id = id ) match ( phase = phase )

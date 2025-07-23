@@ -15,16 +15,16 @@ ENTRYPOINT
 process compute_fn {
     params {
         id = "comp-01"
-        reserved_vcpu = sum( compute_inventory match pool_id = "client_compute", quantity * vcpu_size )
+        total_vcpu = sum( compute_inventory match pool_id = "client_compute", quantity * vcpu_size )
     }
     products {
         timewindow compute
     }
     inputs {
-        timewindow compute from compute_fn( id = id, lc_step = "manufacturing", reserved_vcpu = reserved_vcpu ) match ( phase = "embodied" )
-        timewindow compute from compute_fn( id = id, lc_step = "transport", reserved_vcpu = reserved_vcpu ) match ( phase = "embodied" )
-        timewindow compute from compute_fn( id = id, reserved_vcpu = reserved_vcpu ) match ( phase = "use" )
-        timewindow compute from compute_fn( id = id, lc_step = "end-of-life", reserved_vcpu = reserved_vcpu ) match ( phase = "embodied" )
+        timewindow compute from compute_fn( id = id, lc_step = "manufacturing", total_vcpu = total_vcpu ) match ( phase = "embodied" )
+        timewindow compute from compute_fn( id = id, lc_step = "transport", total_vcpu = total_vcpu ) match ( phase = "embodied" )
+        timewindow compute from compute_fn( id = id, total_vcpu = total_vcpu ) match ( phase = "use" )
+        timewindow compute from compute_fn( id = id, lc_step = "end-of-life", total_vcpu = total_vcpu ) match ( phase = "embodied" )
     }
 }
 
@@ -39,7 +39,7 @@ process compute_fn {
     params {
         id = "comp-01"
         lc_step = "manufacturing"
-        reserved_vcpu = sum( compute_inventory match pool_id = "client_compute", quantity * vcpu_size )
+        total_vcpu = sum( compute_inventory match pool_id = "client_compute", quantity * vcpu_size )
     }
     variables {
         data = lookup compute_inventory match id = id
@@ -48,7 +48,7 @@ process compute_fn {
         timewindow compute
     }
     inputs {
-        data.vcpu_size cpu from compute_pool_equipment( id = data.pool_id, lc_step = lc_step, reserved_vcpu = reserved_vcpu ) match ( phase = phase )
+        data.vcpu_size cpu from compute_pool_equipment( id = data.pool_id, lc_step = lc_step, total_vcpu = total_vcpu ) match ( phase = phase )
     }
 }
 
@@ -58,7 +58,7 @@ process compute_fn {
     }
     params {
         id = "comp-01"
-        reserved_vcpu = sum( compute_inventory match pool_id = "client_compute", quantity * vcpu_size )
+        total_vcpu = sum( compute_inventory match pool_id = "client_compute", quantity * vcpu_size )
     }
     variables {
         data = lookup compute_inventory match id = id
@@ -67,6 +67,6 @@ process compute_fn {
         timewindow compute
     }
     inputs {
-        data.vcpu_size cpu from compute_pool_equipment( id = data.pool_id, reserved_vcpu = reserved_vcpu ) match ( phase = phase )
+        data.vcpu_size cpu from compute_pool_equipment( id = data.pool_id, total_vcpu = total_vcpu ) match ( phase = phase )
     }
 }
