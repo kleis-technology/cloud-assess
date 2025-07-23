@@ -31,6 +31,8 @@ class StorageResourceService(
         defaultDataSourceOperations,
         symbolTable,
     )
+
+    @Suppress("DuplicatedCode")
     fun analyze(storageResources: StorageResourceListDto): Map<String, ResourceAnalysis> {
         val period = with(helper) {
             storageResources.period.toDataExpression()

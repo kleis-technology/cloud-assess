@@ -32,6 +32,7 @@ class VirtualMachineService(
         symbolTable,
     )
 
+    @Suppress("DuplicatedCode")
     fun analyze(vms: VirtualMachineListDto): Map<String, ResourceAnalysis> {
         val period = with(helper) {
             vms.period.toDataExpression()

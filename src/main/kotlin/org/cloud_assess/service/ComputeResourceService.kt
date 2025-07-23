@@ -33,6 +33,7 @@ class ComputeResourceService(
     )
 
 
+    @Suppress("DuplicatedCode")
     fun analyze(computeResources: ComputeResourceListDto): Map<String, ResourceAnalysis> {
         val period = with(helper) {
             computeResources.period.toDataExpression()
