@@ -17,15 +17,25 @@ ENTRYPOINT
 process storage_space_fn {
     params {
         id = "sto-sp-01"
+        reserved_vcpu = sum( storage_space_inventory match pool_id = "client_storage_space", quantity * vcpu_size )
+        reserved_storage = sum( storage_space_inventory match pool_id = "client_storage_space", quantity * volume )
     }
     products {
         1 hour storage
     }
     inputs {
-        1 hour storage from storage_space_fn( id = id, lc_step = "manufacturing" ) match ( phase = "embodied" )
-        1 hour storage from storage_space_fn( id = id, lc_step = "transport" ) match ( phase = "embodied" )
-        1 hour storage from storage_space_fn( id = id ) match ( phase = "use" )
-        1 hour storage from storage_space_fn( id = id, lc_step = "end-of-life" ) match ( phase = "embodied" )
+        1 hour storage from storage_space_fn( id = id, lc_step = "manufacturing",
+                       reserved_vcpu = reserved_vcpu, reserved_storage = reserved_storage
+                       ) match ( phase = "embodied" )
+        1 hour storage from storage_space_fn( id = id, lc_step = "transport",
+                       reserved_vcpu = reserved_vcpu, reserved_storage = reserved_storage
+                       ) match ( phase = "embodied" )
+        1 hour storage from storage_space_fn( id = id,
+                       reserved_vcpu = reserved_vcpu, reserved_storage = reserved_storage
+                       ) match ( phase = "use" )
+        1 hour storage from storage_space_fn( id = id, lc_step = "end-of-life",
+                       reserved_vcpu = reserved_vcpu, reserved_storage = reserved_storage
+                       ) match ( phase = "embodied" )
     }
 }
 
@@ -40,6 +50,8 @@ process storage_space_fn {
     params {
         id = "sto-sp-01"
         lc_step = "manufacturing"
+        reserved_vcpu = sum( storage_space_inventory match pool_id = "client_storage_space", quantity * vcpu_size )
+        reserved_storage = sum( storage_space_inventory match pool_id = "client_storage_space", quantity * volume )
     }
     variables {
         data = lookup storage_space_inventory match id = id
@@ -49,8 +61,12 @@ process storage_space_fn {
     }
 
     inputs {
-        data.vcpu_size vcpu from space_pool_equipment( id = data.pool_id, lc_step = lc_step ) match ( phase = phase )
-        data.volume storage from space_pool_equipment( id = data.pool_id, lc_step = lc_step ) match ( phase = phase )
+        data.vcpu_size vcpu from space_pool_equipment( id = data.pool_id, lc_step = lc_step,
+                            reserved_vcpu = reserved_vcpu, reserved_storage = reserved_storage
+                            ) match ( phase = phase )
+        data.volume storage from space_pool_equipment( id = data.pool_id, lc_step = lc_step,
+                            reserved_vcpu = reserved_vcpu, reserved_storage = reserved_storage
+                            ) match ( phase = phase )
     }
 }
 
@@ -60,6 +76,8 @@ process storage_space_fn {
     }
     params {
         id = "sto-sp-01"
+        reserved_vcpu = sum( storage_space_inventory match pool_id = "client_storage_space", quantity * vcpu_size )
+        reserved_storage = sum( storage_space_inventory match pool_id = "client_storage_space", quantity * volume )
     }
     variables {
         data = lookup storage_space_inventory match id = id
@@ -68,7 +86,11 @@ process storage_space_fn {
         timewindow storage
     }
     inputs {
-        data.vcpu_size vcpu from space_pool_equipment( id = data.pool_id ) match ( phase = phase )
-        data.volume storage from space_pool_equipment( id = data.pool_id ) match ( phase = phase )
+        data.vcpu_size vcpu from space_pool_equipment( id = data.pool_id,
+                            reserved_vcpu = reserved_vcpu, reserved_storage = reserved_storage
+                            ) match ( phase = phase )
+        data.volume storage from space_pool_equipment( id = data.pool_id,
+                            reserved_vcpu = reserved_vcpu, reserved_storage = reserved_storage
+                            ) match ( phase = phase )
     }
 }
