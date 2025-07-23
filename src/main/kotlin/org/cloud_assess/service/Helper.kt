@@ -44,6 +44,19 @@ class Helper(
         }
     }
 
+    fun QuantityMemoryDto.toLcaac(): String {
+        return when(this.unit) {
+            MemoryUnitsDto.gB -> "${this.amount} GB"
+            MemoryUnitsDto.tB -> "${this.amount} TB"
+        }
+    }
+
+    fun QuantityVCPUDto.toLcaac(): String {
+        return when(this.unit) {
+            VCPUUnitsDto.vCPU -> "${this.amount} vCPU"
+        }
+    }
+
     fun String.toDataExpression(): DataExpression<BasicNumber> = EStringLiteral(this)
 
     fun QuantityMemoryDto.toDataExpression(): DataExpression<BasicNumber> {

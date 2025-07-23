@@ -1,5 +1,6 @@
 package org.cloud_assess.service
 
+import ch.kleis.lcaac.core.assessment.ContributionAnalysisProgram
 import ch.kleis.lcaac.core.datasource.DefaultDataSourceOperations
 import ch.kleis.lcaac.core.datasource.in_memory.InMemoryConnector
 import ch.kleis.lcaac.core.datasource.in_memory.InMemoryConnectorKeys
@@ -19,8 +20,6 @@ import org.springframework.stereotype.Service
 
 @Service
 class StorageResourceService(
-    @Value("\${COMPUTE_JOB_SIZE:100}")
-    private val jobSize: Int,
     private val parsingService: ParsingService,
     private val defaultDataSourceOperations: DefaultDataSourceOperations<BasicNumber>,
     private val symbolTable: SymbolTable<BasicNumber>,
@@ -31,6 +30,8 @@ class StorageResourceService(
         defaultDataSourceOperations,
         symbolTable,
     )
+
+    @Suppress("DuplicatedCode")
     fun analyze(storageResources: StorageResourceListDto): Map<String, ResourceAnalysis> {
         val period = with(helper) {
             storageResources.period.toDataExpression()
@@ -48,19 +49,29 @@ class StorageResourceService(
             BasicOperations,
             sourceOps,
         )
-        val jobRunner = AnalysisJobRunner(
-            jobSize = jobSize,
-            productMatcher = { id ->
-                ProductMatcher(
-                    name = "storage",
-                    process = "storage_space_fn",
-                    arguments = mapOf("id" to id)
+        val productMatcher: (String) -> ProductMatcher = { id ->
+            ProductMatcher(
+                name = "storage",
+                process = "storage_space_fn",
+                arguments = mapOf("id" to id)
+            )
+        }
+        val analysis = cases.entries
+            .map {
+                val arguments = it.value.arguments // TODO: override total_vcpu/ram/storage
+                val trace = evaluator.with(it.value.template)
+                    .trace(it.value.template, arguments)
+                val systemValue = trace.getSystemValue()
+                val entryPoint = trace.getEntryPoint()
+                val program = ContributionAnalysisProgram(systemValue, entryPoint)
+                val rawAnalysis = program.run()
+                mapOf(
+                    it.key to ResourceAnalysis(
+                        productMatcher(it.key),
+                        rawAnalysis
+                    )
                 )
-            },
-            periodDto = storageResources.period,
-            evaluator = evaluator,
-        )
-        val analysis = jobRunner.run(cases)
+            }.fold(emptyMap<String, ResourceAnalysis>()) { acc, element -> acc.plus(element) }
         return analysis
     }
 
@@ -90,6 +101,8 @@ class StorageResourceService(
 
     private fun cases(storageResources: StorageResourceListDto): Map<String, EProcessTemplateApplication<BasicNumber>> {
         val period = with(helper) { storageResources.period.toLcaac() }
+        val totalVcpu = with(helper) { storageResources.totalVcpu.toLcaac() }
+        val totalStorage = with(helper) { storageResources.totalStorage.toLcaac() }
         val cases = storageResources.storageResources.associate {
             val content = """
                 process __main__ {
@@ -97,7 +110,11 @@ class StorageResourceService(
                         1 u __main__
                     }
                     inputs {
-                        $period storage from storage_space_fn(id = "${it.id}")
+                        $period storage from storage_space_fn(
+                            id = "${it.id}",
+                            total_vcpu = ${totalVcpu},
+                            total_storage = ${totalStorage},
+                            )
                     }
                 }
             """.trimIndent()

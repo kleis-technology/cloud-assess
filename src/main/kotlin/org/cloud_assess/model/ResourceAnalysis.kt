@@ -6,11 +6,9 @@ import ch.kleis.lcaac.core.lang.value.ProductValue
 import ch.kleis.lcaac.core.lang.value.QuantityValue
 import ch.kleis.lcaac.core.math.basic.BasicMatrix
 import ch.kleis.lcaac.core.math.basic.BasicNumber
-import org.cloud_assess.dto.QuantityTimeDto
 
 class ResourceAnalysis(
     private val target: ProductMatcher,
-    val period: QuantityTimeDto,
     private val rawAnalysis: ContributionAnalysis<BasicNumber, BasicMatrix>,
     private val targetManufacturing: ProductMatcher = target
         .addLabel("phase", "embodied")

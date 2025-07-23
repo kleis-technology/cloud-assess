@@ -1,5 +1,6 @@
 package org.cloud_assess.service
 
+import ch.kleis.lcaac.core.assessment.ContributionAnalysisProgram
 import ch.kleis.lcaac.core.datasource.DefaultDataSourceOperations
 import ch.kleis.lcaac.core.datasource.in_memory.InMemoryConnector
 import ch.kleis.lcaac.core.datasource.in_memory.InMemoryConnectorKeys
@@ -19,8 +20,6 @@ import org.springframework.stereotype.Service
 
 @Service
 class ComputeResourceService(
-    @Value("\${COMPUTE_JOB_SIZE:100}")
-    private val jobSize: Int,
     private val parsingService: ParsingService,
     private val defaultDataSourceOperations: DefaultDataSourceOperations<BasicNumber>,
     private val symbolTable: SymbolTable<BasicNumber>,
@@ -33,6 +32,7 @@ class ComputeResourceService(
     )
 
 
+    @Suppress("DuplicatedCode")
     fun analyze(computeResources: ComputeResourceListDto): Map<String, ResourceAnalysis> {
         val period = with(helper) {
             computeResources.period.toDataExpression()
@@ -50,19 +50,29 @@ class ComputeResourceService(
             BasicOperations,
             sourceOps,
         )
-        val jobRunner = AnalysisJobRunner(
-            jobSize = jobSize,
-            productMatcher = { id ->
-                ProductMatcher(
-                    name = "compute",
-                    process = "compute_fn",
-                    arguments = mapOf("id" to id)
+        val productMatcher: (String) -> ProductMatcher = { id ->
+            ProductMatcher(
+                name = "compute",
+                process = "compute_fn",
+                arguments = mapOf("id" to id)
+            )
+        }
+        val analysis = cases.entries
+            .map {
+                val arguments = it.value.arguments // TODO: override total_vcpu/ram/storage
+                val trace = evaluator.with(it.value.template)
+                    .trace(it.value.template, arguments)
+                val systemValue = trace.getSystemValue()
+                val entryPoint = trace.getEntryPoint()
+                val program = ContributionAnalysisProgram(systemValue, entryPoint)
+                val rawAnalysis = program.run()
+                mapOf(
+                    it.key to ResourceAnalysis(
+                        productMatcher(it.key),
+                        rawAnalysis
+                    )
                 )
-            },
-            periodDto = computeResources.period,
-            evaluator = evaluator,
-        )
-        val analysis = jobRunner.run(cases)
+            }.fold(emptyMap<String, ResourceAnalysis>()) { acc, element -> acc.plus(element) }
         return analysis
     }
 
@@ -93,6 +103,7 @@ class ComputeResourceService(
 
     private fun cases(computeResources: ComputeResourceListDto): Map<String, EProcessTemplateApplication<BasicNumber>> {
         val period = with(helper) { computeResources.period.toLcaac() }
+        val totalVcpu = with(helper) { computeResources.totalVcpu.toLcaac() }
         val cases = computeResources.computeResources.associate {
             val content = """
                 process __main__ {
@@ -100,7 +111,7 @@ class ComputeResourceService(
                         1 u __main__
                     }
                     inputs {
-                        $period compute from compute_fn(id = "${it.id}")
+                        $period compute from compute_fn(id = "${it.id}", total_vcpu = ${totalVcpu})
                     }
                 }
             """.trimIndent()

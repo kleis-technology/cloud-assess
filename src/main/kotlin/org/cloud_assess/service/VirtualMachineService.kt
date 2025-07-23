@@ -1,5 +1,6 @@
 package org.cloud_assess.service
 
+import ch.kleis.lcaac.core.assessment.ContributionAnalysisProgram
 import ch.kleis.lcaac.core.datasource.DefaultDataSourceOperations
 import ch.kleis.lcaac.core.datasource.in_memory.InMemoryConnector
 import ch.kleis.lcaac.core.datasource.in_memory.InMemoryConnectorKeys
@@ -19,8 +20,6 @@ import org.springframework.stereotype.Service
 
 @Service
 class VirtualMachineService(
-    @Value("\${COMPUTE_JOB_SIZE:100}")
-    private val jobSize: Int,
     private val parsingService: ParsingService,
     private val defaultDataSourceOperations: DefaultDataSourceOperations<BasicNumber>,
     private val symbolTable: SymbolTable<BasicNumber>,
@@ -32,6 +31,7 @@ class VirtualMachineService(
         symbolTable,
     )
 
+    @Suppress("DuplicatedCode")
     fun analyze(vms: VirtualMachineListDto): Map<String, ResourceAnalysis> {
         val period = with(helper) {
             vms.period.toDataExpression()
@@ -49,19 +49,29 @@ class VirtualMachineService(
             BasicOperations,
             sourceOps,
         )
-        val jobRunner = AnalysisJobRunner(
-            jobSize = jobSize,
-            productMatcher = { id ->
-                ProductMatcher(
-                    name = "vm",
-                    process = "vm_fn",
-                    arguments = mapOf("id" to id)
+        val productMatcher: (String) -> ProductMatcher = { id ->
+            ProductMatcher(
+                name = "vm",
+                process = "vm_fn",
+                arguments = mapOf("id" to id)
+            )
+        }
+        val analysis = cases.entries
+            .map {
+                val arguments = it.value.arguments // TODO: override total_vcpu/ram/storage
+                val trace = evaluator.with(it.value.template)
+                    .trace(it.value.template, arguments)
+                val systemValue = trace.getSystemValue()
+                val entryPoint = trace.getEntryPoint()
+                val program = ContributionAnalysisProgram(systemValue, entryPoint)
+                val rawAnalysis = program.run()
+                mapOf(
+                    it.key to ResourceAnalysis(
+                        productMatcher(it.key),
+                        rawAnalysis
+                    )
                 )
-            },
-            periodDto = vms.period,
-            evaluator = evaluator,
-        )
-        val analysis = jobRunner.run(cases)
+            }.fold(emptyMap<String, ResourceAnalysis>()) { acc, element -> acc.plus(element) }
         return analysis
     }
 
@@ -69,6 +79,9 @@ class VirtualMachineService(
         vms: VirtualMachineListDto,
     ): Map<String, EProcessTemplateApplication<BasicNumber>> {
         val period = with(helper) { vms.period.toLcaac() }
+        val totalVcpu = with(helper) { vms.totalVcpu.toDataExpression() }
+        val totalRam = with(helper) { vms.totalRam.toDataExpression() }
+        val totalStorage = with(helper) { vms.totalStorage.toDataExpression() }
         val cases = vms.virtualMachines.associate {
             val content = """
                 process __main__ {
@@ -76,7 +89,12 @@ class VirtualMachineService(
                         1 u __main__
                     }
                     inputs {
-                        $period vm from vm_fn(id = "${it.id}")
+                        $period vm from vm_fn(
+                            id = "${it.id}",
+                            total_vcpu = ${totalVcpu},
+                            total_ram = ${totalRam},
+                            total_storage = ${totalStorage},
+                            )
                     }
                 }
             """.trimIndent()

@@ -25,7 +25,6 @@ class PoolService(
 
     @Suppress("DuplicatedCode")
     fun analyze(pools: PoolListDto): Map<String, ResourceAnalysis> {
-        val period = pools.period
         val cases = cases(pools)
         val evaluator = Evaluator(symbolTable, BasicOperations, defaultDataSourceOperations)
         val analysis = cases
@@ -42,7 +41,7 @@ class PoolService(
                             name = "service",
                             process = "service_fn",
                             arguments = mapOf("id" to it.key)
-                        ), period, rawAnalysis
+                        ), rawAnalysis
                     )
                 )
             }.reduce { acc, element -> acc.plus(element) }
