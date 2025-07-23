@@ -134,7 +134,7 @@ class CloudAssessApplicationTest(
         // given
         val computeResources = ComputeResourceListDto(
             period = QuantityTimeDto(1.0, TimeUnitsDto.hour),
-            totalVcpu = QuantityVCPUDto(1.0, VCPUUnitsDto.vCPU),
+            totalVcpu = QuantityVCPUDto(20.0, VCPUUnitsDto.vCPU),
             computeResources = listOf(
                 DtoFixture.computeResourceDto("comp-01", "client_compute"),
                 DtoFixture.computeResourceDto("comp-02", "client_compute"),
@@ -154,11 +154,11 @@ class CloudAssessApplicationTest(
             val use = computeResource.use(Indicator.GWP)
             val endOfLife = computeResource.endOfLife(Indicator.GWP)
 
-            assertGWPKgCO2Eq(total, 3.72540688945756)
-            assertGWPKgCO2Eq(manufacturing, 0.953923318828)
-            assertGWPKgCO2Eq(transport, 0.945360209961)
-            assertGWPKgCO2Eq(use, 0.8805447145145)
-            assertGWPKgCO2Eq(endOfLife, 0.945578646152)
+            assertGWPKgCO2Eq(total, 0.372540688945756)
+            assertGWPKgCO2Eq(manufacturing, 0.0953923318828)
+            assertGWPKgCO2Eq(transport, 0.0945360209961)
+            assertGWPKgCO2Eq(use, 0.08805447145145)
+            assertGWPKgCO2Eq(endOfLife, 0.0945578646152)
             assertThat(
                 total.amount.value
             ).isCloseTo(

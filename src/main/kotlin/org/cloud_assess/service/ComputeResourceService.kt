@@ -103,6 +103,7 @@ class ComputeResourceService(
 
     private fun cases(computeResources: ComputeResourceListDto): Map<String, EProcessTemplateApplication<BasicNumber>> {
         val period = with(helper) { computeResources.period.toLcaac() }
+        val totalVcpu = with(helper) { computeResources.totalVcpu.toLcaac() }
         val cases = computeResources.computeResources.associate {
             val content = """
                 process __main__ {
@@ -110,7 +111,7 @@ class ComputeResourceService(
                         1 u __main__
                     }
                     inputs {
-                        $period compute from compute_fn(id = "${it.id}")
+                        $period compute from compute_fn(id = "${it.id}", total_vcpu = ${totalVcpu})
                     }
                 }
             """.trimIndent()
