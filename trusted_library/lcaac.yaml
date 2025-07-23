@@ -8,6 +8,6 @@ description: Reference models for Cloud Assess
 connectors:
   - name: csv
     cache:
-      enabled: true
+      enabled: false
     options:
-      directory: data
+      directory: test-data/data
