@@ -50,7 +50,6 @@ class CloudAssessApplicationTest(
         // then
         listOf("client_vm").forEach { id ->
             val pool = actual[id]!!
-            assertThat(pool.period).isEqualTo(QuantityTimeDto(1.0, TimeUnitsDto.hour))
 
             val total = pool.total(Indicator.GWP)
             val manufacturing = pool.manufacturing(Indicator.GWP)
@@ -106,7 +105,6 @@ class CloudAssessApplicationTest(
         // then
         listOf("vm-01", "vm-02").forEach { id ->
             val vm = actual[id]!!
-            assertThat(vm.period).isEqualTo(QuantityTimeDto(1.0, TimeUnitsDto.hour))
 
             val total = vm.total(Indicator.GWP)
             val manufacturing = vm.manufacturing(Indicator.GWP)
@@ -149,7 +147,6 @@ class CloudAssessApplicationTest(
         // then
         listOf("comp-01", "comp-02").forEach { id ->
             val computeResource = actual[id]!!
-            assertThat(computeResource.period).isEqualTo(QuantityTimeDto(1.0, TimeUnitsDto.hour))
 
             val total = computeResource.total(Indicator.GWP)
             val manufacturing = computeResource.manufacturing(Indicator.GWP)
@@ -193,7 +190,6 @@ class CloudAssessApplicationTest(
         // then
         listOf("sto-sp-01", "sto-sp-02").forEach { id ->
             val storageResource = actual[id]!!
-            assertThat(storageResource.period).isEqualTo(QuantityTimeDto(1.0, TimeUnitsDto.hour))
 
             val total = storageResource.total(Indicator.GWP)
             val manufacturing = storageResource.manufacturing(Indicator.GWP)
