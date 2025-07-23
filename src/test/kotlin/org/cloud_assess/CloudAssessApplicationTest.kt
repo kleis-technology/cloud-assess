@@ -91,6 +91,9 @@ class CloudAssessApplicationTest(
         // given
         val vms = VirtualMachineListDto(
             period = QuantityTimeDto(1.0, TimeUnitsDto.hour),
+            totalVcpu = QuantityVCPUDto(1.0, VCPUUnitsDto.vCPU),
+            totalRam = QuantityMemoryDto(1.0, MemoryUnitsDto.gB),
+            totalStorage = QuantityMemoryDto(1.0, MemoryUnitsDto.gB),
             virtualMachines = listOf(
                 DtoFixture.virtualMachineDto("vm-01", "client_vm"),
                 DtoFixture.virtualMachineDto("vm-02", "client_vm"),
@@ -133,6 +136,7 @@ class CloudAssessApplicationTest(
         // given
         val computeResources = ComputeResourceListDto(
             period = QuantityTimeDto(1.0, TimeUnitsDto.hour),
+            totalVcpu = QuantityVCPUDto(1.0, VCPUUnitsDto.vCPU),
             computeResources = listOf(
                 DtoFixture.computeResourceDto("comp-01", "client_compute"),
                 DtoFixture.computeResourceDto("comp-02", "client_compute"),
@@ -175,6 +179,8 @@ class CloudAssessApplicationTest(
         // given
         val storageResources = StorageResourceListDto(
             period = QuantityTimeDto(1.0, TimeUnitsDto.hour),
+            totalVcpu = QuantityVCPUDto(1.0, VCPUUnitsDto.vCPU),
+            totalStorage = QuantityMemoryDto(1.0, MemoryUnitsDto.gB),
             storageResources = listOf(
                 DtoFixture.storageResourceDto("sto-sp-01", "client_storage_space"),
                 DtoFixture.storageResourceDto("sto-sp-02", "client_storage_space"),

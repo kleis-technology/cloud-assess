@@ -1,6 +1,5 @@
 package org.cloud_assess.fixtures
 
-import io.mockk.mockk
 import org.cloud_assess.dto.*
 
 @Suppress("SameParameterValue")
@@ -92,7 +91,7 @@ class DtoFixture {
 
         fun poolListDto(): PoolListDto {
             return PoolListDto(
-                period = quantityHour(1.0),
+                period = oneHour(),
                 pools = listOf(
                     poolDto("client_vm"),
                 )
@@ -112,7 +111,10 @@ class DtoFixture {
 
         fun virtualMachineListDto(): VirtualMachineListDto {
             return VirtualMachineListDto(
-                period = quantityHour(1.0),
+                period = oneHour(),
+                totalVcpu = QuantityVCPUDto(1.0, VCPUUnitsDto.vCPU),
+                totalRam = QuantityMemoryDto(1.0, MemoryUnitsDto.gB),
+                totalStorage = QuantityMemoryDto(1.0, MemoryUnitsDto.gB),
                 virtualMachines = listOf(
                     virtualMachineDto("vm-01"),
                 )
@@ -141,7 +143,8 @@ class DtoFixture {
 
         fun computeResourceListDto(): ComputeResourceListDto {
             return ComputeResourceListDto(
-                period = quantityHour(1.0),
+                period = oneHour(),
+                totalVcpu = QuantityVCPUDto(1.0, VCPUUnitsDto.vCPU),
                 computeResources = listOf(
                     computeResourceDto("comp-01"),
                 ),
@@ -168,7 +171,8 @@ class DtoFixture {
             id: String = "comp-01",
         ): ComputeResourceAssessmentDto {
             return ComputeResourceAssessmentDto(
-                period = quantityHour(1.0),
+                period = oneHour(),
+                totalVcpu = QuantityVCPUDto(1.0, VCPUUnitsDto.vCPU),
                 request = computeResourceDto(id),
                 impacts = impactsDto(),
             )
@@ -177,7 +181,9 @@ class DtoFixture {
 
         fun storageResourceListDto(): StorageResourceListDto {
             return StorageResourceListDto(
-                period = quantityHour(1.0),
+                period = oneHour(),
+                totalVcpu = QuantityVCPUDto(1.0, VCPUUnitsDto.vCPU),
+                totalStorage = QuantityMemoryDto(1.0, MemoryUnitsDto.gB),
                 storageResources = listOf(
                     storageResourceDto("sto-sp-01")
                 )
@@ -206,7 +212,9 @@ class DtoFixture {
             id: String = "sto-sp-01",
         ): StorageResourceAssessmentDto {
             return StorageResourceAssessmentDto(
-                period = quantityHour(1.0),
+                period = oneHour(),
+                totalVcpu = QuantityVCPUDto(1.0, VCPUUnitsDto.vCPU),
+                totalStorage = QuantityMemoryDto(1.0, MemoryUnitsDto.gB),
                 request = storageResourceDto(id),
                 impacts = impactsDto(),
             )
@@ -231,7 +239,7 @@ class DtoFixture {
             )
         }
 
-        private fun quantityHour(amount: Double = 1.0): QuantityTimeDto {
+        private fun oneHour(): QuantityTimeDto {
             return QuantityTimeDto(1.0, TimeUnitsDto.hour)
         }
 
@@ -256,7 +264,10 @@ class DtoFixture {
 
         fun virtualMachineAssessmentDto(id: String): VirtualMachineAssessmentDto {
             return VirtualMachineAssessmentDto(
-                period = quantityHour(1.0),
+                period = oneHour(),
+                totalVcpu = QuantityVCPUDto(1.0, VCPUUnitsDto.vCPU),
+                totalRam = QuantityMemoryDto(1.0, MemoryUnitsDto.gB),
+                totalStorage = QuantityMemoryDto(1.0, MemoryUnitsDto.gB),
                 request = virtualMachineDto(id),
                 impacts = impactsDto(),
             )
@@ -264,7 +275,7 @@ class DtoFixture {
 
         fun poolAssessmentDto(id: String): PoolAssessmentDto {
             return PoolAssessmentDto(
-                period = quantityHour(1.0),
+                period = oneHour(),
                 request = poolDto(id),
                 impacts = impactsDto(),
             )
