@@ -101,6 +101,8 @@ class StorageResourceService(
 
     private fun cases(storageResources: StorageResourceListDto): Map<String, EProcessTemplateApplication<BasicNumber>> {
         val period = with(helper) { storageResources.period.toLcaac() }
+        val totalVcpu = with(helper) { storageResources.totalVcpu.toLcaac() }
+        val totalStorage = with(helper) { storageResources.totalStorage.toLcaac() }
         val cases = storageResources.storageResources.associate {
             val content = """
                 process __main__ {
@@ -108,7 +110,11 @@ class StorageResourceService(
                         1 u __main__
                     }
                     inputs {
-                        $period storage from storage_space_fn(id = "${it.id}")
+                        $period storage from storage_space_fn(
+                            id = "${it.id}",
+                            total_vcpu = ${totalVcpu},
+                            total_storage = ${totalStorage},
+                            )
                     }
                 }
             """.trimIndent()

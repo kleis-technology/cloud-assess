@@ -176,8 +176,8 @@ class CloudAssessApplicationTest(
         // given
         val storageResources = StorageResourceListDto(
             period = QuantityTimeDto(1.0, TimeUnitsDto.hour),
-            totalVcpu = QuantityVCPUDto(1.0, VCPUUnitsDto.vCPU),
-            totalStorage = QuantityMemoryDto(1.0, MemoryUnitsDto.gB),
+            totalVcpu = QuantityVCPUDto(20.0, VCPUUnitsDto.vCPU),
+            totalStorage = QuantityMemoryDto(200.0, MemoryUnitsDto.gB),
             storageResources = listOf(
                 DtoFixture.storageResourceDto("sto-sp-01", "client_storage_space"),
                 DtoFixture.storageResourceDto("sto-sp-02", "client_storage_space"),
@@ -197,11 +197,11 @@ class CloudAssessApplicationTest(
             val use = storageResource.use(Indicator.GWP)
             val endOfLife = storageResource.endOfLife(Indicator.GWP)
 
-            assertGWPKgCO2Eq(total, 3.7885393335789)
-            assertGWPKgCO2Eq(manufacturing, 0.953923318828)
-            assertGWPKgCO2Eq(transport, 0.945360209961)
-            assertGWPKgCO2Eq(use, 0.9436771586359)
-            assertGWPKgCO2Eq(endOfLife, 0.945578646152)
+            assertGWPKgCO2Eq(total, 0.37885393335789)
+            assertGWPKgCO2Eq(manufacturing, 0.0953923318828)
+            assertGWPKgCO2Eq(transport, 0.0945360209961)
+            assertGWPKgCO2Eq(use, 0.09436771586359)
+            assertGWPKgCO2Eq(endOfLife, 0.0945578646152)
             assertThat(
                 total.amount.value
             ).isCloseTo(
