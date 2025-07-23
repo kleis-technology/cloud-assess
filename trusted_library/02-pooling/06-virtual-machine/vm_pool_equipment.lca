@@ -9,11 +9,9 @@ process vm_pool_equipment {
     }
     params {
         id = "client_vm"
-    }
-    variables {
         reserved_vcpu = sum( vm_inventory match pool_id = id, quantity * vcpu_size )
-        reserved_ram = sum( vm_inventory match pool_id = id, quantity * ram_size )
-        reserved_storage = sum( vm_inventory match pool_id = id, quantity * storage_size )
+        reserved_ram = sum(vm_inventory match pool_id = id, quantity * ram_size)
+        reserved_storage = sum(vm_inventory match pool_id = id, quantity * storage_size)
     }
     products {
         reserved_ram ram allocate ratio_ram
@@ -37,11 +35,9 @@ process vm_pool_equipment {
     }
     params {
         id = "client_vm"
-    }
-    variables {
         reserved_vcpu = sum( vm_inventory match pool_id = id, quantity * vcpu_size )
-        reserved_ram = sum( vm_inventory match pool_id = id, quantity * ram_size )
-        reserved_storage = sum( vm_inventory match pool_id = id, quantity * storage_size )
+        reserved_ram = sum(vm_inventory match pool_id = id, quantity * ram_size)
+        reserved_storage = sum(vm_inventory match pool_id = id, quantity * storage_size)
     }
     products {
         reserved_ram ram allocate ratio_ram
@@ -65,11 +61,9 @@ process vm_pool_equipment {
     }
     params {
         id = "client_vm"
-    }
-    variables {
         reserved_vcpu = sum( vm_inventory match pool_id = id, quantity * vcpu_size )
-        reserved_ram = sum( vm_inventory match pool_id = id, quantity * ram_size )
-        reserved_storage = sum( vm_inventory match pool_id = id, quantity * storage_size )
+        reserved_ram = sum(vm_inventory match pool_id = id, quantity * ram_size)
+        reserved_storage = sum(vm_inventory match pool_id = id, quantity * storage_size)
     }
     products {
         reserved_ram ram allocate ratio_ram
@@ -93,12 +87,9 @@ process vm_pool_equipment {
     }
     params {
         id = "client_vm"
-    }
-    variables {
-        // According to PCR, allocation built with with respect to total "reserved" resources.
         reserved_vcpu = sum( vm_inventory match pool_id = id, quantity * vcpu_size )
-        reserved_ram = sum( vm_inventory match pool_id = id, quantity * ram_size )
-        reserved_storage = sum( vm_inventory match pool_id = id, quantity * storage_size )
+        reserved_ram = sum(vm_inventory match pool_id = id, quantity * ram_size)
+        reserved_storage = sum(vm_inventory match pool_id = id, quantity * storage_size)
     }
     products {
         reserved_ram ram allocate ratio_ram
