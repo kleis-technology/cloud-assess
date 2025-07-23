@@ -145,11 +145,20 @@ components:
       type: object
       required:
         - period
+        - total_vcpu
+        - total_ram
+        - total_storage
         - request
         - impacts
       properties:
         period:
           $ref: '#/components/schemas/QuantityTimeDto'
+        total_vcpu:
+          $ref: '#/components/schemas/QuantityVCPUDto'
+        total_ram:
+          $ref: '#/components/schemas/QuantityMemoryDto'
+        total_storage:
+          $ref: '#/components/schemas/QuantityMemoryDto'
         request:
           $ref: '#/components/schemas/VirtualMachineDto'
         impacts:
@@ -255,10 +264,19 @@ components:
       type: object
       required:
         - period
+        - total_vcpu
+        - total_ram
+        - total_storage
         - virtual_machines
       properties:
         period:
           $ref: '#/components/schemas/QuantityTimeDto'
+        total_vcpu:
+          $ref: '#/components/schemas/QuantityVCPUDto'
+        total_ram:
+          $ref: '#/components/schemas/QuantityMemoryDto'
+        total_storage:
+          $ref: '#/components/schemas/QuantityMemoryDto'
         virtual_machines:
           type: array
           items:
@@ -578,10 +596,13 @@ components:
       type: object
       required:
         - period
+        - total_vcpu
         - compute_resources
       properties:
         period:
           $ref: '#/components/schemas/QuantityTimeDto'
+        total_vcpu:
+          $ref: '#/components/schemas/QuantityVCPUDto'
         compute_resources:
           type: array
           items:
@@ -620,11 +641,14 @@ components:
       type: object
       required:
         - period
+        - total_vcpu
         - request
         - impacts
       properties:
         period:
           $ref: '#/components/schemas/QuantityTimeDto'
+        total_vcpu:
+          $ref: '#/components/schemas/QuantityVCPUDto'
         request:
           $ref: '#/components/schemas/ComputeResourceDto'
         impacts:
@@ -633,10 +657,16 @@ components:
       type: object
       required:
         - period
+        - total_vcpu
+        - total_storage
         - storage_resources
       properties:
         period:
           $ref: '#/components/schemas/QuantityTimeDto'
+        total_vcpu:
+          $ref: '#/components/schemas/QuantityVCPUDto'
+        total_storage:
+          $ref: '#/components/schemas/QuantityMemoryDto'
         storage_resources:
           type: array
           items:
@@ -676,11 +706,17 @@ components:
       type: object
       required:
         - period
+        - total_vcpu
+        - total_storage
         - request
         - impacts
       properties:
         period:
           $ref: '#/components/schemas/QuantityTimeDto'
+        total_vcpu:
+          $ref: '#/components/schemas/QuantityVCPUDto'
+        total_storage:
+          $ref: '#/components/schemas/QuantityMemoryDto'
         request:
           $ref: '#/components/schemas/StorageResourceDto'
         impacts:
