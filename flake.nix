@@ -1,7 +1,7 @@
 {
   description = "Cloud Assess flake";
   inputs.lcaac-flake = {
-    url = "github:kleis-technology/homebrew-lcaac";
+    url = "github:kleis-technology/homebrew-lcaac/v1.7.13";
   };
   outputs = inputs@{ nixpkgs, lcaac-flake, ...}:
   {
