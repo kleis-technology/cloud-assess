@@ -15,7 +15,6 @@ import ch.kleis.lcaac.core.math.basic.BasicOperations
 import org.cloud_assess.dto.ComputeResourceListDto
 import org.cloud_assess.model.ProductMatcher
 import org.cloud_assess.model.ResourceAnalysis
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 
 @Service
