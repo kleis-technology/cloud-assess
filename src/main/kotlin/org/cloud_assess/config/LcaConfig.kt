@@ -5,7 +5,6 @@ import ch.kleis.lcaac.core.datasource.ConnectorFactory
 import ch.kleis.lcaac.core.datasource.DataSourceConnector
 import ch.kleis.lcaac.core.datasource.DefaultDataSourceOperations
 import ch.kleis.lcaac.core.datasource.cache.SourceOpsCache
-import ch.kleis.lcaac.core.datasource.resilio_db.ResilioDbConnectorKeys
 import ch.kleis.lcaac.core.lang.SymbolTable
 import ch.kleis.lcaac.core.math.basic.BasicNumber
 import ch.kleis.lcaac.core.math.basic.BasicOperations
@@ -73,13 +72,7 @@ class LcaConfig {
             yaml.decodeFromStream(LcaacConfig.serializer(), it)
         }
         else LcaacConfig()
-        val config = yamlConfig
-            .modifyConnector(ResilioDbConnectorKeys.RDB_CONNECTOR_NAME) { connector ->
-                connector
-                    .modifyOption(ResilioDbConnectorKeys.RDB_URL) { rdbUrl }
-                    .modifyOption(ResilioDbConnectorKeys.RDB_ACCESS_TOKEN) { rdbAccessToken }
-            }
-        return config
+        return yamlConfig
     }
 
     @Bean

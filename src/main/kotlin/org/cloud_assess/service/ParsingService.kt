@@ -2,7 +2,6 @@ package org.cloud_assess.service
 
 import ch.kleis.lcaac.core.lang.expression.DataExpression
 import ch.kleis.lcaac.core.lang.expression.EProcessTemplateApplication
-import ch.kleis.lcaac.core.lang.expression.QuantityExpression
 import ch.kleis.lcaac.core.lang.register.DataSourceRegister
 import ch.kleis.lcaac.core.math.basic.BasicNumber
 import ch.kleis.lcaac.core.math.basic.BasicOperations
