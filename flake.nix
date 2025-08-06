@@ -15,6 +15,8 @@
     	packages = with pkgs; [
     	  jdk23
     	  gradle
+    	  python312
+    	  python312Packages.uv
     	  lcaac-flake.packages.aarch64-darwin.lcaac-cli
     	];
       };
