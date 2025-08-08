@@ -631,7 +631,13 @@ Note that the emission factors presented in this repository are mock values.
 
 ## License
 
-The content of this repository is subject to [Apache 2 license](./LICENSE-2.0.txt).
+The contents of this repository are licensed as follows:
+- `trusted_library` folder: Licensed under the [Apache 2 license](LICENSE.Apache-2.0.txt)
+- All other content: Dual-licensed under the GNU AGPL v3 or a commercial license (see [LICENSE](LICENSE.Dual.txt))
+
+For commercial licensing inquiries, please contact us at `contact@kleis.ch`.
+
+`SPDX-License-Identifier: Apache-2.0 OR Dual`
 
 ## About us
 
