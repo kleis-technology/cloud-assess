@@ -637,8 +637,6 @@ The contents of this repository are licensed as follows:
 
 For commercial licensing inquiries, please contact us at `contact@kleis.ch`.
 
-`SPDX-License-Identifier: Apache-2.0 OR Dual`
-
 ## About us
 
 [Cloud Assess](https://cloudassess.org) is a joint-venture of [Resilio](https://resilio-solutions.com)
