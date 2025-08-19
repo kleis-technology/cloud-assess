@@ -7,8 +7,10 @@ import ch.kleis.lcaac.core.datasource.in_memory.InMemoryConnectorKeys
 import ch.kleis.lcaac.core.datasource.in_memory.InMemoryDatasource
 import ch.kleis.lcaac.core.lang.SymbolTable
 import ch.kleis.lcaac.core.lang.evaluator.Evaluator
+import ch.kleis.lcaac.core.lang.expression.EProcessTemplate
 import ch.kleis.lcaac.core.lang.expression.EProcessTemplateApplication
 import ch.kleis.lcaac.core.lang.register.DataKey
+import ch.kleis.lcaac.core.lang.register.ProcessKey
 import ch.kleis.lcaac.core.lang.value.RecordValue
 import ch.kleis.lcaac.core.math.basic.BasicNumber
 import ch.kleis.lcaac.core.math.basic.BasicOperations
@@ -16,6 +18,7 @@ import org.cloud_assess.dto.VirtualMachineListDto
 import org.cloud_assess.model.ProductMatcher
 import org.cloud_assess.model.ResourceAnalysis
 import org.springframework.stereotype.Service
+import java.lang.IllegalStateException
 
 @Service
 class VirtualMachineService(
@@ -38,16 +41,17 @@ class VirtualMachineService(
         val cases = cases(vms)
         val vmsConnector = inMemoryConnector(vms)
         val sourceOps = defaultDataSourceOperations.overrideWith(vmsConnector)
-        val evaluator = Evaluator(
-            symbolTable.copy(
-                data = symbolTable.data.override(
-                    DataKey(overrideTimeWindowParam),
-                    period,
-                )
-            ),
-            BasicOperations,
-            sourceOps,
+
+        val vmTemplates = cases.entries.map { it.value.template }
+        val st = symbolTableWith(vmTemplates, symbolTable.copy(
+            data = symbolTable.data.override(
+                DataKey(overrideTimeWindowParam),
+                period,
+            ))
         )
+
+        val evaluator = Evaluator(st, BasicOperations, sourceOps)
+
         val productMatcher: (String) -> ProductMatcher = { id ->
             ProductMatcher(
                 name = "vm",
@@ -58,8 +62,7 @@ class VirtualMachineService(
         val analysis = cases.entries
             .map {
                 val arguments = it.value.arguments // TODO: override total_vcpu/ram/storage
-                val trace = evaluator.with(it.value.template)
-                    .trace(it.value.template, arguments)
+                val trace = evaluator.trace(it.value.template, arguments)
                 val systemValue = trace.getSystemValue()
                 val entryPoint = trace.getEntryPoint()
                 val program = ContributionAnalysisProgram(systemValue, entryPoint)
@@ -83,9 +86,9 @@ class VirtualMachineService(
         val totalStorage = with(helper) { vms.totalStorage.toDataExpression() }
         val cases = vms.virtualMachines.associate {
             val content = """
-                process __main__ {
+                process __${it.id}__ {
                     products {
-                        1 u __main__
+                        1 u __${it.id}__
                     }
                     inputs {
                         $period vm from vm_fn(
@@ -126,6 +129,18 @@ class VirtualMachineService(
         return InMemoryConnector(
             config = InMemoryConnectorKeys.defaultConfig(cacheEnabled = true, cacheSize = 1024),
             content = content,
+        )
+    }
+
+    private fun symbolTableWith(templates: List<EProcessTemplate<BasicNumber>>, st: SymbolTable<BasicNumber>): SymbolTable<BasicNumber> {
+        val processTemplates = templates.map {
+            val processKey = ProcessKey(it.body.name)
+            if (st.processTemplates[processKey] != null) throw IllegalStateException("Process ${it.body.name} already exists")
+            processKey to it
+        }
+
+        return st.copy(
+            processTemplates = this.symbolTable.processTemplates.plus(processTemplates)
         )
     }
 }
