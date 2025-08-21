@@ -58,7 +58,7 @@ class ComputeResourceService(
         }
         val analysis = cases.entries
             .map {
-                val arguments = it.value.arguments // TODO: override total_vcpu/ram/storage
+                val arguments = it.value.arguments
                 val trace = evaluator.with(it.value.template)
                     .trace(it.value.template, arguments)
                 val systemValue = trace.getSystemValue()
