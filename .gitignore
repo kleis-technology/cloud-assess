@@ -14,3 +14,5 @@ local
 
 **/lcaac-tmp.yaml
 **/application-tmp.yaml
+**/.venv
+experiments/performance/.ipynb_checkpoints

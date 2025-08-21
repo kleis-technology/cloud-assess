@@ -9,16 +9,14 @@ process vm_pool_equipment {
     }
     params {
         id = "client_vm"
-    }
-    variables {
-        reserved_vcpu = sum( vm_inventory match pool_id = id, quantity * vcpu_size )
-        reserved_ram = sum( vm_inventory match pool_id = id, quantity * ram_size )
-        reserved_storage = sum( vm_inventory match pool_id = id, quantity * storage_size )
+        total_vcpu = sum( vm_inventory match pool_id = id, quantity * vcpu_size )
+        total_ram = sum(vm_inventory match pool_id = id, quantity * ram_size)
+        total_storage = sum(vm_inventory match pool_id = id, quantity * storage_size)
     }
     products {
-        reserved_ram ram allocate ratio_ram
-        reserved_vcpu vcpu allocate ratio_cpu
-        reserved_storage storage allocate ratio_storage
+        total_ram ram allocate ratio_ram
+        total_vcpu vcpu allocate ratio_cpu
+        total_storage storage allocate ratio_storage
     }
     inputs {
         timewindow pool_server from pool_server_fn( id = id, lc_step = lc_step ) match ( phase = "embodied" )
@@ -37,16 +35,14 @@ process vm_pool_equipment {
     }
     params {
         id = "client_vm"
-    }
-    variables {
-        reserved_vcpu = sum( vm_inventory match pool_id = id, quantity * vcpu_size )
-        reserved_ram = sum( vm_inventory match pool_id = id, quantity * ram_size )
-        reserved_storage = sum( vm_inventory match pool_id = id, quantity * storage_size )
+        total_vcpu = sum( vm_inventory match pool_id = id, quantity * vcpu_size )
+        total_ram = sum(vm_inventory match pool_id = id, quantity * ram_size)
+        total_storage = sum(vm_inventory match pool_id = id, quantity * storage_size)
     }
     products {
-        reserved_ram ram allocate ratio_ram
-        reserved_vcpu vcpu allocate ratio_cpu
-        reserved_storage storage allocate ratio_storage
+        total_ram ram allocate ratio_ram
+        total_vcpu vcpu allocate ratio_cpu
+        total_storage storage allocate ratio_storage
     }
     inputs {
         timewindow pool_server from pool_server_fn( id = id, lc_step = lc_step ) match ( phase = "embodied" )
@@ -65,16 +61,14 @@ process vm_pool_equipment {
     }
     params {
         id = "client_vm"
-    }
-    variables {
-        reserved_vcpu = sum( vm_inventory match pool_id = id, quantity * vcpu_size )
-        reserved_ram = sum( vm_inventory match pool_id = id, quantity * ram_size )
-        reserved_storage = sum( vm_inventory match pool_id = id, quantity * storage_size )
+        total_vcpu = sum( vm_inventory match pool_id = id, quantity * vcpu_size )
+        total_ram = sum(vm_inventory match pool_id = id, quantity * ram_size)
+        total_storage = sum(vm_inventory match pool_id = id, quantity * storage_size)
     }
     products {
-        reserved_ram ram allocate ratio_ram
-        reserved_vcpu vcpu allocate ratio_cpu
-        reserved_storage storage allocate ratio_storage
+        total_ram ram allocate ratio_ram
+        total_vcpu vcpu allocate ratio_cpu
+        total_storage storage allocate ratio_storage
     }
     inputs {
         timewindow pool_server from pool_server_fn( id = id ) match ( phase = "use" )
@@ -93,17 +87,14 @@ process vm_pool_equipment {
     }
     params {
         id = "client_vm"
-    }
-    variables {
-        // According to PCR, allocation built with with respect to total "reserved" resources.
-        reserved_vcpu = sum( vm_inventory match pool_id = id, quantity * vcpu_size )
-        reserved_ram = sum( vm_inventory match pool_id = id, quantity * ram_size )
-        reserved_storage = sum( vm_inventory match pool_id = id, quantity * storage_size )
+        total_vcpu = sum( vm_inventory match pool_id = id, quantity * vcpu_size )
+        total_ram = sum(vm_inventory match pool_id = id, quantity * ram_size)
+        total_storage = sum(vm_inventory match pool_id = id, quantity * storage_size)
     }
     products {
-        reserved_ram ram allocate ratio_ram
-        reserved_vcpu vcpu allocate ratio_cpu
-        reserved_storage storage allocate ratio_storage
+        total_ram ram allocate ratio_ram
+        total_vcpu vcpu allocate ratio_cpu
+        total_storage storage allocate ratio_storage
     }
     inputs {
         timewindow pool_server from pool_server_fn( id = id, lc_step = lc_step ) match ( phase = "embodied" )

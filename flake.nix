@@ -1,7 +1,7 @@
 {
   description = "Cloud Assess flake";
   inputs.lcaac-flake = {
-    url = "github:kleis-technology/homebrew-lcaac";
+    url = "github:kleis-technology/homebrew-lcaac/v1.7.13";
   };
   outputs = inputs@{ nixpkgs, lcaac-flake, ...}:
   {
@@ -15,6 +15,8 @@
     	packages = with pkgs; [
     	  jdk23
     	  gradle
+    	  python312
+    	  python312Packages.uv
     	  lcaac-flake.packages.aarch64-darwin.lcaac-cli
     	];
       };

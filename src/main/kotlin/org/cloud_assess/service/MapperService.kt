@@ -98,9 +98,7 @@ class MapperService {
         return impacts.entries.map { entry ->
             RawImpactDto(
                 indicator = entry.key.getShortName(),
-                value = entry.value?.let {
-                    it.toQuantityDto()
-                } ?: QuantityDto( amount = 0.0, unit = "")
+                value = entry.value?.toQuantityDto() ?: QuantityDto( amount = 0.0, unit = "")
             )
         }.toList()
     }
@@ -114,6 +112,7 @@ class MapperService {
                 val computeResourceAnalysis = analysis[it.id] ?: throw IllegalStateException("Unknown compute_resource '${it.id}'")
                 ComputeResourceAssessmentDto(
                     period = dto.period,
+                    totalVcpu = dto.totalVcpu,
                     request = it,
                     impacts = impactsDto(computeResourceAnalysis)
                 )
@@ -146,6 +145,9 @@ class MapperService {
                 val vmAnalysis = analysis[it.id] ?: throw IllegalStateException("Unknown virtual machines '${it.id}'")
                 VirtualMachineAssessmentDto(
                     period = dto.period,
+                    totalVcpu = dto.totalVcpu,
+                    totalRam = dto.totalRam,
+                    totalStorage = dto.totalStorage,
                     request = it,
                     impacts = impactsDto(vmAnalysis),
                 )
@@ -205,6 +207,8 @@ class MapperService {
                 val storageResourceAnalysis = analysis[it.id] ?: throw IllegalStateException("Unknown storage_resource '${it.id}'")
                 StorageResourceAssessmentDto(
                     period = dto.period,
+                    totalVcpu = dto.totalVcpu,
+                    totalStorage = dto.totalStorage,
                     request = it,
                     impacts = impactsDto(storageResourceAnalysis),
                 )

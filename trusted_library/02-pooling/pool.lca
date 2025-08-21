@@ -2,6 +2,7 @@
 Servers
 */
 
+@cached
 process pool_server_fn {
     params {
         id = "client_vm"
@@ -17,6 +18,7 @@ process pool_server_fn {
     }
 }
 
+@cached
 process pool_server_fn {
     labels {
         phase = "embodied"
@@ -35,6 +37,7 @@ process pool_server_fn {
     }
 }
 
+@cached
 process pool_server_fn {
     labels {
         phase = "use"
@@ -56,6 +59,7 @@ process pool_server_fn {
 Network
 */
 
+@cached
 process pool_network_fn {
     params {
         id = "client_vm"
@@ -71,6 +75,7 @@ process pool_network_fn {
     }
 }
 
+@cached
 process pool_network_fn {
     labels {
         phase = "embodied"
@@ -89,6 +94,7 @@ process pool_network_fn {
     }
 }
 
+@cached
 process pool_network_fn {
     labels {
         phase = "use"
@@ -110,6 +116,7 @@ process pool_network_fn {
 Storage
 */
 
+@cached
 process pool_storage_fn {
     params {
         id = "client_vm"
@@ -125,6 +132,7 @@ process pool_storage_fn {
     }
 }
 
+@cached
 process pool_storage_fn {
     labels {
         phase = "embodied"
@@ -143,6 +151,7 @@ process pool_storage_fn {
     }
 }
 
+@cached
 process pool_storage_fn {
     labels {
         phase = "use"

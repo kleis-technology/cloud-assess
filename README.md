@@ -94,6 +94,18 @@ The request takes the following form:
       "amount": 1.0,
       "unit": "hour"
    },
+   "total_vcpu": {
+      "amount": 100.0,
+      "unit": "vCPU"
+   },
+   "total_ram": {
+      "amount": 100.0,
+      "unit": "GB"
+   },
+   "total_storage": {
+      "amount": 100.0,
+      "unit": "TB"
+   },
    "virtual_machines": [
       {
          "id": "vm-01",

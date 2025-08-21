@@ -20,15 +20,26 @@ ENTRYPOINT
 process vm_fn {
     params {
         id = "vm-01"
+        total_vcpu = sum( vm_inventory match pool_id = "client_vm", quantity * vcpu_size )
+        total_ram = sum( vm_inventory match pool_id = "client_vm", quantity * ram_size )
+        total_storage = sum( vm_inventory match pool_id = "client_vm", quantity * storage_size )
     }
     products {
         timewindow vm
     }
     inputs {
-        timewindow vm from vm_fn( id = id, lc_step = "manufacturing" ) match ( phase = "embodied" )
-        timewindow vm from vm_fn( id = id, lc_step = "transport" )match ( phase = "embodied" )
-        timewindow vm from vm_fn( id = id ) match ( phase = "use" )
-        timewindow vm from vm_fn( id = id, lc_step = "end-of-life" )match ( phase = "embodied" )
+        timewindow vm from vm_fn( id = id, lc_step = "manufacturing",
+                      total_vcpu = total_vcpu, total_ram = total_ram, total_storage = total_storage
+                      ) match ( phase = "embodied" )
+        timewindow vm from vm_fn( id = id, lc_step = "transport",
+                      total_vcpu = total_vcpu, total_ram = total_ram, total_storage = total_storage
+                      ) match ( phase = "embodied" )
+        timewindow vm from vm_fn( id = id,
+                      total_vcpu = total_vcpu, total_ram = total_ram, total_storage = total_storage
+                      ) match ( phase = "use" )
+        timewindow vm from vm_fn( id = id, lc_step = "end-of-life",
+                      total_vcpu = total_vcpu, total_ram = total_ram, total_storage = total_storage
+                      ) match ( phase = "embodied" )
     }
 }
 
@@ -43,6 +54,9 @@ process vm_fn {
     params {
         id = "vm-01"
         lc_step = "manufacturing"
+        total_vcpu = sum( vm_inventory match pool_id = "client_vm", quantity * vcpu_size )
+        total_ram = sum( vm_inventory match pool_id = "client_vm", quantity * ram_size )
+        total_storage = sum( vm_inventory match pool_id = "client_vm", quantity * storage_size )
     }
     variables {
         data = lookup vm_inventory match id = id
@@ -52,9 +66,15 @@ process vm_fn {
     }
 
     inputs {
-        data.ram_size ram from vm_pool_equipment( id = data.pool_id ) match ( lc_step = lc_step )
-        data.vcpu_size vcpu from vm_pool_equipment( id = data.pool_id ) match ( lc_step = lc_step )
-        data.storage_size storage from vm_pool_equipment( id = data.pool_id ) match ( lc_step = lc_step )
+        data.ram_size ram from vm_pool_equipment( id = data.pool_id,
+                          total_vcpu = total_vcpu, total_ram = total_ram, total_storage = total_storage
+                          ) match ( lc_step = lc_step )
+        data.vcpu_size vcpu from vm_pool_equipment( id = data.pool_id,
+                            total_vcpu = total_vcpu, total_ram = total_ram, total_storage = total_storage
+                            ) match ( lc_step = lc_step )
+        data.storage_size storage from vm_pool_equipment( id = data.pool_id,
+                                  total_vcpu = total_vcpu, total_ram = total_ram, total_storage = total_storage
+                                  ) match ( lc_step = lc_step )
     }
 }
 
@@ -64,6 +84,9 @@ process vm_fn {
     }
     params {
         id = "vm-01"
+        total_vcpu = sum( vm_inventory match pool_id = "client_vm", quantity * vcpu_size )
+        total_ram = sum( vm_inventory match pool_id = "client_vm", quantity * ram_size )
+        total_storage = sum( vm_inventory match pool_id = "client_vm", quantity * storage_size )
     }
     variables {
         data = lookup vm_inventory match id = id
@@ -73,8 +96,14 @@ process vm_fn {
     }
 
     inputs {
-        data.ram_size ram from vm_pool_equipment( id = data.pool_id ) match ( lc_step = phase )
-        data.vcpu_size vcpu from vm_pool_equipment( id = data.pool_id ) match ( lc_step = phase )
-        data.storage_size storage from vm_pool_equipment( id = data.pool_id ) match ( lc_step = phase )
+        data.ram_size ram from vm_pool_equipment( id = data.pool_id,
+                          total_vcpu = total_vcpu, total_ram = total_ram, total_storage = total_storage
+                          ) match ( lc_step = phase )
+        data.vcpu_size vcpu from vm_pool_equipment( id = data.pool_id,
+                            total_vcpu = total_vcpu, total_ram = total_ram, total_storage = total_storage
+                            ) match ( lc_step = phase )
+        data.storage_size storage from vm_pool_equipment( id = data.pool_id,
+                                  total_vcpu = total_vcpu, total_ram = total_ram, total_storage = total_storage
+                                  ) match ( lc_step = phase )
     }
 }
