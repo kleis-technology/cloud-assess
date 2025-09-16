@@ -716,8 +716,10 @@ class TraceServiceTest {
     }
 
     @Test
-    fun analyze_singleRequest_withOnlineDataSources_isNotEmpty() {
+    fun analyze_singleRequest_withInMemoryDataSources_isNotEmpty() {
         // given
+
+
         val symbolTable = prepare(
             """
             datasource inventory {
@@ -743,7 +745,7 @@ class TraceServiceTest {
         val sourceOps = DefaultDataSourceOperations(
             ops = BasicOperations,
             config = LcaacConfig(),
-            connectors = emptyMap(),
+            connectors = mapOf(),
         )
         val service = TraceService(
             parsingService,

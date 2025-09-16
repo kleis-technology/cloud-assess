@@ -1,14 +1,19 @@
 package org.cloud_assess.service
 
 import ch.kleis.lcaac.core.assessment.ContributionAnalysisProgram
+import ch.kleis.lcaac.core.config.DataSourceConfig
 import ch.kleis.lcaac.core.datasource.DefaultDataSourceOperations
 import ch.kleis.lcaac.core.datasource.in_memory.InMemoryConnector
 import ch.kleis.lcaac.core.datasource.in_memory.InMemoryConnectorKeys
+import ch.kleis.lcaac.core.datasource.in_memory.InMemoryConnectorKeys.IN_MEMORY_CONNECTOR_NAME
 import ch.kleis.lcaac.core.datasource.in_memory.InMemoryDatasource
 import ch.kleis.lcaac.core.lang.SymbolTable
 import ch.kleis.lcaac.core.lang.evaluator.Evaluator
+import ch.kleis.lcaac.core.lang.expression.EDataSource
 import ch.kleis.lcaac.core.lang.expression.EProcessTemplateApplication
+import ch.kleis.lcaac.core.lang.expression.EStringLiteral
 import ch.kleis.lcaac.core.lang.register.DataKey
+import ch.kleis.lcaac.core.lang.register.DataSourceKey
 import ch.kleis.lcaac.core.lang.value.RecordValue
 import ch.kleis.lcaac.core.math.basic.BasicNumber
 import ch.kleis.lcaac.core.math.basic.BasicOperations
@@ -37,14 +42,20 @@ class ComputeResourceService(
             computeResources.period.toDataExpression()
         }
         val cases = cases(computeResources)
+
         val computeResourcesConnector = inMemoryConnector(computeResources)
         val sourceOps = defaultDataSourceOperations.overrideWith(computeResourcesConnector)
+
+        val computeResourcesDatasource = inMemoryDataSource()
+        val newDataSources = symbolTable.dataSources.override(mapOf(computeResourcesDatasource))
+
         val evaluator = Evaluator(
             symbolTable.copy(
                 data = symbolTable.data.override(
                     DataKey(overrideTimeWindowParam),
                     period,
-                )
+                ),
+                dataSources = newDataSources
             ),
             BasicOperations,
             sourceOps,
@@ -98,6 +109,20 @@ class ComputeResourceService(
             config = InMemoryConnectorKeys.defaultConfig(cacheEnabled = true, cacheSize = 1024),
             content = content,
         )
+    }
+
+    private fun inMemoryDataSource(): Pair<DataSourceKey, EDataSource<BasicNumber>> {
+        val key = DataSourceKey(overriddenDataSourceName)
+        val source = EDataSource<BasicNumber>(
+            DataSourceConfig(overriddenDataSourceName, IN_MEMORY_CONNECTOR_NAME, "", "id"),
+            mapOf(
+                "id" to EStringLiteral("comp-01"),
+                "pool_id" to EStringLiteral("client_compute"),
+                "vcpu_size" to EStringLiteral("1 vCPU"),
+                "quantity" to EStringLiteral("1 p")
+            )
+        )
+        return Pair(key,source)
     }
 
     private fun cases(computeResources: ComputeResourceListDto): Map<String, EProcessTemplateApplication<BasicNumber>> {

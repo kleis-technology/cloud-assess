@@ -1,9 +1,11 @@
 package org.cloud_assess.service.debug
 
 import ch.kleis.lcaac.core.assessment.ContributionAnalysisProgram
+import ch.kleis.lcaac.core.config.DataSourceConfig
 import ch.kleis.lcaac.core.datasource.DefaultDataSourceOperations
 import ch.kleis.lcaac.core.datasource.in_memory.InMemoryConnector
 import ch.kleis.lcaac.core.datasource.in_memory.InMemoryConnectorKeys
+import ch.kleis.lcaac.core.datasource.in_memory.InMemoryConnectorKeys.IN_MEMORY_CONNECTOR_NAME
 import ch.kleis.lcaac.core.datasource.in_memory.InMemoryDatasource
 import ch.kleis.lcaac.core.lang.SymbolTable
 import ch.kleis.lcaac.core.lang.evaluator.Evaluator
@@ -12,6 +14,7 @@ import ch.kleis.lcaac.core.lang.evaluator.reducer.DataExpressionReducer
 import ch.kleis.lcaac.core.lang.expression.*
 import ch.kleis.lcaac.core.lang.register.DataKey
 import ch.kleis.lcaac.core.lang.register.DataRegister
+import ch.kleis.lcaac.core.lang.register.DataSourceKey
 import ch.kleis.lcaac.core.lang.register.DataSourceRegister
 import ch.kleis.lcaac.core.lang.value.DataValue
 import ch.kleis.lcaac.core.lang.value.RecordValue
@@ -67,18 +70,25 @@ class TraceService(
     }
 
     fun analyze(request: TraceRequestDto): ResourceTrace {
-        val processApplication = prepare(request)
-        val symbolTablesWithGlobals = symbolTable.copy(
-            data = globals(symbolTable.data, request),
-        )
         val content = overriddenDatasources(request)
+
         val inMemoryConnector = InMemoryConnector(
             config = InMemoryConnectorKeys.defaultConfig(cacheEnabled = true, cacheSize = 1024),
             content = content,
         )
-        val sourceOps = defaultDataSourceOperations
-            .overrideWith(inMemoryConnector)
-        val evaluator = Evaluator(symbolTablesWithGlobals, BasicOperations, sourceOps)
+        val sourceOps = defaultDataSourceOperations.overrideWith(inMemoryConnector)
+
+        val dataSources = inMemoryDataSources(request.datasources)
+        val newDataSources = symbolTable.dataSources.override(dataSources)
+
+        val overriddenSymbolTable = symbolTable.copy(
+            data = globals(symbolTable.data, request),
+            dataSources = newDataSources,
+        )
+
+        val evaluator = Evaluator(overriddenSymbolTable, BasicOperations, sourceOps)
+
+        val processApplication = prepare(request)
         val trace = evaluator
             .with(processApplication.template)
             .trace(processApplication.template, processApplication.arguments)
@@ -200,5 +210,18 @@ class TraceService(
             ),
             arguments = emptyMap(),
         )
+    }
+
+    private fun inMemoryDataSources(dtos: List<DatasourceDto>?): Map<DataSourceKey, EDataSource<BasicNumber>> {
+        val sources = dtos?.map { dto ->
+            val key = DataSourceKey(dto.name)
+            val schema = dto.records[0].elements.associate { it.name to EStringLiteral<BasicNumber>(it.value.toString()) }
+            val source = EDataSource(
+                DataSourceConfig(dto.name, IN_MEMORY_CONNECTOR_NAME, ""),
+                schema
+            )
+            Pair(key, source)
+        }
+        return sources?.associate { it.first to it.second } ?: emptyMap()
     }
 }
