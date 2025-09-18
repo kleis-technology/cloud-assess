@@ -1,7 +1,6 @@
 package org.cloud_assess.service
 
 import ch.kleis.lcaac.core.assessment.ContributionAnalysisProgram
-import ch.kleis.lcaac.core.config.DataSourceConfig
 import ch.kleis.lcaac.core.datasource.DefaultDataSourceOperations
 import ch.kleis.lcaac.core.datasource.in_memory.InMemoryConnector
 import ch.kleis.lcaac.core.datasource.in_memory.InMemoryConnectorKeys
@@ -9,9 +8,7 @@ import ch.kleis.lcaac.core.datasource.in_memory.InMemoryConnectorKeys.IN_MEMORY_
 import ch.kleis.lcaac.core.datasource.in_memory.InMemoryDatasource
 import ch.kleis.lcaac.core.lang.SymbolTable
 import ch.kleis.lcaac.core.lang.evaluator.Evaluator
-import ch.kleis.lcaac.core.lang.expression.EDataSource
 import ch.kleis.lcaac.core.lang.expression.EProcessTemplateApplication
-import ch.kleis.lcaac.core.lang.expression.EStringLiteral
 import ch.kleis.lcaac.core.lang.register.DataKey
 import ch.kleis.lcaac.core.lang.register.DataSourceKey
 import ch.kleis.lcaac.core.lang.value.RecordValue
@@ -45,20 +42,12 @@ class VirtualMachineService(
         val vmsConnector = inMemoryConnector(vms)
         val sourceOps = defaultDataSourceOperations.overrideWith(vmsConnector)
 
-        val vmsDatasource = inMemoryDataSource()
-        val newDataSources = symbolTable.dataSources.override(mapOf(vmsDatasource))
+        val newSymbolTable = symbolTable
+            .overrideDatasourceConnector(DataSourceKey(overriddenDataSourceName), IN_MEMORY_CONNECTOR_NAME)
+            .copy(data = symbolTable.data.override(DataKey(overrideTimeWindowParam), period))
 
-        val evaluator = Evaluator(
-            symbolTable.copy(
-                data = symbolTable.data.override(
-                    DataKey(overrideTimeWindowParam),
-                    period,
-                ),
-                dataSources = newDataSources,
-            ),
-            BasicOperations,
-            sourceOps,
-        )
+        val evaluator = Evaluator(newSymbolTable, BasicOperations, sourceOps)
+
         val productMatcher: (String) -> ProductMatcher = { id ->
             ProductMatcher(
                 name = "vm",
@@ -138,21 +127,5 @@ class VirtualMachineService(
             config = InMemoryConnectorKeys.defaultConfig(cacheEnabled = true, cacheSize = 1024),
             content = content,
         )
-    }
-
-    private fun inMemoryDataSource(): Pair<DataSourceKey, EDataSource<BasicNumber>> {
-        val key = DataSourceKey(overriddenDataSourceName)
-        val source = EDataSource<BasicNumber>(
-                DataSourceConfig(overriddenDataSourceName, IN_MEMORY_CONNECTOR_NAME, "", "id"),
-                mapOf(
-                    "id" to EStringLiteral("vm-01"),
-                    "pool_id" to EStringLiteral("client_vm"),
-                    "ram_size" to EStringLiteral("4 GB"),
-                    "storage_size" to EStringLiteral("20 GB"),
-                    "vcpu_size" to EStringLiteral("1 vCPU"),
-                    "quantity" to EStringLiteral("1 p")
-                )
-            )
-        return Pair(key,source)
     }
 }

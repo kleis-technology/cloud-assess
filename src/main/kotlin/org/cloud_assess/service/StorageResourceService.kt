@@ -1,7 +1,6 @@
 package org.cloud_assess.service
 
 import ch.kleis.lcaac.core.assessment.ContributionAnalysisProgram
-import ch.kleis.lcaac.core.config.DataSourceConfig
 import ch.kleis.lcaac.core.datasource.DefaultDataSourceOperations
 import ch.kleis.lcaac.core.datasource.in_memory.InMemoryConnector
 import ch.kleis.lcaac.core.datasource.in_memory.InMemoryConnectorKeys
@@ -9,9 +8,7 @@ import ch.kleis.lcaac.core.datasource.in_memory.InMemoryConnectorKeys.IN_MEMORY_
 import ch.kleis.lcaac.core.datasource.in_memory.InMemoryDatasource
 import ch.kleis.lcaac.core.lang.SymbolTable
 import ch.kleis.lcaac.core.lang.evaluator.Evaluator
-import ch.kleis.lcaac.core.lang.expression.EDataSource
 import ch.kleis.lcaac.core.lang.expression.EProcessTemplateApplication
-import ch.kleis.lcaac.core.lang.expression.EStringLiteral
 import ch.kleis.lcaac.core.lang.register.DataKey
 import ch.kleis.lcaac.core.lang.register.DataSourceKey
 import ch.kleis.lcaac.core.lang.value.RecordValue
@@ -45,20 +42,12 @@ class StorageResourceService(
         val storageResourcesConnector = inMemoryConnector(storageResources)
         val sourceOps = defaultDataSourceOperations.overrideWith(storageResourcesConnector)
 
-        val storageResourcesDatasource = inMemoryDataSource()
-        val newDataSources = symbolTable.dataSources.override(mapOf(storageResourcesDatasource))
+        val newSymbolTable = symbolTable
+            .overrideDatasourceConnector(DataSourceKey(overriddenDataSourceName), IN_MEMORY_CONNECTOR_NAME)
+            .copy(data = symbolTable.data.override(DataKey(overrideTimeWindowParam), period))
 
-        val evaluator = Evaluator(
-            symbolTable.copy(
-                data = symbolTable.data.override(
-                    DataKey(overrideTimeWindowParam),
-                    period,
-                ),
-                dataSources = newDataSources,
-            ),
-            BasicOperations,
-            sourceOps,
-        )
+        val evaluator = Evaluator(newSymbolTable, BasicOperations, sourceOps)
+
         val productMatcher: (String) -> ProductMatcher = { id ->
             ProductMatcher(
                 name = "storage",
@@ -107,21 +96,6 @@ class StorageResourceService(
             config = InMemoryConnectorKeys.defaultConfig(cacheEnabled = true, cacheSize = 1024),
             content = content,
         )
-    }
-
-    private fun inMemoryDataSource(): Pair<DataSourceKey, EDataSource<BasicNumber>> {
-        val key = DataSourceKey(overriddenDataSourceName)
-        val source = EDataSource<BasicNumber>(
-            DataSourceConfig(overriddenDataSourceName, IN_MEMORY_CONNECTOR_NAME, "", "id"),
-            mapOf(
-                "id" to EStringLiteral("sto-01"),
-                "pool_id" to EStringLiteral("client_vm"),
-                "vcpu_size" to EStringLiteral("1 vCPU"),
-                "volume" to EStringLiteral("4 GB"),
-                "quantity" to EStringLiteral("1 p")
-            )
-        )
-        return Pair(key,source)
     }
 
     private fun cases(storageResources: StorageResourceListDto): Map<String, EProcessTemplateApplication<BasicNumber>> {
