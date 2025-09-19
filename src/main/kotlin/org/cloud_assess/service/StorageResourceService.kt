@@ -4,11 +4,13 @@ import ch.kleis.lcaac.core.assessment.ContributionAnalysisProgram
 import ch.kleis.lcaac.core.datasource.DefaultDataSourceOperations
 import ch.kleis.lcaac.core.datasource.in_memory.InMemoryConnector
 import ch.kleis.lcaac.core.datasource.in_memory.InMemoryConnectorKeys
+import ch.kleis.lcaac.core.datasource.in_memory.InMemoryConnectorKeys.IN_MEMORY_CONNECTOR_NAME
 import ch.kleis.lcaac.core.datasource.in_memory.InMemoryDatasource
 import ch.kleis.lcaac.core.lang.SymbolTable
 import ch.kleis.lcaac.core.lang.evaluator.Evaluator
 import ch.kleis.lcaac.core.lang.expression.EProcessTemplateApplication
 import ch.kleis.lcaac.core.lang.register.DataKey
+import ch.kleis.lcaac.core.lang.register.DataSourceKey
 import ch.kleis.lcaac.core.lang.value.RecordValue
 import ch.kleis.lcaac.core.math.basic.BasicNumber
 import ch.kleis.lcaac.core.math.basic.BasicOperations
@@ -36,18 +38,16 @@ class StorageResourceService(
             storageResources.period.toDataExpression()
         }
         val cases = cases(storageResources)
+
         val storageResourcesConnector = inMemoryConnector(storageResources)
         val sourceOps = defaultDataSourceOperations.overrideWith(storageResourcesConnector)
-        val evaluator = Evaluator(
-            symbolTable.copy(
-                data = symbolTable.data.override(
-                    DataKey(overrideTimeWindowParam),
-                    period,
-                )
-            ),
-            BasicOperations,
-            sourceOps,
-        )
+
+        val newSymbolTable = symbolTable
+            .overrideDatasourceConnector(DataSourceKey(overriddenDataSourceName), IN_MEMORY_CONNECTOR_NAME)
+            .copy(data = symbolTable.data.override(DataKey(overrideTimeWindowParam), period))
+
+        val evaluator = Evaluator(newSymbolTable, BasicOperations, sourceOps)
+
         val productMatcher: (String) -> ProductMatcher = { id ->
             ProductMatcher(
                 name = "storage",

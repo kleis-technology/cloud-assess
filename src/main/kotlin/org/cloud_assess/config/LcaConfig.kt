@@ -51,9 +51,7 @@ class LcaConfig {
     @Bean
     fun lcaacConfig(
         @Value("\${lca.config}") modelDirectory: Path,
-        @Value("\${lca.manifest}") manifest: String,
-        @Value("\${resilio-db.url}") rdbUrl: String,
-        @Value("\${resilio-db.access-token}") rdbAccessToken: String,
+        @Value("\${lca.manifest}") manifest: String
     ): LcaacConfig {
         val configFile = Files.walk(modelDirectory, 1)
             .filter {

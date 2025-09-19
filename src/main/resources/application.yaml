@@ -4,6 +4,3 @@ lca:
 cors:
   enabled: false
   allowed-origin:
-resilio-db:
-  url: https://db.resilio.tech
-  access-token: dummy-token

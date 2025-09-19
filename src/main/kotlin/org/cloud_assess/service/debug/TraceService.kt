@@ -4,6 +4,7 @@ import ch.kleis.lcaac.core.assessment.ContributionAnalysisProgram
 import ch.kleis.lcaac.core.datasource.DefaultDataSourceOperations
 import ch.kleis.lcaac.core.datasource.in_memory.InMemoryConnector
 import ch.kleis.lcaac.core.datasource.in_memory.InMemoryConnectorKeys
+import ch.kleis.lcaac.core.datasource.in_memory.InMemoryConnectorKeys.IN_MEMORY_CONNECTOR_NAME
 import ch.kleis.lcaac.core.datasource.in_memory.InMemoryDatasource
 import ch.kleis.lcaac.core.lang.SymbolTable
 import ch.kleis.lcaac.core.lang.evaluator.Evaluator
@@ -12,6 +13,7 @@ import ch.kleis.lcaac.core.lang.evaluator.reducer.DataExpressionReducer
 import ch.kleis.lcaac.core.lang.expression.*
 import ch.kleis.lcaac.core.lang.register.DataKey
 import ch.kleis.lcaac.core.lang.register.DataRegister
+import ch.kleis.lcaac.core.lang.register.DataSourceKey
 import ch.kleis.lcaac.core.lang.register.DataSourceRegister
 import ch.kleis.lcaac.core.lang.value.DataValue
 import ch.kleis.lcaac.core.lang.value.RecordValue
@@ -67,18 +69,23 @@ class TraceService(
     }
 
     fun analyze(request: TraceRequestDto): ResourceTrace {
-        val processApplication = prepare(request)
-        val symbolTablesWithGlobals = symbolTable.copy(
-            data = globals(symbolTable.data, request),
-        )
         val content = overriddenDatasources(request)
+
         val inMemoryConnector = InMemoryConnector(
             config = InMemoryConnectorKeys.defaultConfig(cacheEnabled = true, cacheSize = 1024),
             content = content,
         )
-        val sourceOps = defaultDataSourceOperations
-            .overrideWith(inMemoryConnector)
-        val evaluator = Evaluator(symbolTablesWithGlobals, BasicOperations, sourceOps)
+        val sourceOps = defaultDataSourceOperations.overrideWith(inMemoryConnector)
+
+        val symbolTableWithGlobalData = symbolTable.copy(data = globals(symbolTable.data, request))
+        val newSymbolTable = request.datasources
+            ?.fold(symbolTableWithGlobalData)
+            {acc, next -> symbolTable.overrideDatasourceConnector(DataSourceKey(next.name), IN_MEMORY_CONNECTOR_NAME)}
+            ?: symbolTableWithGlobalData
+
+        val evaluator = Evaluator(newSymbolTable, BasicOperations, sourceOps)
+
+        val processApplication = prepare(request)
         val trace = evaluator
             .with(processApplication.template)
             .trace(processApplication.template, processApplication.arguments)
