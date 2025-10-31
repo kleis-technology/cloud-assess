@@ -10,5 +10,4 @@ connectors:
     cache:
       enabled: true
     options:
-#      directory: data
-      directory: test-data
+      directory: data
