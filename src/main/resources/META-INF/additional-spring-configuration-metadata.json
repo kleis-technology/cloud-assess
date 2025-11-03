@@ -1,16 +1,33 @@
 {
   "properties": [
     {
-      "name": "lca.config",
+      "name": "lca.directory",
       "type": "java.lang.String",
-      "description": "Path to LCA as CODE config directory.",
-      "defaultValue": "trusted_library"
+      "description": "Working directory."
     },
     {
-      "name": "lca.manifest",
+      "name": "lca.lib.directory",
       "type": "java.lang.String",
-      "description": "Name of the manifest in the config directory.",
-      "defaultValue": "lcaac.yaml"
+      "description": "Library directory relatively to working directory.",
+      "defaultValue": "lib"
+    },
+    {
+      "name": "lca.archive.directory",
+      "type": "java.lang.String",
+      "description": "Archive directory relatively to working directory.",
+      "defaultValue": "lib"
+    },
+    {
+      "name": "lca.inventory.directory",
+      "type": "java.lang.String",
+      "description": "Inventory directory relatively to working directory.",
+      "defaultValue": "inventory"
+    },
+    {
+      "name": "lca.inventory.zip",
+      "type": "java.lang.String",
+      "description": "Inventory zip relatively to archive directory.",
+      "defaultValue": null
     },
     {
       "name": "cors.allowed-origin",
@@ -24,23 +41,5 @@
       "description": "Enable CORS.",
       "defaultValue": false
     },
-    {
-      "name": "compute.job-size",
-      "type": "java.lang.Integer",
-      "description": "Job size.",
-      "defaultValue": 100
-    },
-    {
-      "name": "resilio-db.url",
-      "type": "java.lang.String",
-      "description": "Resilio DB URL.",
-      "defaultValue": "https://db.resilio.tech"
-    },
-    {
-      "name": "resilio-db.access-token",
-      "type": "java.lang.String",
-      "description": "Resilio DB access token.",
-      "defaultValue": null
-    }
   ]
 }

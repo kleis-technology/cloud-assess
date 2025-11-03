@@ -52,6 +52,8 @@ dependencies {
 
     implementation("com.charleskorn.kaml:kaml:0.59.0")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
+
+    implementation("org.apache.commons:commons-compress:1.28.0")
 }
 
 tasks.withType<KotlinCompile> {
