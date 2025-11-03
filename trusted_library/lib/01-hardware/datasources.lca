@@ -1,5 +1,5 @@
 datasource maintenance_impacts {
-    location = "01-hardware/maintenance_impacts.csv"
+    location = "maintenance_impacts.csv"
     schema {
         id = "maintenance"
         lc_step = "use"
@@ -28,7 +28,7 @@ datasource maintenance_impacts {
 }
 
 datasource server_inventory {
-    location = "01-hardware/server_inventory.csv"
+    location = "server_inventory.csv"
     schema {
         id = "srv-01"
         dc_id = "dc-01"
@@ -40,7 +40,7 @@ datasource server_inventory {
 }
 
 datasource server_impacts {
-    location = "01-hardware/server_impacts.csv"
+    location = "server_impacts.csv"
     schema {
         hw_id = "srv-01"
         lc_step = "manufacturing"
@@ -74,7 +74,7 @@ datasource server_impacts {
 }
 
 datasource storage_inventory {
-    location = "01-hardware/storage_inventory.csv"
+    location = "storage_inventory.csv"
     schema {
         id = "srv-01"
         dc_id = "dc-01"
@@ -86,7 +86,7 @@ datasource storage_inventory {
 }
 
 datasource storage_impacts {
-    location = "01-hardware/storage_impacts.csv"
+    location = "storage_impacts.csv"
     schema {
         hw_id = "srv-01"
         lc_step = "manufacturing"
@@ -120,7 +120,7 @@ datasource storage_impacts {
 }
 
 datasource network_inventory {
-    location = "01-hardware/network_inventory.csv"
+    location = "network_inventory.csv"
     schema {
         id = "srv-01"
         dc_id = "dc-01"
@@ -132,7 +132,7 @@ datasource network_inventory {
 }
 
 datasource network_impacts {
-    location = "01-hardware/network_impacts.csv"
+    location = "network_impacts.csv"
     schema {
         hw_id = "srv-01"
         lc_step = "manufacturing"

@@ -1,5 +1,5 @@
 datasource dc_inventory {
-    location = "01-hardware/dc_inventory.csv"
+    location = "dc_inventory.csv"
     schema {
         id = "dc-01"
         geo = "GLO"
@@ -11,7 +11,7 @@ datasource dc_inventory {
 }
 
 datasource dc_impacts {
-    location = "01-hardware/dc_impacts.csv"
+    location = "dc_impacts.csv"
     schema {
         dc_id = "dc-01"
         lc_step = "manufacturing"

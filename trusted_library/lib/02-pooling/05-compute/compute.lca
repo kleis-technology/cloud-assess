@@ -1,5 +1,5 @@
 datasource compute_inventory {
-    location = "02-pooling/compute_inventory.csv"
+    location = "compute_inventory.csv"
     schema {
         id = "comp-01" // e.g., a client id
         pool_id = "client_compute"
