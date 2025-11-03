@@ -1,0 +1,291 @@
+# Default values for cloud-assess.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
+replicaCount: 1
+
+# This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
+image:
+#  repository: ghcr.io/kleis-technology/cloud-assess/cloud-assess-app
+  repository: cloud-assess
+  # This sets the pull policy for images.
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+#  tag:
+
+# This is for the secrets for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+imagePullSecrets: []
+# This is to override the chart name.
+nameOverride: ""
+fullnameOverride: ""
+
+# This section builds out the service account more information can be found here: https://kubernetes.io/docs/concepts/security/service-accounts/
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: false
+  # Automatically mount a ServiceAccount's API credentials?
+  automount: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+# This is for setting Kubernetes Annotations to a Pod.
+# For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+podAnnotations: {}
+# This is for setting Kubernetes Labels to a Pod.
+# For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+podLabels: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+# This is for setting up a service more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/
+service:
+  # This sets the service type more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
+  type: ClusterIP
+  # This sets the ports more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
+  port: 8080
+
+# This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+# -- Expose the service via gateway-api HTTPRoute
+# Requires Gateway API resources and suitable controller installed within the cluster
+# (see: https://gateway-api.sigs.k8s.io/guides/)
+httpRoute:
+  # HTTPRoute enabled.
+  enabled: false
+  # HTTPRoute annotations.
+  annotations: {}
+  # Which Gateways this Route is attached to.
+  parentRefs:
+  - name: gateway
+    sectionName: http
+    # namespace: default
+  # Hostnames matching HTTP header.
+  hostnames:
+  - chart-example.local
+  # List of rules and filters applied.
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /headers
+  #   filters:
+  #   - type: RequestHeaderModifier
+  #     requestHeaderModifier:
+  #       set:
+  #       - name: My-Overwrite-Header
+  #         value: this-is-the-only-value
+  #       remove:
+  #       - User-Agent
+  # - matches:
+  #   - path:
+  #       type: PathPrefix
+  #       value: /echo
+  #     headers:
+  #     - name: version
+  #       value: v2
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+# This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+livenessProbe:
+  httpGet:
+    path: /actuator/health
+    port: 8080
+readinessProbe:
+  httpGet:
+    path: /actuator/health
+    port: 8080
+
+# This section is for setting up autoscaling more information can be found here: https://kubernetes.io/docs/concepts/workloads/autoscaling/
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+lca:
+  directory: trusted_library # working directory
+  lib:
+    directory: lib
+  inventory:
+    directory: inventory
+  archive:
+    directory: archive
+    configMapName: archive
+    inventory:
+      filename: inventory.zip
+      content: |
+        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
+
