@@ -1,5 +1,5 @@
 datasource vm_inventory {
-    location = "02-pooling/vm_inventory.csv"
+    location = "vm_inventory.csv"
     schema {
         id = "vm-01"
         pool_id = "client_vm"

@@ -1,5 +1,5 @@
 datasource electricity_mix {
-    location = "01-hardware/electricity_mix.csv"
+    location = "electricity_mix.csv"
     schema {
         geo = "GLO"
 

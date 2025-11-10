@@ -10,4 +10,4 @@ connectors:
     cache:
       enabled: true
     options:
-      directory: data
+      directory: inventory

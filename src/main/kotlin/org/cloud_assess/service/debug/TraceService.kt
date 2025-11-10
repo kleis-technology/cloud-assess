@@ -80,7 +80,7 @@ class TraceService(
         val symbolTableWithGlobalData = symbolTable.copy(data = globals(symbolTable.data, request))
         val newSymbolTable = request.datasources
             ?.fold(symbolTableWithGlobalData)
-            {acc, next -> symbolTable.overrideDatasourceConnector(DataSourceKey(next.name), IN_MEMORY_CONNECTOR_NAME)}
+            {_, next -> symbolTable.overrideDatasourceConnector(DataSourceKey(next.name), IN_MEMORY_CONNECTOR_NAME)}
             ?: symbolTableWithGlobalData
 
         val evaluator = Evaluator(newSymbolTable, BasicOperations, sourceOps)

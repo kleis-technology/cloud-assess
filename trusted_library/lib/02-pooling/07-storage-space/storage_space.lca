@@ -1,5 +1,5 @@
 datasource storage_space_inventory {
-    location = "02-pooling/storage_space_inventory.csv"
+    location = "storage_space_inventory.csv"
     schema {
         id = "sto-sp-01"
         pool_id = "client_storage_space"

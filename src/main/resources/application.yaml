@@ -1,6 +1,12 @@
 lca:
-  config: trusted_library
-  manifest: lcaac.yaml
+  directory: trusted_library
+  lib:
+    directory: lib
+  archive:
+    directory: archive
+  inventory:
+    directory: inventory
+#    zip: inventory.zip
 cors:
   enabled: false
   allowed-origin:
