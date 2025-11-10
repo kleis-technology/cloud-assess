@@ -601,45 +601,24 @@ These models are specified under the folder `trusted_library`.
 
 The models are written in the [LCA as CODE](https://lca-as-code.com) language.
 This is a domain-specific language designed for the need of lifecycle analysis.
-The models under the folder `trusted_library` are directly loaded in the server
+The models under the folder `trusted_library/lib` are directly loaded in the server
 to perform the assessments.
 A [tutorial](https://lca-as-code.com/book) is available if you want to learn
 more about the language itself.
 The source repository is available [here](https://github.com/kleis-technology/lcaac).
 
 The folder `trusted_library` is organized as follows.
-
-* `01-hardware` : this folder contains the PCR models for the functional units 1 to 4.
-* `02-pooling` : this folder contains the PCR models for the functional units 5 to 7.
-* `03-services` : this folder contains higher functional units.
+* `lib` : this folder contains the models written in [LCA as CODE](https://lca-as-code.com).
+* `inventory` : this folder contains inventory data (csv files)
 
 Here is an illustration of this layering structure.
 
 <img alt="sankey" src="assets/sankey.png" width=800/>
 
-#### Configuring the models
+#### Configuring and deploying Cloud Assess
 
-You can read and edit the models in `trusted_library` with any text editor.
-Unless you need to customize one of the functional units, there is no need to actually modify the models.
-
-The folder `trusted_library/data` contains inventory files (in CSV format),
-and associated emission factors. To adapt Cloud Assess you must fill in, at least,
-the following inventories
-
-* `data/01-hardware/dc_inventory.csv` : this file lists the available datacenters.
-* `data/01-hardware/server_inventory.csv` : this file lists the available servers.
-* `data/01-hardware/network_inventory.csv` : this file lists the available network equipments.
-* `data/01-hardware/storage_inventory.csv` : this file lists the available storage equipments.
-
-The following files should be filled with the relevant emission factors:
-
-* `data/01-hardware/dc_impacts.csv`
-* `data/01-hardware/server_impacts.csv`
-* `data/01-hardware/network_impacts.csv`
-* `data/01-hardware/storage_impacts.csv`
-* `data/01-hardware/electricity_mix.csv`
-
-Note that the emission factors presented in this repository are mock values.
+Check out the [wiki](https://github.com/kleis-technology/cloud-assess/wiki/Deploying-Cloud-Assess)
+for a tutorial on how to configure and deploy Cloud Assess in a Kubernetes environment.
 
 ## License
 
