@@ -13,8 +13,9 @@ spec:
       {{- include "cloud-assess.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
       annotations:
+        checksum/inventory.zip: {{ .Values.lca.archive.inventory.content | sha256sum }}
+      {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
