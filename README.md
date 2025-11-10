@@ -46,7 +46,7 @@ docker compose up -d
 The API specification is available in the folder `openapi`.
 For a more interactive visualisation of the API, the `docker-compose`
 also spins up a swagger ui instance.
-Visit this [page](http://localhost) to explore the endpoints, DTOs and run example queries.
+Visit this [http://localhost](http://localhost) to explore the endpoints, DTOs and run example queries.
 
 ### Local build and run
 
