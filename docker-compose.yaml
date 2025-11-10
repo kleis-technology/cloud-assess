@@ -1,13 +1,16 @@
 services:
   app:
-    image: "ghcr.io/kleis-technology/cloud-assess/cloud-assess-app:v2.0.1"
+    image: "ghcr.io/kleis-technology/cloud-assess/cloud-assess-app:v2.1.0"
     container_name: cloud-assess-app
     ports:
     - "8080:8080"
     volumes:
-      - ./trusted_library:/config
+      - ./trusted_library:/trusted_library
     environment:
-      - LCA_CONFIG=/config
+      - LCA_DIRECTORY=/trusted_library
+      - LCA_LIB_DIRECTORY=lib
+      - LCA_ARCHIVE_DIRECTORY=archive
+      - LCA_INVENTORY_DIRECTORY=inventory
 #      - CORS_ENABLED=true
 #      - CORS_ALLOWED_ORIGIN=http://localhost
   swagger_ui:
