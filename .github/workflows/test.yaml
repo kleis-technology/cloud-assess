@@ -42,3 +42,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: ./gradlew test
 
+      - name: Run Trivy vulnerability scanner (Repo scan)
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs' # 'fs'
+          scan-ref: '.'
+          vuln-type: 'library'
+          ignore-unfixed: true
+          format: 'table'
+          exit-code: '1' # Fail the pipeline if vulnerabilities are found
+          severity: 'CRITICAL,HIGH'

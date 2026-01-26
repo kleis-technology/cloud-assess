@@ -46,7 +46,25 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # Build and push the Docker image
+      # Build the Docker image locally
+      - name: Build local image for scanning
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          load: true
+          tags: ghcr.io/kleis-technology/cloud-assess/cloud-assess-app:scan-tmp
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'ghcr.io/kleis-technology/cloud-assess/cloud-assess-app:scan-tmp'
+          format: 'table'
+          exit-code: '1' # Fail the pipeline if vulnerabilities are found
+          ignore-unfixed: true
+          vuln-type: 'library'
+          severity: 'CRITICAL,HIGH'
+
+      # If scan passes, Build and push the actual multi-platform images
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
         with:

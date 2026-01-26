@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("maven-publish")
-    id("org.springframework.boot") version "3.2.4"
+    id("org.springframework.boot") version "3.5.10"
     id("io.spring.dependency-management") version "1.1.3"
     kotlin("jvm") version "1.8.22"
     kotlin("plugin.spring") version "1.8.22"
@@ -33,7 +33,6 @@ dependencies {
     val lcaacVersion = "2.0.0"
     implementation("ch.kleis.lcaac:core:$lcaacVersion")
     implementation("ch.kleis.lcaac:grammar:$lcaacVersion")
-
 
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
@@ -95,9 +94,19 @@ openApiGenerate {
         "EntryValueDto" to " org.cloud_assess.dto.EntryValueDto",
         "ParameterValueDto" to "org.cloud_assess.dto.ParameterValueDto",
     ))
+    // generate only the API and the DTO (and not the supporting files such as the pom.xml that has no usage and outdated libraries)
+    globalProperties.set(mapOf(
+        "apis" to "",
+        "models" to "",
+        "supportingFiles" to "ApiUtil.kt"
+    ))
 }
 
 openApiValidate {
     inputSpec.set("$rootDir/openapi/api.yaml")
     recommend.set(true)
+}
+
+dependencyLocking {
+    lockAllConfigurations()
 }
