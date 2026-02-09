@@ -5,6 +5,10 @@ on:
     tags: [ "v*.*.*" ]
   workflow_dispatch:
 
+env:
+  REF_TAG:    ghcr.io/kleis-technology/cloud-assess/cloud-assess-app:${{ github.ref_name }}
+  LATEST_TAG: ghcr.io/kleis-technology/cloud-assess/cloud-assess-app:latest
+
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -32,6 +36,16 @@ jobs:
         run: |
           ./gradlew :build
 
+      - name: Set up Docker
+        uses: docker/setup-docker-action@v4
+        with:
+          daemon-config: |
+            {
+              "features": {
+                "containerd-snapshotter": true
+              }
+            }
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
@@ -46,34 +60,38 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # Build the Docker image locally
-      - name: Build local image for scanning
+      - name: Build and load images
         uses: docker/build-push-action@v6
         with:
           context: .
           load: true
-          tags: ghcr.io/kleis-technology/cloud-assess/cloud-assess-app:scan-tmp
+          platforms: linux/amd64,linux/arm64
+          tags: |
+            ${{ env.REF_TAG }}
+            ${{ env.LATEST_TAG }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: 'ghcr.io/kleis-technology/cloud-assess/cloud-assess-app:scan-tmp'
+          image-ref: ${{ env.LATEST_TAG }}
           format: 'table'
           exit-code: '1' # Fail the pipeline if vulnerabilities are found
           ignore-unfixed: true
           vuln-type: 'library'
           severity: 'CRITICAL,HIGH'
 
-      # If scan passes, Build and push the actual multi-platform images
-      - name: Build and push Docker image
+      - name: Push images
         uses: docker/build-push-action@v6
         with:
           context: .
-          push: true
           platforms: linux/amd64,linux/arm64
+          push: true
           tags: |
-            ghcr.io/kleis-technology/cloud-assess/cloud-assess-app:${{ github.ref_name }}
-            ghcr.io/kleis-technology/cloud-assess/cloud-assess-app:latest
+            ${{ env.REF_TAG }}
+            ${{ env.LATEST_TAG }}
+          cache-from: type=gha
 
       - name: Create a GitHub release
         id: create_release
