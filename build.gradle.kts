@@ -8,6 +8,7 @@ plugins {
     kotlin("plugin.spring") version "1.8.22"
     kotlin("plugin.serialization") version "1.9.0"
     id("org.openapi.generator") version "7.2.0"
+    id("org.sonarqube") version "7.1.0.6387"
 }
 
 group = "org.cloud_assess"
@@ -109,4 +110,11 @@ openApiValidate {
 
 dependencyLocking {
     lockAllConfigurations()
+}
+
+sonar {
+    properties {
+        property("sonar.projectKey", "kleis-technology_cloud-assess")
+        property("sonar.organization", "kleis-technology")
+    }
 }
