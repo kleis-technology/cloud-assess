@@ -27,7 +27,7 @@ jobs:
 
       # Validate wrapper
       - name: Gradle Wrapper Validation
-        uses: gradle/wrapper-validation-action@v1.0.6
+        uses: gradle/wrapper-validation-action@8d49e559aae34d3e0eb16cde532684bc9702762b # v1.0.6
 
       # Setup Java 17 environment for the next steps
       - name: Setup Java
@@ -43,7 +43,7 @@ jobs:
         run: ./gradlew test
 
       - name: Run Trivy vulnerability scanner (Repo scan)
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@c1824fd6edce30d7ab345a9989de00bbd46ef284 # v0.34.0
         with:
           scan-type: 'fs' # 'fs'
           scan-ref: '.'
