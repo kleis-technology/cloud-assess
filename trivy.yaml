@@ -1,0 +1,6 @@
+scan:
+  skip-dirs:
+    - demo
+    - experiments
+  scanners:
+    - vuln
