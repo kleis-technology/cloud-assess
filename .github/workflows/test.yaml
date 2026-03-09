@@ -12,6 +12,7 @@ on:
 
 permissions:
   contents: read
+  security-events: write
 
 jobs:
   build:
@@ -45,10 +46,18 @@ jobs:
       - name: Run Trivy vulnerability scanner (Repo scan)
         uses: aquasecurity/trivy-action@master
         with:
-          scan-type: 'fs' # 'fs'
+          scan-type: 'fs'
           scan-ref: '.'
+          trivy-config: trivy.yaml
           vuln-type: 'library'
           ignore-unfixed: true
-          format: 'table'
-          exit-code: '1' # Fail the pipeline if vulnerabilities are found
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          exit-code: '1'
           severity: 'CRITICAL,HIGH'
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'

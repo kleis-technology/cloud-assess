@@ -9,6 +9,11 @@ env:
   REF_TAG:    ghcr.io/kleis-technology/cloud-assess/cloud-assess-app:${{ github.ref_name }}
   LATEST_TAG: ghcr.io/kleis-technology/cloud-assess/cloud-assess-app:latest
 
+permissions:
+  contents: write
+  packages: write
+  security-events: write
+
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -76,11 +81,19 @@ jobs:
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: ${{ env.LATEST_TAG }}
-          format: 'table'
-          exit-code: '1' # Fail the pipeline if vulnerabilities are found
-          ignore-unfixed: true
+          trivy-config: trivy.yaml
           vuln-type: 'library'
+          ignore-unfixed: true
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          exit-code: '1'
           severity: 'CRITICAL,HIGH'
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
 
       - name: Push images
         uses: docker/build-push-action@v6
