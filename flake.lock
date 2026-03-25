@@ -23,39 +23,43 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1758272293,
-        "narHash": "sha256-FejyYNGaVGbovVmse4KymQCGauzLgzWqV+HyUU8zhWY=",
+        "lastModified": 1773969103,
+        "narHash": "sha256-+yef2uQTyM1mlULAps7huKB6QbYvWhZ4p2eGdRfxgNc=",
         "owner": "kleis-technology",
         "repo": "homebrew-lcaac",
-        "rev": "5f38f8631c5e7c8072b3435c176d5456b579a9b1",
+        "rev": "af2a390e3890b84461a6425a5cf858c666d8b30d",
         "type": "github"
       },
       "original": {
         "owner": "kleis-technology",
-        "ref": "v2.0.0",
+        "ref": "v2.2.0",
         "repo": "homebrew-lcaac",
         "type": "github"
       }
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 0,
-        "narHash": "sha256-v2NB8B3EahTvJ0Zg6QVJVUjq2cBwZ0UKTwMr2nv9718=",
-        "path": "/nix/store/hpyq11kyx19ggxi78ryhhhc9ai9p7jxp-source",
-        "type": "path"
+        "lastModified": 1735563628,
+        "narHash": "sha256-OnSAY7XDSx7CtDoqNh8jwVwh4xNL/2HaJxGjryLWzX8=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "b134951a4c9f3c995fd7be05f3243f8ecd65d798",
+        "type": "github"
       },
       "original": {
-        "id": "nixpkgs",
-        "type": "indirect"
+        "owner": "NixOS",
+        "ref": "nixos-24.05",
+        "repo": "nixpkgs",
+        "type": "github"
       }
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1761999846,
-        "narHash": "sha256-IYlYnp4O4dzEpL77BD/lj5NnJy2J8qbHkNSFiPBCbqo=",
+        "lastModified": 1767313136,
+        "narHash": "sha256-16KkgfdYqjaeRGBaYsNrhPRRENs0qzkQVUooNHtoy2w=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "3de8f8d73e35724bf9abef41f1bdbedda1e14a31",
+        "rev": "ac62194c3917d5f474c1a844b6fd6da2db95077d",
         "type": "github"
       },
       "original": {

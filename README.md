@@ -72,6 +72,12 @@ From the root of the git repository, run
 ./gradlew build
 ```
 
+To update a library and update the gradle.lockfile
+
+```bash
+./gradlew dependencies --write-locks
+```
+
 To run the server locally
 
 ```bash

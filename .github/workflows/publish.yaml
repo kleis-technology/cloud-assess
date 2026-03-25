@@ -5,6 +5,15 @@ on:
     tags: [ "v*.*.*" ]
   workflow_dispatch:
 
+env:
+  REF_TAG:    ghcr.io/kleis-technology/cloud-assess/cloud-assess-app:${{ github.ref_name }}
+  LATEST_TAG: ghcr.io/kleis-technology/cloud-assess/cloud-assess-app:latest
+
+permissions:
+  contents: write
+  packages: write
+  security-events: write
+
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -32,6 +41,16 @@ jobs:
         run: |
           ./gradlew :build
 
+      - name: Set up Docker
+        uses: docker/setup-docker-action@v4
+        with:
+          daemon-config: |
+            {
+              "features": {
+                "containerd-snapshotter": true
+              }
+            }
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
@@ -46,16 +65,46 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # Build and push the Docker image
-      - name: Build and push Docker image
+      - name: Build and load images
         uses: docker/build-push-action@v6
         with:
           context: .
-          push: true
+          load: true
           platforms: linux/amd64,linux/arm64
           tags: |
-            ghcr.io/kleis-technology/cloud-assess/cloud-assess-app:${{ github.ref_name }}
-            ghcr.io/kleis-technology/cloud-assess/cloud-assess-app:latest
+            ${{ env.REF_TAG }}
+            ${{ env.LATEST_TAG }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # v0.35.0
+        with:
+          image-ref: ${{ env.LATEST_TAG }}
+          trivy-config: trivy.yaml
+          vuln-type: 'library'
+          ignore-unfixed: true
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          exit-code: 0
+          severity: 'CRITICAL'
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+      - name: Push images
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ${{ env.REF_TAG }}
+            ${{ env.LATEST_TAG }}
+          cache-from: type=gha
 
       - name: Create a GitHub release
         id: create_release
