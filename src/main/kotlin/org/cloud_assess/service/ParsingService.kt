@@ -2,6 +2,7 @@ package org.cloud_assess.service
 
 import ch.kleis.lcaac.core.lang.expression.DataExpression
 import ch.kleis.lcaac.core.lang.expression.EProcessTemplateApplication
+import ch.kleis.lcaac.core.lang.register.DataRegister
 import ch.kleis.lcaac.core.lang.register.DataSourceRegister
 import ch.kleis.lcaac.core.math.basic.BasicNumber
 import ch.kleis.lcaac.core.math.basic.BasicOperations
@@ -24,7 +25,8 @@ class ParsingService {
         val ctx = parser.processDefinition()
         val preludeUnits = Prelude.units<BasicNumber>()
         return EProcessTemplateApplication(
-            template = coreMapper.process(ctx, preludeUnits, DataSourceRegister.empty()),
+            template = coreMapper.process(ctx,
+                DataRegister.empty(),preludeUnits, DataSourceRegister.empty()),
             arguments = emptyMap()
         )
     }

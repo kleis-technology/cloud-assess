@@ -50,7 +50,8 @@ class TraceService(
 
     fun analyze(request: TraceRequestListDto): ResourceTraceAnalysis {
         val meta = request.meta ?: emptyMap()
-        val commonGlobals = request.globals ?: emptyList()
+        val commonGlobalParams = request.globalParams ?: emptyList()
+        val commonGlobalVariables = request.globalVariables ?: emptyList()
         val commonDatasources = request.datasources ?: emptyList()
         val elements = request.elements
             .chunked(jobSize)
@@ -58,7 +59,8 @@ class TraceService(
             .map { job ->
                 job.map {
                     val merged = it.copy(
-                        globals = commonGlobals.plus(it.globals ?: emptyList()),
+                        globalParams = commonGlobalParams.plus(it.globalParams ?: emptyList()),
+                        globalVariables = commonGlobalVariables.plus(it.globalVariables ?: emptyList()),
                         datasources = commonDatasources.plus(it.datasources ?: emptyList()),
                     )
                     mapOf(it.requestId to analyze(merged))
@@ -77,7 +79,11 @@ class TraceService(
         )
         val sourceOps = defaultDataSourceOperations.overrideWith(inMemoryConnector)
 
-        val symbolTableWithGlobalData = symbolTable.copy(data = globals(symbolTable.data, request))
+        val symbolTableWithGlobalData = symbolTable
+            .copy(
+                globalParameters = globalParams(symbolTable.globalParameters, request),
+                globalVariables = globalVariables(symbolTable.globalVariables, request),
+                )
         val newSymbolTable = request.datasources
             ?.fold(symbolTableWithGlobalData)
             {_, next -> symbolTable.overrideDatasourceConnector(DataSourceKey(next.name), IN_MEMORY_CONNECTOR_NAME)}
@@ -146,9 +152,19 @@ class TraceService(
         }
     }
 
-    private fun globals(dataRegister: DataRegister<BasicNumber>, request: TraceRequestDto): DataRegister<BasicNumber> {
-        val requestGlobals = request.globals ?: emptyList()
-        return requestGlobals.fold(dataRegister) { register, parameter ->
+    private fun globalParams(dataRegister: DataRegister<BasicNumber>, request: TraceRequestDto): DataRegister<BasicNumber> {
+        val requestGlobalParams = request.globalParams ?: emptyList()
+        return requestGlobalParams.fold(dataRegister) { register, parameter ->
+            register.override(
+                DataKey(parameter.name),
+                parameter(parameter)
+            )
+        }
+    }
+    
+    private fun globalVariables(dataRegister: DataRegister<BasicNumber>, request: TraceRequestDto): DataRegister<BasicNumber> {
+        val requestGlobalVariables = request.globalVariables ?: emptyList()
+        return requestGlobalVariables.fold(dataRegister) { register, parameter ->
             register.override(
                 DataKey(parameter.name),
                 parameter(parameter)

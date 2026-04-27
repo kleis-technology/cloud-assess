@@ -386,7 +386,12 @@ components:
           default: { }
           additionalProperties:
             type: string
-        globals:
+        globalParams:
+          type: array
+          default: [ ]
+          items:
+            $ref: '#/components/schemas/ParameterDto'
+        globalVariables:
           type: array
           default: [ ]
           items:
@@ -418,7 +423,12 @@ components:
           default: -1
         demand:
           $ref: '#/components/schemas/DemandDto'
-        globals:
+        globalParams:
+          type: array
+          default: [ ]
+          items:
+            $ref: '#/components/schemas/ParameterDto'
+        globalVariables:
           type: array
           default: [ ]
           items:
