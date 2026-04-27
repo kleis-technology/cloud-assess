@@ -109,7 +109,7 @@ class TraceServiceTest {
                 processName = "vm",
                 quantity = QuantityDto(1.0, "hour"),
             ),
-            globals = listOf(
+            globalVariables = listOf(
                 ParameterDto(
                     "x",
                     PVNum(1.0, "kg"),
@@ -160,7 +160,7 @@ class TraceServiceTest {
         )
         val requestList = DtoFixture.traceRequestListWithSpecificGlobalsAndDatasources(1)
             .copy(
-                globals = listOf(
+                globalVariables = listOf(
                     ParameterDto(
                         "y",
                         PVNum(1.0, "l"),
@@ -194,7 +194,7 @@ class TraceServiceTest {
                 processName = "vm",
                 quantity = QuantityDto(1.0, "hour"),
             ),
-            globals = listOf(
+            globalVariables = listOf(
                 ParameterDto(
                     "y",
                     PVNum(1.0, "l"),
@@ -619,9 +619,9 @@ class TraceServiceTest {
         assertThat(actual.target.getDisplayName())
             .isEqualTo("p from p{}{my_name=foo}")
     }
-
+    
     @Test
-    fun analyze_singleRequest_withGlobals_Num_isNotEmpty() {
+    fun analyze_singleRequest_withGlobalVariables_Num_isNotEmpty() {
         // given
         val symbolTable = prepare(
             """
@@ -652,7 +652,7 @@ class TraceServiceTest {
             meta = mapOf(
                 "group" to "foo",
             ),
-            globals = listOf(
+            globalVariables = listOf(
                 ParameterDto("x", PVNum(1.0, "kg")),
             )
         )
@@ -668,7 +668,7 @@ class TraceServiceTest {
     }
 
     @Test
-    fun analyze_singleRequest_withGlobals_Str_isNotEmpty() {
+    fun analyze_singleRequest_withGlobalVariables_Str_isNotEmpty() {
         // given
         val symbolTable = prepare(
             """
@@ -702,7 +702,102 @@ class TraceServiceTest {
             meta = mapOf(
                 "group" to "foo",
             ),
-            globals = listOf(
+            globalVariables = listOf(
+                ParameterDto("x", PVStr("foo")),
+            )
+        )
+
+        // when
+        val actual = service.analyze(request).getElements()[1]
+
+        // then success
+        assertThat(actual.target.getDisplayName())
+            .isEqualTo("p from p{}{my_name=foo}")
+    }
+
+    @Test
+    fun analyze_singleRequest_withGlobalParams_Num_isNotEmpty() {
+        // given
+        val symbolTable = prepare(
+            """
+            process p {
+                products {
+                    1 kg p
+                }
+                impacts {
+                    x GWP
+                }
+            }
+        """.trimIndent()
+        )
+        val sourceOps = mockk<DefaultDataSourceOperations<BasicNumber>>()
+        every { sourceOps.overrideWith(any()) } returns sourceOps
+        val service = TraceService(
+            parsingService,
+            sourceOps,
+            symbolTable,
+        )
+        val request = TraceRequestDto(
+            requestId = "r01",
+            demand = DemandDto(
+                productName = "p",
+                quantity = QuantityDto(1.0, "kg"),
+                processName = "p",
+            ),
+            meta = mapOf(
+                "group" to "foo",
+            ),
+            globalParams = listOf(
+                ParameterDto("x", PVNum(1.0, "kg")),
+            )
+        )
+
+        // when
+        val actual = service.analyze(request)
+            .getElements()[1]
+
+        // then success
+        assertThat(actual.impacts[Indicator.GWP]).isEqualTo(
+            QuantityFixture.oneKg,
+        )
+    }
+
+    @Test
+    fun analyze_singleRequest_withGlobalParams_Str_isNotEmpty() {
+        // given
+        val symbolTable = prepare(
+            """
+            process p {
+                params {
+                    my_name = x
+                }
+                products {
+                    1 kg p
+                }
+                impacts {
+                    1 kg GWP
+                }
+            }
+        """.trimIndent()
+        )
+        val sourceOps = mockk<DefaultDataSourceOperations<BasicNumber>>()
+        every { sourceOps.overrideWith(any()) } returns sourceOps
+        val service = TraceService(
+            parsingService,
+            sourceOps,
+            symbolTable,
+        )
+        val request = TraceRequestDto(
+            requestId = "r01",
+            demand = DemandDto(
+                productName = "p",
+                quantity = QuantityDto(1.0, "kg"),
+                processName = "p",
+            ),
+            meta = mapOf(
+                "group" to "foo",
+            ),
+            globalParams = listOf(
                 ParameterDto("x", PVStr("foo")),
             )
         )

@@ -44,7 +44,7 @@ class StorageResourceService(
 
         val newSymbolTable = symbolTable
             .overrideDatasourceConnector(DataSourceKey(overriddenDataSourceName), IN_MEMORY_CONNECTOR_NAME)
-            .copy(data = symbolTable.data.override(DataKey(overrideTimeWindowParam), period))
+            .copy(globalParameters = symbolTable.globalParameters.override(DataKey(overrideTimeWindowParam), period))
 
         val evaluator = Evaluator(newSymbolTable, BasicOperations, sourceOps)
 

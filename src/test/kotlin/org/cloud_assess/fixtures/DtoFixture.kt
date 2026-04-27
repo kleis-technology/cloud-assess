@@ -12,7 +12,7 @@ class DtoFixture {
         fun traceRequestListWithCommonGlobalAndDatasource(size: Int = 3): TraceRequestListDto {
             return TraceRequestListDto(
                 elements = (1..size).map { traceRequestDto("r$it") },
-                globals = listOf(
+                globalVariables = listOf(
                     ParameterDto(
                         "x",
                         PVNum(1.0, "kg"),
@@ -47,7 +47,7 @@ class DtoFixture {
                     processName = "vm",
                     quantity = QuantityDto(1.0, "hour"),
                 ),
-                globals = emptyList(),
+                globalVariables = emptyList(),
                 meta = mapOf(
                     "group" to "foo"
                 ),
@@ -64,7 +64,7 @@ class DtoFixture {
                     processName = "vm",
                     quantity = QuantityDto(1.0, "hour"),
                 ),
-                globals = listOf(
+                globalVariables = listOf(
                     ParameterDto(
                         "x",
                         PVNum(1.0, "kg"),
