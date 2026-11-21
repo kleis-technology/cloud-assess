@@ -9,6 +9,7 @@ local
 .local
 .clients
 .direnv
+.claude
 
 **/node_modules
 
