@@ -11,3 +11,175 @@ connectors:
       enabled: true
     options:
       directory: inventory
+
+# -------------------------------------- #
+#               API
+# -------------------------------------- #
+
+x-indicators: &indicators [ ADPe, ADPf, AP, GWP, LU, ODP, PM, POCP, WU, CTUe, CTUh_c, CTUh_nc, Epf, Epm, Ept, IR ]
+
+api:
+  name: cloud-assess
+  version: 3.0.0
+  description: |
+    Environmental impacts of cloud services.
+    Each operation gives the impacts over the requested period, in total and per life cycle step
+    (manufacturing, transport, use, end of life).
+  units:
+    impacts:
+      ADPe: kg_Sb_Eq
+      ADPf: MJ_net_calorific_value
+      AP: mol_H_p_Eq
+      GWP: kg_CO2_Eq
+      LU: u
+      ODP: kg_CFC_11_Eq
+      PM: disease_incidence
+      POCP: kg_NMVOC_Eq
+      WU: m3_world_eq_deprived
+      CTUe: CTUe
+      CTUh_c: CTUh
+      CTUh_nc: CTUh
+      Epf: kg_P_Eq
+      Epm: kg_N_Eq
+      Ept: mol_N_Eq
+      IR: kBq_U235_Eq
+    products: { }
+  operations:
+
+    # FU5
+    compute_resources:
+      description: Impacts of compute resources over a period (FU5)
+      process: compute_fn
+      inputs:
+        period: { global: timewindow, description: Assessment period }
+        total_vcpu: { parameter: total_vcpu, description: "Total vCPU of the pool (default, the sum over the requested resources)" }
+      data:
+        compute_resources:
+          datasource: compute_inventory
+          columns: { id: id, pool_id: pool_id, quantity: quantity, vcpu: vcpu_size }
+          pass_through: [ meta ]
+      for_each: { rows: compute_resources, arguments: { id: id } }
+      outputs:
+        total:
+          select: *indicators
+          where: { product: compute, process: compute_fn, labels: { phase: null } }
+          aggregate: one
+        manufacturing:
+          select: *indicators
+          where: { product: compute, process: compute_fn, labels: { phase: embodied }, arguments: { lc_step: manufacturing } }
+          aggregate: one
+        transport:
+          select: *indicators
+          where: { product: compute, process: compute_fn, labels: { phase: embodied }, arguments: { lc_step: transport } }
+          aggregate: one
+        use:
+          select: *indicators
+          where: { product: compute, process: compute_fn, labels: { phase: use } }
+          aggregate: one
+        end_of_life:
+          select: *indicators
+          where: { product: compute, process: compute_fn, labels: { phase: embodied }, arguments: { lc_step: end-of-life } }
+          aggregate: one
+
+    # FU6
+    virtual_machines:
+      description: Impacts of virtual machines over a period (FU6)
+      process: vm_fn
+      inputs:
+        period: { global: timewindow, description: Assessment period }
+        total_vcpu: { parameter: total_vcpu, description: "Total vCPU of the pool (default, the sum over the requested virtual machines)" }
+        total_ram: { parameter: total_ram, description: "Total RAM of the pool (default, the sum over the requested virtual machines)" }
+        total_storage: { parameter: total_storage, description: "Total storage of the pool (default, the sum over the requested virtual machines)" }
+      data:
+        virtual_machines:
+          datasource: vm_inventory
+          columns: { id: id, pool_id: pool_id, quantity: quantity, vcpu: vcpu_size, ram: ram_size, storage: storage_size }
+          pass_through: [ meta ]
+      for_each: { rows: virtual_machines, arguments: { id: id } }
+      outputs:
+        total:
+          select: *indicators
+          where: { product: vm, process: vm_fn, labels: { phase: null } }
+          aggregate: one
+        manufacturing:
+          select: *indicators
+          where: { product: vm, process: vm_fn, labels: { phase: embodied }, arguments: { lc_step: manufacturing } }
+          aggregate: one
+        transport:
+          select: *indicators
+          where: { product: vm, process: vm_fn, labels: { phase: embodied }, arguments: { lc_step: transport } }
+          aggregate: one
+        use:
+          select: *indicators
+          where: { product: vm, process: vm_fn, labels: { phase: use } }
+          aggregate: one
+        end_of_life:
+          select: *indicators
+          where: { product: vm, process: vm_fn, labels: { phase: embodied }, arguments: { lc_step: end-of-life } }
+          aggregate: one
+
+    # FU7
+    storage_resources:
+      description: Impacts of storage resources over a period (FU7)
+      process: storage_space_fn
+      inputs:
+        period: { global: timewindow, description: Assessment period }
+        total_vcpu: { parameter: total_vcpu, description: "Total vCPU of the pool (default, the sum over the requested resources)" }
+        total_storage: { parameter: total_storage, description: "Total storage of the pool (default, the sum over the requested resources)" }
+      data:
+        storage_resources:
+          datasource: storage_space_inventory
+          columns: { id: id, pool_id: pool_id, quantity: quantity, vcpu: vcpu_size, storage: volume }
+          pass_through: [ meta ]
+      for_each: { rows: storage_resources, arguments: { id: id } }
+      outputs:
+        total:
+          select: *indicators
+          where: { product: storage, process: storage_space_fn, labels: { phase: null } }
+          aggregate: one
+        manufacturing:
+          select: *indicators
+          where: { product: storage, process: storage_space_fn, labels: { phase: embodied }, arguments: { lc_step: manufacturing } }
+          aggregate: one
+        transport:
+          select: *indicators
+          where: { product: storage, process: storage_space_fn, labels: { phase: embodied }, arguments: { lc_step: transport } }
+          aggregate: one
+        use:
+          select: *indicators
+          where: { product: storage, process: storage_space_fn, labels: { phase: use } }
+          aggregate: one
+        end_of_life:
+          select: *indicators
+          where: { product: storage, process: storage_space_fn, labels: { phase: embodied }, arguments: { lc_step: end-of-life } }
+          aggregate: one
+
+    # Several pools: POST /pools/batch
+    pools:
+      description: Impacts of a pool over a period
+      process: service_fn
+      inputs:
+        period: { global: timewindow, description: Assessment period }
+        id: { parameter: id, description: Pool id }
+      pass_through: [ meta ]
+      outputs:
+        total:
+          select: *indicators
+          where: { product: service, process: service_fn, labels: { phase: null } }
+          aggregate: one
+        manufacturing:
+          select: *indicators
+          where: { product: service, process: service_fn, labels: { phase: embodied }, arguments: { lc_step: manufacturing } }
+          aggregate: one
+        transport:
+          select: *indicators
+          where: { product: service, process: service_fn, labels: { phase: embodied }, arguments: { lc_step: transport } }
+          aggregate: one
+        use:
+          select: *indicators
+          where: { product: service, process: service_fn, labels: { phase: use } }
+          aggregate: one
+        end_of_life:
+          select: *indicators
+          where: { product: service, process: service_fn, labels: { phase: embodied }, arguments: { lc_step: end-of-life } }
+          aggregate: one

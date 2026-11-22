@@ -5,8 +5,11 @@ on:
     branches: [ "main" ]
     paths:
       - trusted_library/**
-      - openapi/**
-      - src/**
+      - samples/**
+      - tests/**
+      - docker/**
+      - Dockerfile
+      - .github/workflows/test.yaml
   pull_request:
     branches: [ "main" ]
 
@@ -14,31 +17,37 @@ permissions:
   contents: read
 
 jobs:
-  build:
+  test:
     name: test
     runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.properties.outputs.version }}
-      changelog: ${{ steps.properties.outputs.changelog }}
+    env:
+      IMAGE: cloud-assess-app:test
     steps:
-      # Check out current repository
       - name: Fetch Sources
-        uses: actions/checkout@v3.5.1
+        uses: actions/checkout@v4
 
-      # Validate wrapper
-      - name: Gradle Wrapper Validation
-        uses: gradle/wrapper-validation-action@v1.0.6
+      - name: Build image
+        run: docker build -t "$IMAGE" .
 
-      # Setup Java 17 environment for the next steps
-      - name: Setup Java
-        uses: actions/setup-java@v3
-        with:
-          distribution: zulu
-          java-version: 17
-          cache: gradle
+      - name: Test the models
+        run: docker run --rm --entrypoint lcaac "$IMAGE" test -c /trusted_library/lcaac.yaml -s /trusted_library/lib
 
-      - name: Run Tests
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: ./gradlew test
+      - name: Check the API definition
+        run: docker run --rm --entrypoint lcaac "$IMAGE" api openapi -c /trusted_library/lcaac.yaml -s /trusted_library/lib > /dev/null
 
+      - name: Start server
+        run: |
+          docker run -d --name cloud-assess -p 8080:8080 "$IMAGE"
+          for i in $(seq 1 120); do
+            curl -sf localhost:8080/health && exit 0
+            sleep 1
+          done
+          echo "server did not start"
+          exit 1
+
+      - name: Smoke test the API
+        run: python3 tests/smoke_test.py http://localhost:8080
+
+      - name: Server logs
+        if: always()
+        run: docker logs cloud-assess || true

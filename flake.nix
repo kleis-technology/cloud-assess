@@ -1,7 +1,7 @@
 {
   description = "Cloud Assess flake";
   inputs = {
-    lcaac-flake.url = "github:kleis-technology/homebrew-lcaac/v2.4.0";
+    lcaac-flake.url = "github:kleis-technology/homebrew-lcaac/v3.3.0";
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
     flake-utils.url = "github:numtide/flake-utils";
   };
@@ -15,8 +15,6 @@
         devShells.default = pkgs.mkShell {
           name = "cloud-assess-dev-shell";
           packages = with pkgs; [
-            jdk17
-            gradle
             python312
             python312Packages.uv
             lcaac-flake.packages.aarch64-darwin.lcaac-cli

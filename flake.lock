@@ -23,16 +23,16 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1777303634,
-        "narHash": "sha256-MWufsHeXsiCTq1tIsxoVuzsVVz9cNqQAdjjjfTI9s3A=",
+        "lastModified": 1795218237,
+        "narHash": "sha256-hSxjTUpQhe+661L2r0EpfOad8zc6IhjDpzIcb2IN+/w=",
         "owner": "kleis-technology",
         "repo": "homebrew-lcaac",
-        "rev": "5b906b18e73aac925d8f0eedbd21595be31bc2db",
+        "rev": "28fdbb3336b104a7cb4f51dca122737f6e93adab",
         "type": "github"
       },
       "original": {
         "owner": "kleis-technology",
-        "ref": "v2.4.0",
+        "ref": "v3.3.0",
         "repo": "homebrew-lcaac",
         "type": "github"
       }

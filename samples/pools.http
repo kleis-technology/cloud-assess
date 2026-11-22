@@ -1,18 +1,19 @@
-POST http://localhost:8080/pools/assess
+POST http://localhost:8080/pools/batch
 Content-Type: application/json
 
 {
-  "period": {
-    "amount": 1.0,
-    "unit": "hour"
-  },
-  "pools": [
+  "requests": [
     {
+      "period": "1 hour",
       "id": "client_vm",
-      "service_level": {
-        "amount": 10.0,
-        "unit": "u"
-      },
+      "meta": {
+        "region": "sofia",
+        "env": "production"
+      }
+    },
+    {
+      "period": "1 hour",
+      "id": "client_storage_space",
       "meta": {
         "region": "sofia",
         "env": "production"

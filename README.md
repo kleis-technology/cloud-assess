@@ -43,104 +43,85 @@ You can run the server using `docker-compose`.
 docker compose up -d
 ```
 
-The API specification is available in the folder `openapi`.
-For a more interactive visualisation of the API, the `docker-compose`
-also spins up a swagger ui instance.
-Visit this [http://localhost](http://localhost) to explore the endpoints, DTOs and run example queries.
+The server listens on [http://localhost:8080](http://localhost:8080).
+The `docker-compose` also spins up a swagger ui instance, behind a proxy that serves the API on the same origin.
+Visit [http://localhost/docs/](http://localhost/docs/) to explore the endpoints, DTOs and run example queries.
+If the port 80 is already used on your machine, choose another one with `PROXY_PORT=8000 docker compose up -d`.
 
-### Local build and run
+The OpenAPI specification of the API is served at `/openapi.json`.
 
-#### Requirements
+### Local run
 
-To build the server, you will need
+The server is the [LCA as Code](https://github.com/kleis-technology/lcaac) command-line tool `lcaac`, version 3.3.0 or later,
+which requires Java 17.
+Download `lcaac-cli-v<version>.tar.gz` from the [lcaac releases](https://github.com/kleis-technology/lcaac/releases),
+extract it, and add its `bin` folder to your `PATH`.
 
-* Java 17 (temurin) environment
-* A [GitHub personal access token (classic)](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic) with the permission `read:packages` to download packages from GitHub Package Registry.
-
-Then, set up the following environment variables.
-
-```bash
-export GITHUB_ACTOR=<your GitHub username>
-export GITHUB_TOKEN=<the token you just created>
-```
-
-#### Procedure
-
-From the root of the git repository, run
+Then, from the root of the git repository, run
 
 ```bash
-./gradlew build
-```
-
-To run the server locally
-
-```bash
-./gradlew bootRun
+cd trusted_library
+lcaac serve -s lib
 ```
 
 The server should start listening for requests on `localhost:8080`.
-
-Note that, if you are on Windows, use the command `./gradlew.bat` instead of `./gradlew`.
+`lcaac api openapi` prints the OpenAPI specification of the API, and `lcaac serve --help` lists the options of the server.
 
 ## First Assessment
 
 Each functional unit is associated with a specific API endpoint.
+
+| Endpoint                   | Functional unit                     |
+|----------------------------|-------------------------------------|
+| `POST /compute_resources`  | Computing resources (FU5)           |
+| `POST /virtual_machines`   | Virtual machines (FU6)              |
+| `POST /storage_resources`  | Block storage (FU7)                 |
+| `POST /pools`              | Pool of equipment, identified by id |
+
+Every endpoint `POST /<name>` also has a batch version `POST /<name>/batch`, taking `{"requests": [...]}`.
+Example requests are available in the folder `samples`.
+
 For instance, say we want to assess the environmental impact of using a virtual machine.
-The request takes the following form:
+The request `POST /virtual_machines` takes the following form:
 
 ```json
 {
-   "period": {
-      "amount": 1.0,
-      "unit": "hour"
-   },
-   "total_vcpu": {
-      "amount": 100.0,
-      "unit": "vCPU"
-   },
-   "total_ram": {
-      "amount": 100.0,
-      "unit": "GB"
-   },
-   "total_storage": {
-      "amount": 100.0,
-      "unit": "TB"
-   },
-   "virtual_machines": [
-      {
-         "id": "vm-01",
-         "pool_id": "client_vm",
-         "quantity": {
-            "amount": 1.0,
-            "unit": "u"
-         },
-         "ram": {
-            "amount": 4.0,
-            "unit": "GB"
-         },
-         "storage": {
-            "amount": 20.0,
-            "unit": "GB"
-         },
-         "vcpu": {
-            "amount": 1.0,
-            "unit": "vCPU"
-         },
-         "meta": {
-            "region": "sofia",
-            "env": "production"
-         }
+  "period": "1 hour",
+  "total_vcpu": "100 vCPU",
+  "total_ram": "100 GB",
+  "total_storage": "100 TB",
+  "virtual_machines": [
+    {
+      "id": "vm-01",
+      "pool_id": "client_vm",
+      "quantity": 1,
+      "ram": "4 GB",
+      "storage": "20 GB",
+      "vcpu": "1 vCPU",
+      "meta": {
+        "region": "sofia",
+        "env": "production"
       }
-   ]
+    }
+  ]
 }
 ```
 
 In this request, we specify the usage of our virtual machine in terms
-of the quantity of resources used (ram, storage and vCPU).
+of the quantity of resources used (ram, storage and vCPU) during the period.
+The fields `total_vcpu`, `total_ram` and `total_storage` describe the whole pool of virtual machines,
+and are used to allocate the impacts of the pool to each virtual machine.
+They are optional: by default, they are the sum over the virtual machines of the request.
 
-Running this request yields an impact assessment with the common LCA indicators.
+Quantities are given as text, e.g., `"4 GB"`, as a number in the default unit, e.g., `4`,
+or as an object, e.g., `{"amount": 4.0, "unit": "GB"}`.
+The field `meta` is optional, and is returned as is in the response.
+
+Running this request yields an impact assessment with the common LCA indicators,
+in total and per life cycle step (manufacturing, transport, use and end of life).
 Of course, in this example, we ran the assessment for a single virtual machine,
-but nothing stops you from assessing as many virtual machines as you want.
+but nothing stops you from assessing as many virtual machines as you want:
+the response contains one result per virtual machine.
 <details>
 <summary>
     Expand to see what the result looks like.
@@ -148,424 +129,120 @@ but nothing stops you from assessing as many virtual machines as you want.
 
 ```json
 {
-   "virtual_machines": [
-      {
-         "period": {
-            "amount": 1.0,
-            "unit": "hour"
-         },
-         "request": {
-            "id": "vm-01",
-            "pool_id": "client_vm",
-            "quantity": {
-               "amount": 1.0,
-               "unit": "u"
-            },
-            "ram": {
-               "amount": 4.0,
-               "unit": "GB"
-            },
-            "storage": {
-               "amount": 20.0,
-               "unit": "GB"
-            },
-            "vcpu": {
-               "amount": 1.0,
-               "unit": "vCPU"
-            },
-            "meta": {
-               "region": "sofia",
-               "env": "production"
-            }
-         },
-         "impacts": {
-            "ADPe": {
-               "total": {
-                  "amount": 1.1854678736318172E-5,
-                  "unit": "kg Sb-Eq"
-               },
-               "per_lc_step": {
-                  "manufacturing": {
-                     "amount": 2.225849560067201E-6,
-                     "unit": "kg Sb-Eq"
-                  },
-                  "transport": {
-                     "amount": 1.526861504175665E-6,
-                     "unit": "kg Sb-Eq"
-                  },
-                  "use": {
-                     "amount": 6.570462152963352E-6,
-                     "unit": "kg Sb-Eq"
-                  },
-                  "end_of_life": {
-                     "amount": 1.5315055191119535E-6,
-                     "unit": "kg Sb-Eq"
-                  }
-               }
-            },
-            "ADPf": {
-               "total": {
-                  "amount": 62.33162368565782,
-                  "unit": "MJ, net calorific value"
-               },
-               "per_lc_step": {
-                  "manufacturing": {
-                     "amount": 16.68493611195954,
-                     "unit": "MJ, net calorific value"
-                  },
-                  "transport": {
-                     "amount": 16.575951835849164,
-                     "unit": "MJ, net calorific value"
-                  },
-                  "use": {
-                     "amount": 12.48864307614414,
-                     "unit": "MJ, net calorific value"
-                  },
-                  "end_of_life": {
-                     "amount": 16.582092661704973,
-                     "unit": "MJ, net calorific value"
-                  }
-               }
-            },
-            "AP": {
-               "total": {
-                  "amount": 0.027696043162935963,
-                  "unit": "mol H+-Eq"
-               },
-               "per_lc_step": {
-                  "manufacturing": {
-                     "amount": 0.007594263925867406,
-                     "unit": "mol H+-Eq"
-                  },
-                  "transport": {
-                     "amount": 0.007499887185410032,
-                     "unit": "mol H+-Eq"
-                  },
-                  "use": {
-                     "amount": 0.005096811622739166,
-                     "unit": "mol H+-Eq"
-                  },
-                  "end_of_life": {
-                     "amount": 0.007505080428919357,
-                     "unit": "mol H+-Eq"
-                  }
-               }
-            },
-            "GWP": {
-               "total": {
-                  "amount": 4.917652556684529,
-                  "unit": "kg CO2-Eq"
-               },
-               "per_lc_step": {
-                  "manufacturing": {
-                     "amount": 1.2685097680580173,
-                     "unit": "kg CO2-Eq"
-                  },
-                  "transport": {
-                     "amount": 1.2582340374175287,
-                     "unit": "kg CO2-Eq"
-                  },
-                  "use": {
-                     "amount": 1.1324125903631403,
-                     "unit": "kg CO2-Eq"
-                  },
-                  "end_of_life": {
-                     "amount": 1.2584961608458427,
-                     "unit": "kg CO2-Eq"
-                  }
-               }
-            },
-            "LU": {
-               "total": {
-                  "amount": 2.624571812069938,
-                  "unit": "u"
-               },
-               "per_lc_step": {
-                  "manufacturing": {
-                     "amount": 0.04726920471902647,
-                     "unit": "u"
-                  },
-                  "transport": {
-                     "amount": 0.021918300384408593,
-                     "unit": "u"
-                  },
-                  "use": {
-                     "amount": 2.5317431295884796,
-                     "unit": "u"
-                  },
-                  "end_of_life": {
-                     "amount": 0.02364117737802341,
-                     "unit": "u"
-                  }
-               }
-            },
-            "ODP": {
-               "total": {
-                  "amount": 0.013312891435337558,
-                  "unit": "kg CFC-11-Eq"
-               },
-               "per_lc_step": {
-                  "manufacturing": {
-                     "amount": 0.0044376267209147125,
-                     "unit": "kg CFC-11-Eq"
-                  },
-                  "transport": {
-                     "amount": 0.0044376261366686634,
-                     "unit": "kg CFC-11-Eq"
-                  },
-                  "use": {
-                     "amount": 1.2410867486489788E-8,
-                     "unit": "kg CFC-11-Eq"
-                  },
-                  "end_of_life": {
-                     "amount": 0.004437626166886695,
-                     "unit": "kg CFC-11-Eq"
-                  }
-               }
-            },
-            "PM": {
-               "total": {
-                  "amount": 1.443563140628956E-6,
-                  "unit": "disease incidence"
-               },
-               "per_lc_step": {
-                  "manufacturing": {
-                     "amount": 4.659322817923548E-7,
-                     "unit": "disease incidence"
-                  },
-                  "transport": {
-                     "amount": 4.6532709663581914E-7,
-                     "unit": "disease incidence"
-                  },
-                  "use": {
-                     "amount": 4.6936584062332816E-8,
-                     "unit": "disease incidence"
-                  },
-                  "end_of_life": {
-                     "amount": 4.653671781384491E-7,
-                     "unit": "disease incidence"
-                  }
-               }
-            },
-            "POCP": {
-               "total": {
-                  "amount": 0.002505739886538823,
-                  "unit": "kg NMVOC-Eq"
-               },
-               "per_lc_step": {
-                  "manufacturing": {
-                     "amount": 4.015940673344095E-5,
-                     "unit": "kg NMVOC-Eq"
-                  },
-                  "transport": {
-                     "amount": 1.6654121903901202E-6,
-                     "unit": "kg NMVOC-Eq"
-                  },
-                  "use": {
-                     "amount": 0.0024609082726224306,
-                     "unit": "kg NMVOC-Eq"
-                  },
-                  "end_of_life": {
-                     "amount": 3.0067949925616415E-6,
-                     "unit": "kg NMVOC-Eq"
-                  }
-               }
-            },
-            "WU": {
-               "total": {
-                  "amount": 0.2503283010915833,
-                  "unit": "m3 world eq. deprived"
-               },
-               "per_lc_step": {
-                  "manufacturing": {
-                     "amount": 0.012371380794322486,
-                     "unit": "m3 world eq. deprived"
-                  },
-                  "transport": {
-                     "amount": 0.0028470792627199957,
-                     "unit": "m3 world eq. deprived"
-                  },
-                  "use": {
-                     "amount": 0.23226350876206023,
-                     "unit": "m3 world eq. deprived"
-                  },
-                  "end_of_life": {
-                     "amount": 0.002846332272480629,
-                     "unit": "m3 world eq. deprived"
-                  }
-               }
-            },
-            "CTUe": {
-               "total": {
-                  "amount": 58.90191574298565,
-                  "unit": "CTUe"
-               },
-               "per_lc_step": {
-                  "manufacturing": {
-                     "amount": 18.73533240114092,
-                     "unit": "CTUe"
-                  },
-                  "transport": {
-                     "amount": 18.51641380532083,
-                     "unit": "CTUe"
-                  },
-                  "use": {
-                     "amount": 3.064604371185056,
-                     "unit": "CTUe"
-                  },
-                  "end_of_life": {
-                     "amount": 18.58556516533884,
-                     "unit": "CTUe"
-                  }
-               }
-            },
-            "CTUh_c": {
-               "total": {
-                  "amount": 1.9213914310898006E-9,
-                  "unit": "CTUh"
-               },
-               "per_lc_step": {
-                  "manufacturing": {
-                     "amount": 1.8094839178619905E-10,
-                     "unit": "CTUh"
-                  },
-                  "transport": {
-                     "amount": 1.3431110837644963E-10,
-                     "unit": "CTUh"
-                  },
-                  "use": {
-                     "amount": 1.4671232876712334E-9,
-                     "unit": "CTUh"
-                  },
-                  "end_of_life": {
-                     "amount": 1.3900864325591864E-10,
-                     "unit": "CTUh"
-                  }
-               }
-            },
-            "CTUh_nc": {
-               "total": {
-                  "amount": 3.503286449092768E-8,
-                  "unit": "CTUh"
-               },
-               "per_lc_step": {
-                  "manufacturing": {
-                     "amount": 8.23316171853553E-9,
-                     "unit": "CTUh"
-                  },
-                  "transport": {
-                     "amount": 7.746208995686664E-9,
-                     "unit": "CTUh"
-                  },
-                  "use": {
-                     "amount": 1.1281201653961916E-8,
-                     "unit": "CTUh"
-                  },
-                  "end_of_life": {
-                     "amount": 7.772292122743571E-9,
-                     "unit": "CTUh"
-                  }
-               }
-            },
-            "Epf": {
-               "total": {
-                  "amount": 3.763748948066863E-4,
-                  "unit": "kg P-Eq"
-               },
-               "per_lc_step": {
-                  "manufacturing": {
-                     "amount": 6.67944179626921E-6,
-                     "unit": "kg P-Eq"
-                  },
-                  "transport": {
-                     "amount": 3.4798870544897944E-6,
-                     "unit": "kg P-Eq"
-                  },
-                  "use": {
-                     "amount": 3.624785519394673E-4,
-                     "unit": "kg P-Eq"
-                  },
-                  "end_of_life": {
-                     "amount": 3.737014016459945E-6,
-                     "unit": "kg P-Eq"
-                  }
-               }
-            },
-            "Epm": {
-               "total": {
-                  "amount": 0.004107094825533502,
-                  "unit": "kg N-Eq"
-               },
-               "per_lc_step": {
-                  "manufacturing": {
-                     "amount": 9.038519487735136E-4,
-                     "unit": "kg N-Eq"
-                  },
-                  "transport": {
-                     "amount": 8.924280436794234E-4,
-                     "unit": "kg N-Eq"
-                  },
-                  "use": {
-                     "amount": 0.0014164017889792132,
-                     "unit": "kg N-Eq"
-                  },
-                  "end_of_life": {
-                     "amount": 8.944130441013518E-4,
-                     "unit": "kg N-Eq"
-                  }
-               }
-            },
-            "Ept": {
-               "total": {
-                  "amount": 0.04057960045019888,
-                  "unit": "mol N-Eq"
-               },
-               "per_lc_step": {
-                  "manufacturing": {
-                     "amount": 0.00950936272870918,
-                     "unit": "mol N-Eq"
-                  },
-                  "transport": {
-                     "amount": 0.009385327891433154,
-                     "unit": "mol N-Eq"
-                  },
-                  "use": {
-                     "amount": 0.01229587775308712,
-                     "unit": "mol N-Eq"
-                  },
-                  "end_of_life": {
-                     "amount": 0.009389032076969424,
-                     "unit": "mol N-Eq"
-                  }
-               }
-            },
-            "IR": {
-               "total": {
-                  "amount": 0.19346701518814927,
-                  "unit": "kBq U235-Eq"
-               },
-               "per_lc_step": {
-                  "manufacturing": {
-                     "amount": 0.018582459009159547,
-                     "unit": "kBq U235-Eq"
-                  },
-                  "transport": {
-                     "amount": 4.811815316290109E-7,
-                     "unit": "kBq U235-Eq"
-                  },
-                  "use": {
-                     "amount": 0.17482771230063854,
-                     "unit": "kBq U235-Eq"
-                  },
-                  "end_of_life": {
-                     "amount": 5.6362696819523E-5,
-                     "unit": "kBq U235-Eq"
-                  }
-               }
-            }
-         }
+  "request": {
+    "period": "1 hour",
+    "total_vcpu": "100 vCPU",
+    "total_ram": "100 GB",
+    "total_storage": "100 TB"
+  },
+  "results": [
+    {
+      "row": {
+        "id": "vm-01",
+        "pool_id": "client_vm",
+        "quantity": 1,
+        "ram": "4 GB",
+        "storage": "20 GB",
+        "vcpu": "1 vCPU",
+        "meta": {
+          "region": "sofia",
+          "env": "production"
+        }
+      },
+      "outputs": {
+        "total": {
+          "ADPe": {"amount": 2.7244563676497693e-07, "unit": "kg Sb-Eq"},
+          "ADPf": {"amount": 1.6398974883358208, "unit": "MJ, net calorific value"},
+          "AP": {"amount": 0.000733627825160735, "unit": "mol H+-Eq"},
+          "GWP": {"amount": 0.12786510826860784, "unit": "kg CO2-Eq"},
+          "LU": {"amount": 0.04841428032704457, "unit": "u"},
+          "ODP": {"amount": 0.0003777221061754429, "unit": "kg CFC-11-Eq"},
+          "PM": {"amount": 4.047559395292748e-08, "unit": "disease incidence"},
+          "POCP": {"amount": 4.5850729252495396e-05, "unit": "kg NMVOC-Eq"},
+          "WU": {"amount": 0.004753679298309218, "unit": "m3 world eq. deprived"},
+          "CTUe": {"amount": 1.6411637633585676, "unit": "CTUe"},
+          "CTUh_c": {"amount": 3.962684005738905e-11, "unit": "CTUh"},
+          "CTUh_nc": {"amount": 8.80188236098126e-10, "unit": "CTUh"},
+          "Epf": {"amount": 6.946372920245792e-06, "unit": "kg P-Eq"},
+          "Epm": {"amount": 0.00010194418365950182, "unit": "kg N-Eq"},
+          "Ept": {"amount": 0.0010248040523684106, "unit": "mol N-Eq"},
+          "IR": {"amount": 0.003788335706737753, "unit": "kBq U235-Eq"}
+        },
+        "manufacturing": {
+          "ADPe": {"amount": 7.618192704286007e-08, "unit": "kg Sb-Eq"},
+          "ADPf": {"amount": 0.5710586233679271, "unit": "MJ, net calorific value"},
+          "AP": {"amount": 0.0002599212771267378, "unit": "mol H+-Eq"},
+          "GWP": {"amount": 0.04341601532155369, "unit": "kg CO2-Eq"},
+          "LU": {"amount": 0.0016178358007133964, "unit": "u"},
+          "ODP": {"amount": 0.00015188221215002687, "unit": "kg CFC-11-Eq"},
+          "PM": {"amount": 1.5946998276625128e-08, "unit": "disease incidence"},
+          "POCP": {"amount": 1.3744958548587505e-06, "unit": "kg NMVOC-Eq"},
+          "WU": {"amount": 0.0004234228790664816, "unit": "m3 world eq. deprived"},
+          "CTUe": {"amount": 0.6412354867614493, "unit": "CTUe"},
+          "CTUh_c": {"amount": 6.1931396572744474e-12, "unit": "CTUh"},
+          "CTUh_nc": {"amount": 2.8178819297859717e-10, "unit": "CTUh"},
+          "Epf": {"amount": 2.2861057491911063e-07, "unit": "kg P-Eq"},
+          "Epm": {"amount": 3.093523679872225e-05, "unit": "kg N-Eq"},
+          "Ept": {"amount": 0.0003254674487528003, "unit": "mol N-Eq"},
+          "IR": {"amount": 0.0006360032420474949, "unit": "kBq U235-Eq"}
+        },
+        "transport": {
+          "ADPe": {"amount": 2.544667382859162e-08, "unit": "kg Sb-Eq"},
+          "ADPf": {"amount": 0.2762548132962621, "unit": "MJ, net calorific value"},
+          "AP": {"amount": 0.0001249931198320436, "unit": "mol H+-Eq"},
+          "GWP": {"amount": 0.020969728467600535, "unit": "kg CO2-Eq"},
+          "LU": {"amount": 0.00036529039420655357, "unit": "u"},
+          "ODP": {"amount": 7.395747719371993e-05, "unit": "kg CFC-11-Eq"},
+          "PM": {"amount": 7.755141392532559e-09, "unit": "disease incidence"},
+          "POCP": {"amount": 2.775575956504223e-08, "unit": "kg NMVOC-Eq"},
+          "WU": {"amount": 4.744942299249148e-05, "unit": "m3 world eq. deprived"},
+          "CTUe": {"amount": 0.30859455247947687, "unit": "CTUe"},
+          "CTUh_c": {"amount": 2.238428932201913e-12, "unit": "CTUh"},
+          "CTUh_nc": {"amount": 1.290983191221139e-10, "unit": "CTUh"},
+          "Epf": {"amount": 5.79957976501266e-08, "unit": "kg P-Eq"},
+          "Epm": {"amount": 1.4873205775961273e-05, "unit": "kg N-Eq"},
+          "Ept": {"amount": 0.0001564158746386249, "unit": "mol N-Eq"},
+          "IR": {"amount": 8.019371406080972e-09, "unit": "kBq U235-Eq"}
+        },
+        "use": {
+          "ADPe": {"amount": 1.1839972799639955e-07, "unit": "kg Sb-Eq"},
+          "ADPf": {"amount": 0.2250453482321173, "unit": "MJ, net calorific value"},
+          "AP": {"amount": 9.184454544175973e-05, "unit": "mol H+-Eq"},
+          "GWP": {"amount": 0.020406074878343786, "unit": "kg CO2-Eq"},
+          "LU": {"amount": 0.04562201119518439, "unit": "u"},
+          "ODP": {"amount": 2.236438321003629e-10, "unit": "kg CFC-11-Eq"},
+          "PM": {"amount": 8.457972448032406e-10, "unit": "disease incidence"},
+          "POCP": {"amount": 4.434556707265619e-05, "unit": "kg NMVOC-Eq"},
+          "WU": {"amount": 0.004185388427892323, "unit": "m3 world eq. deprived"},
+          "CTUe": {"amount": 0.05522417076875476, "unit": "CTUe"},
+          "CTUh_c": {"amount": 2.643756164383562e-11, "unit": "CTUh"},
+          "CTUh_nc": {"amount": 2.032872538043937e-10, "unit": "CTUh"},
+          "Epf": {"amount": 6.531863505949198e-06, "unit": "kg P-Eq"},
+          "Epm": {"amount": 2.552356023740542e-05, "unit": "kg N-Eq"},
+          "Ept": {"amount": 0.00022157171711062988, "unit": "mol N-Eq"},
+          "IR": {"amount": 0.0031503953756575067, "unit": "kBq U235-Eq"}
+        },
+        "end_of_life": {
+          "ADPe": {"amount": 5.241730789712571e-08, "unit": "kg Sb-Eq"},
+          "ADPf": {"amount": 0.5675387034395143, "unit": "MJ, net calorific value"},
+          "AP": {"amount": 0.0002568688827601939, "unit": "mol H+-Eq"},
+          "GWP": {"amount": 0.04307328960110983, "unit": "kg CO2-Eq"},
+          "LU": {"amount": 0.0008091429369402286, "unit": "u"},
+          "ODP": {"amount": 0.00015188219318786397, "unit": "kg CFC-11-Eq"},
+          "PM": {"amount": 1.5927657038966555e-08, "unit": "disease incidence"},
+          "POCP": {"amount": 1.0291056541541495e-07, "unit": "kg NMVOC-Eq"},
+          "WU": {"amount": 9.741856835792173e-05, "unit": "m3 world eq. deprived"},
+          "CTUe": {"amount": 0.6361095533488867, "unit": "CTUe"},
+          "CTUh_c": {"amount": 4.757709824077069e-12, "unit": "CTUh"},
+          "CTUh_nc": {"amount": 2.660144701930213e-10, "unit": "CTUh"},
+          "Epf": {"amount": 1.2790304172735727e-07, "unit": "kg P-Eq"},
+          "Epm": {"amount": 3.0612180847412875e-05, "unit": "kg N-Eq"},
+          "Ept": {"amount": 0.0003213490118663555, "unit": "mol N-Eq"},
+          "IR": {"amount": 1.9290696613450726e-06, "unit": "kBq U235-Eq"}
+        }
       }
-   ]
+    }
+  ]
 }
 ```
 
@@ -610,10 +287,20 @@ The source repository is available [here](https://github.com/kleis-technology/lc
 The folder `trusted_library` is organized as follows.
 * `lib` : this folder contains the models written in [LCA as CODE](https://lca-as-code.com).
 * `inventory` : this folder contains inventory data (csv files)
+* `lcaac.yaml` : the configuration of the library, including the definition of the API (see below)
 
 Here is an illustration of this layering structure.
 
 <img alt="sankey" src="assets/sankey.png" width=800/>
+
+#### The API
+
+The server is `lcaac serve`, and the API is declared in `trusted_library/lcaac.yaml`, under the key `api`.
+Each operation names the process of the library to evaluate,
+the request fields that set its parameters or replace the rows of a data source (e.g., `vm_inventory`),
+and the outputs to return, selected in the trace of the evaluation (e.g., the impacts of the life cycle step `use`).
+To expose a new functional unit, or other results of the existing ones, add or change an operation in this file:
+the server checks the API against the models when it starts.
 
 #### Configuring and deploying Cloud Assess
 

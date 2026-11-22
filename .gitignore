@@ -1,18 +1,12 @@
-# Ignore Gradle project-specific cache directory
-.gradle
-
-# Ignore Gradle build output directory
-build
-
 .idea
 local
 .local
 .clients
 .direnv
+.claude
 
 **/node_modules
 
 **/lcaac-tmp.yaml
-**/application-tmp.yaml
 **/.venv
 experiments/performance/.ipynb_checkpoints

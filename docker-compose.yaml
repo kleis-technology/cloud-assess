@@ -1,6 +1,7 @@
 services:
   app:
-    image: "ghcr.io/kleis-technology/cloud-assess/cloud-assess-app:v2.2.0"
+    image: "ghcr.io/kleis-technology/cloud-assess/cloud-assess-app:v3.0.0"
+    build: .
     container_name: cloud-assess-app
     ports:
     - "8080:8080"
@@ -11,14 +12,20 @@ services:
       - LCA_LIB_DIRECTORY=lib
       - LCA_ARCHIVE_DIRECTORY=archive
       - LCA_INVENTORY_DIRECTORY=inventory
-#      - CORS_ENABLED=true
-#      - CORS_ALLOWED_ORIGIN=http://localhost
+#      - LCA_INVENTORY_ZIP=inventory.zip
   swagger_ui:
     image: "swaggerapi/swagger-ui"
     container_name: swagger-ui
-    volumes:
-      - ./openapi:/app
-    ports:
-      - "80:8080"
     environment:
-      - SWAGGER_JSON=/app/api.yaml
+      - BASE_URL=/docs
+      - URL=/openapi.json
+  proxy:
+    image: "nginx:1.27-alpine"
+    container_name: cloud-assess-proxy
+    depends_on:
+      - app
+      - swagger_ui
+    volumes:
+      - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      - "${PROXY_PORT:-80}:80"
