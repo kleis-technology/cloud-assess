@@ -15,8 +15,6 @@
         devShells.default = pkgs.mkShell {
           name = "cloud-assess-dev-shell";
           packages = with pkgs; [
-            jdk17
-            gradle
             python312
             python312Packages.uv
             lcaac-flake.packages.aarch64-darwin.lcaac-cli
