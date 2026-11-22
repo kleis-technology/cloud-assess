@@ -1,43 +1,19 @@
-POST http://localhost:8080/virtual_machines/assess
+POST http://localhost:8080/virtual_machines
 Content-Type: application/json
 
 {
-  "period": {
-    "amount": 1.0,
-    "unit": "hour"
-  },
-  "total_vcpu": {
-    "amount": 100.0,
-    "unit": "vCPU"
-  },
-  "total_ram": {
-    "amount": 100.0,
-    "unit": "GB"
-  },
-  "total_storage": {
-    "amount": 100.0,
-    "unit": "TB"
-  },
+  "period": "1 hour",
+  "total_vcpu": "100 vCPU",
+  "total_ram": "100 GB",
+  "total_storage": "100 TB",
   "virtual_machines": [
     {
       "id": "vm-01",
       "pool_id": "client_vm",
-      "quantity": {
-        "amount": 1.0,
-        "unit": "u"
-      },
-      "ram": {
-        "amount": 4.0,
-        "unit": "GB"
-      },
-      "storage": {
-        "amount": 20.0,
-        "unit": "GB"
-      },
-      "vcpu": {
-        "amount": 1.0,
-        "unit": "vCPU"
-      },
+      "quantity": 1,
+      "ram": "4 GB",
+      "storage": "20 GB",
+      "vcpu": "1 vCPU",
       "meta": {
         "region": "sofia",
         "env": "production"
@@ -46,22 +22,10 @@ Content-Type: application/json
     {
       "id": "vm-02",
       "pool_id": "client_vm",
-      "quantity": {
-        "amount": 1.0,
-        "unit": "u"
-      },
-      "ram": {
-        "amount": 16.0,
-        "unit": "GB"
-      },
-      "storage": {
-        "amount": 400.0,
-        "unit": "GB"
-      },
-      "vcpu": {
-        "amount": 2.0,
-        "unit": "vCPU"
-      },
+      "quantity": 1,
+      "ram": "16 GB",
+      "storage": "400 GB",
+      "vcpu": "2 vCPU",
       "meta": {
         "region": "sofia",
         "env": "production"
@@ -70,22 +34,10 @@ Content-Type: application/json
     {
       "id": "vm-03",
       "pool_id": "client_vm",
-      "quantity": {
-        "amount": 1.0,
-        "unit": "u"
-      },
-      "ram": {
-        "amount": 8.0,
-        "unit": "GB"
-      },
-      "storage": {
-        "amount": 800.0,
-        "unit": "GB"
-      },
-      "vcpu": {
-        "amount": 4.0,
-        "unit": "vCPU"
-      },
+      "quantity": 1,
+      "ram": "8 GB",
+      "storage": "800 GB",
+      "vcpu": "4 vCPU",
       "meta": {
         "region": "sofia",
         "env": "production"

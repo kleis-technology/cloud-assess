@@ -1,5 +1,8 @@
 # Build
 
+The image runs `lcaac serve` on the trusted library.
+The version of lcaac is set by the build argument `LCAAC_VERSION` in the `Dockerfile`.
+
 ## Requirements
 
 On GitHub
@@ -8,8 +11,12 @@ On GitHub
 
 ## Procedure
 
+Build and test the image locally
 ```bash
-./gradlew clean build
+docker build -t cloud-assess-app:dev .
+docker run -d --name cloud-assess -p 8080:8080 cloud-assess-app:dev
+python3 tests/smoke_test.py http://localhost:8080
+docker rm -f cloud-assess
 ```
 
 Environment variables
@@ -23,6 +30,6 @@ docker login ghcr.io -u $GITHUB_ACTOR
 
 Docker build and push to GitHub packages.
 ```bash
- docker buildx build --push --build-arg GITHUB_ACTOR=$GITHUB_ACTOR --build-arg GITHUB_TOKEN=$GITHUB_TOKEN --platform=linux/arm64,linux/amd64,linux/amd64/v2,linux/arm/v7 --tag ghcr.io/kleis-technology/cloud-assess/cloud-assess-app:1.6.6 .
- docker buildx build --push --build-arg GITHUB_ACTOR=$GITHUB_ACTOR --build-arg GITHUB_TOKEN=$GITHUB_TOKEN --platform=linux/arm64,linux/amd64,linux/amd64/v2,linux/arm/v7 --tag ghcr.io/kleis-technology/cloud-assess/cloud-assess-app:latest .
+ docker buildx build --push --platform=linux/arm64,linux/amd64 --tag ghcr.io/kleis-technology/cloud-assess/cloud-assess-app:<version> .
+ docker buildx build --push --platform=linux/arm64,linux/amd64 --tag ghcr.io/kleis-technology/cloud-assess/cloud-assess-app:latest .
 ```

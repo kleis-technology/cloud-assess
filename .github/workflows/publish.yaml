@@ -13,25 +13,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Validate wrapper
-      - name: Gradle Wrapper Validation
-        uses: gradle/wrapper-validation-action@v1.0.6
-
-      # Setup Java 17 environment for the next steps
-      - name: Setup Java
-        uses: actions/setup-java@v3
-        with:
-          distribution: zulu
-          java-version: 17
-          cache: gradle
-
-      - name: Build gradle
-        env:
-          GITHUB_ACTOR: ${{ github.actor }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          ./gradlew :build
-
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 

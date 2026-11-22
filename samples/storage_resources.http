@@ -1,0 +1,32 @@
+POST http://localhost:8080/storage_resources
+Content-Type: application/json
+
+{
+  "period": "1 hour",
+  "total_vcpu": "32 vCPU",
+  "total_storage": "20 TB",
+  "storage_resources": [
+    {
+      "id": "sto-sp-01",
+      "pool_id": "client_storage_space",
+      "quantity": 1,
+      "vcpu": "1 vCPU",
+      "storage": "100 GB",
+      "meta": {
+        "region": "sofia",
+        "env": "production"
+      }
+    },
+    {
+      "id": "sto-sp-02",
+      "pool_id": "client_storage_space",
+      "quantity": 1,
+      "vcpu": "4 vCPU",
+      "storage": "1.5 TB",
+      "meta": {
+        "region": "sofia",
+        "env": "production"
+      }
+    }
+  ]
+}

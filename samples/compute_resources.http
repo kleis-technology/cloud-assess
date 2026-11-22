@@ -1,0 +1,29 @@
+POST http://localhost:8080/compute_resources
+Content-Type: application/json
+
+{
+  "period": "1 hour",
+  "total_vcpu": "64 vCPU",
+  "compute_resources": [
+    {
+      "id": "comp-01",
+      "pool_id": "client_compute",
+      "quantity": 1,
+      "vcpu": "4 vCPU",
+      "meta": {
+        "region": "sofia",
+        "env": "production"
+      }
+    },
+    {
+      "id": "comp-02",
+      "pool_id": "client_compute",
+      "quantity": 2,
+      "vcpu": "8 vCPU",
+      "meta": {
+        "region": "sofia",
+        "env": "production"
+      }
+    }
+  ]
+}
