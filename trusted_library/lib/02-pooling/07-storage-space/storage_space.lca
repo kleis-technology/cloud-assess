@@ -21,19 +21,19 @@ process storage_space_fn {
         total_storage = sum( storage_space_inventory match pool_id = "client_storage_space", quantity * volume )
     }
     products {
-        1 hour storage
+        timewindow storage
     }
     inputs {
-        1 hour storage from storage_space_fn( id = id, lc_step = "manufacturing",
+        timewindow storage from storage_space_fn( id = id, lc_step = "manufacturing",
                        total_vcpu = total_vcpu, total_storage = total_storage
                        ) match ( phase = "embodied" )
-        1 hour storage from storage_space_fn( id = id, lc_step = "transport",
+        timewindow storage from storage_space_fn( id = id, lc_step = "transport",
                        total_vcpu = total_vcpu, total_storage = total_storage
                        ) match ( phase = "embodied" )
-        1 hour storage from storage_space_fn( id = id,
+        timewindow storage from storage_space_fn( id = id,
                        total_vcpu = total_vcpu, total_storage = total_storage
                        ) match ( phase = "use" )
-        1 hour storage from storage_space_fn( id = id, lc_step = "end-of-life",
+        timewindow storage from storage_space_fn( id = id, lc_step = "end-of-life",
                        total_vcpu = total_vcpu, total_storage = total_storage
                        ) match ( phase = "embodied" )
     }
